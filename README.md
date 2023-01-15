@@ -13,16 +13,12 @@
 
 ## Environment
 
----
-
 * Win32
 * DirectX12
 * CMake
 * C++ 20
 
 ## Dependencies
-
----
 
 * ImGui
 * DirectXTK12
