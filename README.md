@@ -18,7 +18,7 @@
 * Win32
 * DirectX12
 * CMake
-* C++ 17
+* C++ 20
 
 ## Dependencies
 
