@@ -4,6 +4,9 @@ build/
 .VSCodeCounter/
 .cache/
 *.code-workspace
+.idea
+
+docs/zeroengine-design/.obsidian
 
 # CMake.gitignore https://github.com/github/gitignore/blob/master/CMake.gitignore
 CMakeLists.txt.user
@@ -16,7 +19,6 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
-_deps
 # finish CMake.ignore
 
 # C++.gitignore from https://github.com/github/gitignore/blob/master/C%2B%2B.gitignore

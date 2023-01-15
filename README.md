@@ -1,6 +1,6 @@
 # ZeroEngine
 
-***toy game engine***
+***toy game engine.***
 
 ```txt
            __________                     ___________                .__                 
@@ -10,3 +10,19 @@
            /_______ \\___  >|__|    \____//_______  /|___|  /\___  / |__||___|  / \___  >
                    \/    \/                       \/      \//_____/           \/      \/
 ```
+
+## Environment
+
+---
+
+* Win32
+* DirectX12
+* CMake
+* C++ 17
+
+## Dependencies
+
+---
+
+* ImGui
+* DirectXTK12
