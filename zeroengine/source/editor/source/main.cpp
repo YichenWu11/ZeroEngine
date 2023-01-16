@@ -1,28 +1,39 @@
 #include <iostream>
 
-#include "runtime/core/interface/i_application.h"
+#include "runtime/core/common/application.h"
+#include "runtime/core/log/log_system.h"
 
-using namespace Zero;
+#include "runtime/function/event/key_event.h"
+
+// https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
+#define ZERO_XSTR(s) ZERO_STR(s)
+#define ZERO_STR(s) #s
+
+class SandBox : public Zero::Application {
+public:
+    SandBox() {
+    }
+
+    ~SandBox() {
+    }
+};
 
 namespace Zero {
-    extern IApplication* g_pApp;
-}
+    Application* createApplication() {
+        return new SandBox();
+    }
+} // namespace Zero
 
 int main(int /*argc*/, char** /*argv*/) {
-    std::cout << "hello engine" << std::endl;
+    Zero::LogSystem::init();
 
-    int ret;
+    LOG_INFO("zeroengine start {}", 1);
 
-    if ((ret = g_pApp->initialize()) != 0) {
-        printf("App Initialize failed, will exit now.");
-        return ret;
-    }
+    auto editor_app = Zero::createApplication();
 
-    while (!g_pApp->isQuit()) {
-        g_pApp->tick();
-    }
+    editor_app->run();
 
-    g_pApp->finalize();
+    delete editor_app;
 
     return 0;
 }

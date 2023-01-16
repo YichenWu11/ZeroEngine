@@ -1,3 +1,6 @@
 [submodule "zeroengine/_deps/CDX12-Backend"]
 	path = zeroengine/_deps/CDX12-Backend
 	url = https://github.com/YichenWu11/CDX12-Backend.git
+[submodule "zeroengine/_deps/spdlog"]
+	path = zeroengine/_deps/spdlog
+	url = https://github.com/gabime/spdlog.git

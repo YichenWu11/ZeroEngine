@@ -1,7 +1,8 @@
-set(TARGET_NAME ZEEditor)
+set(TARGET_NAME ZE_Editor)
 
 file(GLOB_RECURSE srcs CONFIGURE_DEPENDS source/*.cpp include/*.h)
 
+# add_library(${TARGET_NAME} SHARED ${srcs})
 add_executable(${TARGET_NAME} ${srcs})
 
 set_target_properties(${TARGET_NAME} PROPERTIES

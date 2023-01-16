@@ -6,7 +6,12 @@ lib/
 .VSCodeCounter/
 .cache/
 *.code-workspace
-.idea
+
+# CLion
+.idea/
+compiledDependencies/
+cmake-build-*
+build-*
 
 docs/zeroengine-design/.obsidian
 

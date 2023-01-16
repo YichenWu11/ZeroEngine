@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.11)
 
-set(ZE_ROOT_DIR "${CMAKE_SOURCE_DIR}")
+set(ZE_ROOT_DIR ${CMAKE_SOURCE_DIR})
 message(STATUS ${ZE_ROOT_DIR})
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
 set(VCPKG_TARGET_TRIPLET $ENV{VCPKG_DEFAULT_TRIPLET} CACHE STRING "")
