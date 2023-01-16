@@ -10,6 +10,8 @@ add_library(ZE::Runtime ALIAS ${TARGET_NAME})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${ZE_ROOT_DIR}/zeroengine/source)
 
+target_precompile_headers(${TARGET_NAME} PUBLIC ${ZE_ROOT_DIR}/zeroengine/source/runtime/pch.h)
+
 target_link_libraries(${TARGET_NAME} PUBLIC Chen::CDX12)
 target_link_libraries(${TARGET_NAME} PUBLIC crossguid)
 target_link_libraries(${TARGET_NAME} PUBLIC spdlog::spdlog)

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <functional>
-#include <string>
-
 #include "runtime/core/common/core.h"
 
 namespace Zero {
@@ -35,6 +32,7 @@ namespace Zero {
         MouseScrolled
     };
 
+    // filter
     enum EventCategory {
         None                     = 0,
         EventCategoryApplication = BIT(0),

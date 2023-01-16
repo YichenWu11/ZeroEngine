@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.16)
 
 set(ZE_ROOT_DIR ${CMAKE_SOURCE_DIR})
 message(STATUS ${ZE_ROOT_DIR})

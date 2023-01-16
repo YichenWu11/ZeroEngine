@@ -10,15 +10,15 @@ namespace Zero {
     }
 
     void Application::run() {
-        // WindowResizeEvent event(1080, 920);
+        WindowResizeEvent event(1080, 920);
 
-        // if (event.isInCategory(EventCategoryApplication)) {
-        //     LOG_TRACE(event.toString());
-        // }
+        if (event.isInCategory(EventCategoryApplication)) {
+            LOG_TRACE(event.toString());
+        }
 
-        // if (event.isInCategory(EventCategoryInput)) {
-        //     LOG_TRACE(event.toString());
-        // }
+        if (event.isInCategory(EventCategoryInput)) {
+            LOG_TRACE(event.toString());
+        }
 
         while (true) {}
     }

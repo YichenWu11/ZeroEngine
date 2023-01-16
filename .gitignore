@@ -1,6 +1,11 @@
 build/
+build-vs/
 bin/
 lib/
+
+zeroengine.log
+zero.log
+Zero.log
 
 .vscode/
 .VSCodeCounter/

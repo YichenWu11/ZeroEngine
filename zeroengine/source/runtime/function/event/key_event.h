@@ -1,7 +1,5 @@
 #pragma once
 
-#include <sstream>
-
 #include "runtime/function/event/event.h"
 
 namespace Zero {
