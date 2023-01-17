@@ -56,7 +56,6 @@ namespace Zero {
 
         inline bool isInCategory(EventCategory category) { return getCategoryFlags() & category; }
 
-    protected:
         bool m_handled = false;
     };
 

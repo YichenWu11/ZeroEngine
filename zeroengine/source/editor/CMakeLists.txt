@@ -13,7 +13,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 target_compile_definitions(${TARGET_NAME} PUBLIC ZE_ROOT_DIR=${CMAKE_SOURCE_DIR})
 
 target_include_directories(${TARGET_NAME}
-    PUBLIC ${PROJECT_SOURCE_DIR}/include
+    PUBLIC ${ZE_ROOT_DIR}/zeroengine/source/editor/include
     PUBLIC ${ZE_ROOT_DIR}/zeroengine/source)
 
 target_link_libraries(${TARGET_NAME} PUBLIC ZE::Runtime)

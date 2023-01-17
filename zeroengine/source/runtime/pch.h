@@ -2,6 +2,7 @@
 
 // if windows
 #include <Windows.h>
+#include <WindowsX.h>
 
 #include <algorithm>
 #include <functional>
@@ -17,3 +18,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+#include "runtime/core/common/core.h"
+#include "runtime/core/log/log_system.h"

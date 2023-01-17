@@ -1,7 +1,10 @@
 build/
 build-vs/
+build-clion/
 bin/
 lib/
+
+docs/zeroengine-design/.obsidian
 
 zeroengine.log
 zero.log
@@ -17,8 +20,6 @@ Zero.log
 compiledDependencies/
 cmake-build-*
 build-*
-
-docs/zeroengine-design/.obsidian
 
 # CMake.gitignore https://github.com/github/gitignore/blob/master/CMake.gitignore
 CMakeLists.txt.user
