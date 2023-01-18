@@ -17,10 +17,7 @@ namespace Zero {
             return ss.str();
         }
 
-        static EventType    getStaticType() { return EventType::WindowResize; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "WindowResize"; }
-
+        EVENT_CLASS_TYPE(WindowResize)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     private:
         unsigned int m_width, m_height;
@@ -30,10 +27,7 @@ namespace Zero {
     public:
         WindowCloseEvent() {}
 
-        static EventType    getStaticType() { return EventType::WindowClose; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "WindowClose"; }
-
+        EVENT_CLASS_TYPE(WindowClose)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
@@ -41,10 +35,7 @@ namespace Zero {
     public:
         AppTickEvent() {}
 
-        static EventType    getStaticType() { return EventType::AppTick; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "AppTick"; }
-
+        EVENT_CLASS_TYPE(AppTick)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
@@ -52,10 +43,7 @@ namespace Zero {
     public:
         AppUpdateEvent() {}
 
-        static EventType    getStaticType() { return EventType::AppUpdate; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "AppUpdate"; }
-
+        EVENT_CLASS_TYPE(AppUpdate)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
@@ -63,10 +51,7 @@ namespace Zero {
     public:
         AppRenderEvent() {}
 
-        static EventType    getStaticType() { return EventType::AppRender; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "AppRender"; }
-
+        EVENT_CLASS_TYPE(AppRender)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 } // namespace Zero

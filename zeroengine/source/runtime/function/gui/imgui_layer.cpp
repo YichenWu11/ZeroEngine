@@ -40,12 +40,12 @@ namespace Zero {
         io.KeyMap[ImGuiKey_Space]      = VK_SPACE;
         io.KeyMap[ImGuiKey_Enter]      = VK_RETURN;
         io.KeyMap[ImGuiKey_Escape]     = VK_ESCAPE;
-        io.KeyMap[ImGuiKey_A]          = GetAsyncKeyState('A');
-        io.KeyMap[ImGuiKey_C]          = GetAsyncKeyState('C');
-        io.KeyMap[ImGuiKey_V]          = GetAsyncKeyState('V');
-        io.KeyMap[ImGuiKey_X]          = GetAsyncKeyState('X');
-        io.KeyMap[ImGuiKey_Y]          = GetAsyncKeyState('Y');
-        io.KeyMap[ImGuiKey_Z]          = GetAsyncKeyState('Z');
+        io.KeyMap[ImGuiKey_A]          = 'A';
+        io.KeyMap[ImGuiKey_C]          = 'C';
+        io.KeyMap[ImGuiKey_V]          = 'V';
+        io.KeyMap[ImGuiKey_X]          = 'X';
+        io.KeyMap[ImGuiKey_Y]          = 'Y';
+        io.KeyMap[ImGuiKey_Z]          = 'Z';
 
         ImGui_ImplWin32_Init(GetModuleHandle(NULL));
 

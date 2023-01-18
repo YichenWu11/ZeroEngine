@@ -14,6 +14,4 @@ int main(int /*argc*/, char** /*argv*/) {
     editor_app->run();
 
     delete editor_app;
-
-    return 0;
 }

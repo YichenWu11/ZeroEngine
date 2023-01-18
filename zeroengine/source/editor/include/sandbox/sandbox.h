@@ -3,6 +3,7 @@
 #include "runtime/core/common/application.h"
 #include "runtime/core/common/layer.h"
 #include "runtime/function/gui/imgui_layer.h"
+#include "runtime/function/input/input_system.h"
 
 namespace Zero {
     class ExampleLayer : public Layer {
@@ -12,11 +13,14 @@ namespace Zero {
         }
 
         void onUpdate() override {
-            // LOG_INFO("ExampleLayer::Update");
+            if (InputSystem::isMouseButtonPressed(VK_LBUTTON))
+                LOG_TRACE("lbutton is pressed");
+            if (InputSystem::isMouseButtonPressed(VK_RBUTTON))
+                LOG_TRACE("rbutton is pressed");
         }
 
         void onEvent(Event& event) override {
-            LOG_TRACE("{0}", event.toString());
+            // LOG_TRACE("{0}", event.toString());
         }
     };
 

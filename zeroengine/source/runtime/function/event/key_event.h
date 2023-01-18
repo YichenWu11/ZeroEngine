@@ -28,9 +28,7 @@ namespace Zero {
             return ss.str();
         }
 
-        static EventType    getStaticType() { return EventType::KeyPressed; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "KeyPressed"; }
+        EVENT_CLASS_TYPE(KeyPressed)
 
     private:
         int m_repeat_count;
@@ -47,9 +45,7 @@ namespace Zero {
             return ss.str();
         }
 
-        static EventType    getStaticType() { return EventType::KeyReleased; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "KeyReleased"; }
+        EVENT_CLASS_TYPE(KeyReleased)
     };
 
     class KeyTypedEvent : public KeyEvent {
@@ -63,9 +59,7 @@ namespace Zero {
             return ss.str();
         }
 
-        static EventType    getStaticType() { return EventType::KeyTyped; }
-        virtual EventType   getEventType() const override { return getStaticType(); }
-        virtual const char* getName() const override { return "KeyTyped"; }
+        EVENT_CLASS_TYPE(KeyTyped)
     };
 
 } // namespace Zero

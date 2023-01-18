@@ -1,6 +1,7 @@
 #include "runtime/core/common/application.h"
 #include "runtime/core/common/layer.h"
 #include "runtime/core/log/log_system.h"
+#include "runtime/function/input/input_system.h"
 
 namespace Zero {
     Application* Application::s_instance = nullptr;
