@@ -3,12 +3,14 @@
 #include "runtime/core/log/log_system.h"
 
 namespace Zero {
-
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
+    Application* Application::s_instance = nullptr;
 
     Application::Application() {
+        ZE_ASSERT(!s_instance && "Application already exists!");
+        s_instance = this;
+
         m_window = std::unique_ptr<IWindowSystem>(IWindowSystem::create());
-        m_window->setEventCallback(BIND_EVENT_FN(onEvent));
+        m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
     }
 
     Application::~Application() {
@@ -16,15 +18,17 @@ namespace Zero {
 
     void Application::pushLayer(Layer* layer) {
         m_layerStack.pushLayer(layer);
+        layer->onAttach();
     }
 
     void Application::pushOverlay(Layer* layer) {
         m_layerStack.pushOverlay(layer);
+        layer->onAttach();
     }
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(onWindowClose));
+        dispatcher.Dispatch<WindowCloseEvent>(ZE_BIND_EVENT_FN(Application::onWindowClose));
 
         for (auto it = m_layerStack.end(); it != m_layerStack.begin();) {
             (*--it)->onEvent(e);

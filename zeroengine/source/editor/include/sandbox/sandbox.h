@@ -2,6 +2,7 @@
 
 #include "runtime/core/common/application.h"
 #include "runtime/core/common/layer.h"
+#include "runtime/function/gui/imgui_layer.h"
 
 namespace Zero {
     class ExampleLayer : public Layer {
@@ -11,7 +12,7 @@ namespace Zero {
         }
 
         void onUpdate() override {
-            LOG_INFO("ExampleLayer::Update");
+            // LOG_INFO("ExampleLayer::Update");
         }
 
         void onEvent(Event& event) override {
@@ -23,6 +24,7 @@ namespace Zero {
     public:
         Sandbox() {
             pushLayer(new ExampleLayer());
+            // pushOverlay(new ImGuiLayer());
         }
 
         ~Sandbox() {

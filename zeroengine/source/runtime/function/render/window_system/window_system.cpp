@@ -50,6 +50,11 @@ namespace Zero {
                 EVENT_CALLBACK(event)
                 return 0;
             }
+            case WM_CHAR: {
+                KeyTypedEvent event(wParam);
+                EVENT_CALLBACK(event)
+                return 0;
+            }
 
             // MOUSE BUTTON
             case WM_LBUTTONDOWN: {

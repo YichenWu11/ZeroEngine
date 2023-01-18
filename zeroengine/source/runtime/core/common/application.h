@@ -19,12 +19,19 @@ namespace Zero {
         void pushLayer(Layer* layer);
         void pushOverlay(Layer* layer);
 
+        IWindowSystem& getWindow() { return *m_window; }
+
+        static Application& get() { return *s_instance; }
+
     private:
         bool onWindowClose(WindowCloseEvent& e);
 
         std::unique_ptr<IWindowSystem> m_window;
         bool                           m_running = true;
         LayerStack                     m_layerStack;
+
+    private:
+        static Application* s_instance;
     };
 
     // TODO: to be defined

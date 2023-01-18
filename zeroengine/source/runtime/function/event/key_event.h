@@ -52,4 +52,20 @@ namespace Zero {
         virtual const char* getName() const override { return "KeyReleased"; }
     };
 
+    class KeyTypedEvent : public KeyEvent {
+    public:
+        KeyTypedEvent(int keycode) :
+            KeyEvent(keycode) {}
+
+        std::string toString() const override {
+            std::stringstream ss;
+            ss << "KeyTypedEvent: " << m_keycode;
+            return ss.str();
+        }
+
+        static EventType    getStaticType() { return EventType::KeyTyped; }
+        virtual EventType   getEventType() const override { return getStaticType(); }
+        virtual const char* getName() const override { return "KeyTyped"; }
+    };
+
 } // namespace Zero

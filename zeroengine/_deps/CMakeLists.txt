@@ -13,3 +13,7 @@ if(NOT TARGET spdlog)
     option(SPDLOG_INSTALL "" OFF)
     add_subdirectory(spdlog)
 endif()
+
+if(NOT TARGET imgui)
+    include(imgui.cmake)
+endif()

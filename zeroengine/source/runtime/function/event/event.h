@@ -24,6 +24,7 @@ namespace Zero {
         /* key */
         KeyPressed,
         KeyReleased,
+        KeyTyped,
         /* mouse button */
         MouseButtonPressed,
         MouseButtonReleased,
