@@ -12,6 +12,9 @@ namespace Zero {
 
         m_window = std::unique_ptr<IWindowSystem>(IWindowSystem::create());
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
+
+        m_ImGuiLayer = new ImGuiLayer();
+        // pushOverlay(m_ImGuiLayer);
     }
 
     Application::~Application() {
@@ -19,12 +22,10 @@ namespace Zero {
 
     void Application::pushLayer(Layer* layer) {
         m_layerStack.pushLayer(layer);
-        layer->onAttach();
     }
 
     void Application::pushOverlay(Layer* layer) {
         m_layerStack.pushOverlay(layer);
-        layer->onAttach();
     }
 
     void Application::onEvent(Event& e) {
@@ -42,6 +43,11 @@ namespace Zero {
         while (m_running) {
             for (Layer* layer : m_layerStack)
                 layer->onUpdate();
+
+            // m_ImGuiLayer->begin();
+            // for (Layer* layer : m_layerStack)
+            //     layer->onImGuiRender();
+            // m_ImGuiLayer->end();
 
             m_window->onUpdate();
         }

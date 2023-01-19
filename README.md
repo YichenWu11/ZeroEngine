@@ -22,3 +22,4 @@
 
 * ImGui
 * DirectXTK12
+* DirectXMath (use DirectXTK12/SimpleMath as warpper)

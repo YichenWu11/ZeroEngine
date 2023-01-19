@@ -3,6 +3,8 @@
 #include "runtime/function/render/window_system/i_window_system.h"
 
 namespace Zero {
+    class GraphicsContext;
+
     class WindowSystem : public IWindowSystem {
     public:
         WindowSystem(const WindowCreateInfo& create_info);
@@ -24,7 +26,9 @@ namespace Zero {
 
     private:
         // hwnd
-        HWND         m_window;
+        HWND             m_window;
+        GraphicsContext* m_context;
+
         static POINT m_last_mouse_pos;
 
         struct WindowData {

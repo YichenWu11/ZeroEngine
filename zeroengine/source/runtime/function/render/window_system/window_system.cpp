@@ -2,6 +2,8 @@
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
+#include "runtime/function/render/render_system/dx12/dx12_context.h"
+#include "runtime/function/render/window_system/i_window_system.h"
 
 namespace Zero {
 
@@ -11,7 +13,6 @@ namespace Zero {
     WindowSystem::WindowData WindowSystem::m_data;
     POINT                    WindowSystem::m_last_mouse_pos;
 
-    // TODO: impl the window process func
     LRESULT CALLBACK
     MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         return WindowSystem::msgProc(hwnd, msg, wParam, lParam);
@@ -134,7 +135,7 @@ namespace Zero {
         m_data.width  = create_info.width;
         m_data.height = create_info.height;
 
-        LOG_INFO("Creating window {0} ({1}, {2})", create_info.title, create_info.width, create_info.height);
+        LOG_INFO("creating window {0} ({1}, {2})", create_info.title, create_info.width, create_info.height);
 
         WNDCLASSEXW wc = {
             sizeof(wc),
@@ -144,15 +145,17 @@ namespace Zero {
             0L,
             GetModuleHandle(NULL), NULL, NULL, (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, L"MainWnd", NULL};
 
-        if (!::RegisterClassExW(&wc)) {
+        if (!::RegisterClassExW(&wc))
             LOG_CRITICAL("RegisterClass Failed.");
-        }
+
         // TODO: std::string to std::wstring
         m_window = ::CreateWindowW(wc.lpszClassName, L"Zero Engine", WS_OVERLAPPEDWINDOW, 100, 100, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
 
-        if (!m_window) {
+        if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
-        }
+
+        m_context = new DX12Context(m_window);
+        m_context->init();
 
         if (create_info.is_fullscreen)
             ::ShowWindow(m_window, SW_MAXIMIZE);
@@ -177,6 +180,8 @@ namespace Zero {
                 // TODO: quit
             }
         }
+
+        m_context->swapBuffer();
     }
 
     void WindowSystem::setVSync(bool enabled) {

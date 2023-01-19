@@ -3,7 +3,6 @@
 
 namespace Zero {
     LayerStack::LayerStack() {
-        m_layer_insert = m_layers.begin();
     }
 
     LayerStack::~LayerStack() {
@@ -12,25 +11,31 @@ namespace Zero {
     }
 
     void LayerStack::pushLayer(Layer* layer) {
-        m_layer_insert = m_layers.emplace(m_layer_insert, layer);
+        m_layers.emplace(m_layers.begin() + m_layer_insert_index, layer);
+        m_layer_insert_index++;
+        layer->onAttach();
     }
 
     void LayerStack::pushOverlay(Layer* overlay) {
         m_layers.emplace_back(overlay);
+        overlay->onAttach();
     }
 
     void LayerStack::popLayer(Layer* layer) {
         auto it = std::find(m_layers.begin(), m_layers.end(), layer);
         if (it != m_layers.end()) {
             m_layers.erase(it);
-            m_layer_insert--;
+            m_layer_insert_index--;
+            layer->onDetach();
         }
     }
 
     void LayerStack::popOverlay(Layer* overlay) {
         auto it = std::find(m_layers.begin(), m_layers.end(), overlay);
-        if (it != m_layers.end())
+        if (it != m_layers.end()) {
             m_layers.erase(it);
+            overlay->onDetach();
+        }
     }
 
 } // namespace Zero

@@ -7,6 +7,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+# set(CMAKE_CXX_FLAGS_DEBUG "-Wall")
 set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
 set(VCPKG_TARGET_TRIPLET $ENV{VCPKG_DEFAULT_TRIPLET} CACHE STRING "")
 
@@ -20,7 +21,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/bin)
 
 project(ZeroEngine)
 
-add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
+add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX -DGUID_WINDOWS)
 
 if(MSVC)
     add_definitions(-D_USE_MATH_DEFINES)

@@ -23,5 +23,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include <SimpleMath.h>
+
 #include "runtime/core/common/core.h"
 #include "runtime/core/log/log_system.h"

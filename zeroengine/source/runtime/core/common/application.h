@@ -4,6 +4,7 @@
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
+#include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/render/window_system/i_window_system.h"
 
 namespace Zero {
@@ -27,6 +28,7 @@ namespace Zero {
         bool onWindowClose(WindowCloseEvent& e);
 
         std::unique_ptr<IWindowSystem> m_window;
+        ImGuiLayer*                    m_ImGuiLayer;
         bool                           m_running = true;
         LayerStack                     m_layerStack;
 
@@ -34,6 +36,6 @@ namespace Zero {
         static Application* s_instance;
     };
 
-    // TODO: to be defined
+    // TODO: to be defined in client
     Application* createApplication();
 } // namespace Zero
