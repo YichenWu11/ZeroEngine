@@ -11,7 +11,7 @@ namespace Zero {
         return GetAsyncKeyState(button) & 0x0001;
     }
 
-    std::pair<float, float> InputSystem::getMousePosition() {
+    DirectX::SimpleMath::Vector2 InputSystem::getMousePosition() {
         POINT pos;
         bool  success = GetCursorPos(&pos);
         ZE_ASSERT(success && "GetCursorPos failed!");
@@ -20,12 +20,12 @@ namespace Zero {
     }
 
     float InputSystem::getMouseX() {
-        auto [x, y] = getMousePosition();
-        return x;
+        auto pos = getMousePosition();
+        return pos.x;
     }
 
     float InputSystem::getMouseY() {
-        auto [x, y] = getMousePosition();
-        return y;
+        auto pos = getMousePosition();
+        return pos.y;
     }
 } // namespace Zero

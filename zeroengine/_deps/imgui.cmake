@@ -1,6 +1,6 @@
-set(imgui_SOURCE_DIR_ ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+set(imgui_SOURCE_DIR_ ${CMAKE_CURRENT_SOURCE_DIR}/imgui-docking)
 
-message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/imgui-docking)
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR_}/backends/imgui_impl_win32.cpp

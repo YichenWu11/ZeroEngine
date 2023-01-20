@@ -5,6 +5,7 @@
 
 #include "runtime/core/common/application.h"
 #include "runtime/function/gui/imgui_layer.h"
+#include "runtime/function/input/input_system.h"
 #include "runtime/function/render/render_system/render_context.h"
 
 namespace Zero {

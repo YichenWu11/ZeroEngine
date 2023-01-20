@@ -5,10 +5,10 @@ namespace Zero {
     public:
         static bool isKeyPressed(int keycode);
 
-        static bool                    isMouseButtonPressed(int button);
-        static std::pair<float, float> getMousePosition();
-        static float                   getMouseX();
-        static float                   getMouseY();
+        static bool                         isMouseButtonPressed(int button);
+        static DirectX::SimpleMath::Vector2 getMousePosition();
+        static float                        getMouseX();
+        static float                        getMouseY();
 
     private:
         static std::unique_ptr<InputSystem> s_instance;

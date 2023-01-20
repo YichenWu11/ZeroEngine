@@ -153,13 +153,16 @@ namespace Zero {
             MainWndProc,
             0L,
             0L,
-            GetModuleHandle(NULL), NULL, NULL, (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, L"MainWnd", NULL};
+            GetModuleHandle(NULL), NULL, NULL, (HBRUSH)GetStockObject(NULL_BRUSH), NULL, L"MainWnd", NULL};
 
         if (!::RegisterClassExW(&wc))
             LOG_CRITICAL("RegisterClass Failed.");
 
-        // TODO: std::string to std::wstring
-        m_window = ::CreateWindowW(wc.lpszClassName, L"Zero Engine", WS_OVERLAPPEDWINDOW, 100, 100, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
+        RECT rc;
+        SetRect(&rc, 0, 0, m_data.width, m_data.height);
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
+
+        m_window = CreateWindow(wc.lpszClassName, L"Zero Engine", WS_POPUPWINDOW | WS_CAPTION, CW_USEDEFAULT, CW_USEDEFAULT, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
 
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
@@ -168,7 +171,7 @@ namespace Zero {
         m_context->init(m_data.width, m_data.height);
 
         if (create_info.is_fullscreen)
-            ShowWindow(m_window, SW_MAXIMIZE);
+            ShowWindow(m_window, SW_SHOWMAXIMIZED);
         else
             ShowWindow(m_window, SW_SHOWDEFAULT);
         UpdateWindow(m_window);

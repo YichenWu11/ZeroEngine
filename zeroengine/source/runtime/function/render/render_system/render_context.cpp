@@ -202,7 +202,7 @@ namespace Zero {
             ImGui::RenderPlatformWindowsDefault(NULL, (void*)getCommandList());
         }
 
-        ThrowIfFailed(m_swapChain->Present(1, 0));
+        ThrowIfFailed(m_swapChain->Present(0, 0));
         m_frameResourceMngr->EndFrame(m_commandQueue.Get());
     }
 
@@ -241,11 +241,10 @@ namespace Zero {
                 bindProperties);
         }
 
-        cmdList->SetDescriptorHeaps(1, get_rvalue_ptr(m_csuGpuDH.GetDescriptorHeap()));
-
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
-
         m_stateTracker.RestoreState(cmdList);
+
+        cmdList->SetDescriptorHeaps(1, get_rvalue_ptr(m_csuGpuDH.GetDescriptorHeap()));
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
 
         // clear mesh
         m_draw_list.clear();
