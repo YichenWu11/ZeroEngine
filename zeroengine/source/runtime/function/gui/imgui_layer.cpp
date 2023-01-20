@@ -1,16 +1,19 @@
+#include <CDX12/DescriptorHeapMngr.h>
 #include <backends/imgui_impl_dx12.h>
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
 #include "runtime/core/common/application.h"
 #include "runtime/function/gui/imgui_layer.h"
-
-// NOTE: this layer dosen't work so far
+#include "runtime/function/render/render_system/render_context.h"
 
 namespace Zero {
-    ImGuiLayer::ImGuiLayer() :
-        Layer("ImGuiLayer") {
+    ImGuiLayer::ImGuiLayer(RenderContext* context, HWND handle) :
+        Layer("ImGuiLayer"),
+        m_context(context),
+        m_handle(handle) {
     }
+
     ImGuiLayer::~ImGuiLayer() {
     }
 
@@ -22,11 +25,10 @@ namespace Zero {
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-        ImGui::StyleColorsDark();
+        // ImGui::StyleColorsDark();
         // ImGui::StyleColorsClassic();
+        ImGui::StyleColorsLight();
 
         // When viewports are enabled we tweak WindowRounding/WindowBg
         // so platform windows can look identical to regular ones.
@@ -36,11 +38,17 @@ namespace Zero {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        ImGui_ImplWin32_Init(GetModuleHandle(NULL));
+        auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/ZeroEngineFont.ttf";
+        io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 20.0f);
 
-        // TODO: init imgui_impldx12
-        // ImGui_ImplDX12_Init(device, 3, DXGI_FORMAT_R8G8B8A8_UNORM, heap, cpuHandle,
-        //                     gpuHandle);
+        ImGui_ImplWin32_Init(m_handle);
+
+        ImGui_ImplDX12_Init(m_context->getGraphicsDevice(),
+                            3,
+                            DXGI_FORMAT_R8G8B8A8_UNORM,
+                            m_context->getImGuiDH(),
+                            m_context->getImGuiInitCPUHandle(),
+                            m_context->getImGuiInitGPUHandle());
     }
 
     void ImGuiLayer::onDetach() {
@@ -61,18 +69,18 @@ namespace Zero {
         io.DisplaySize   = ImVec2(app.getWindow().getWidth(), app.getWindow().getHeight());
 
         ImGui::Render();
-        // TODO: impl in render_backend
-        // ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), g_pd3dCommandList);
-
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            ImGui::UpdatePlatformWindows();
-            // TODO: impl in render_backend
-            // ImGui::RenderPlatformWindowsDefault(NULL, (void*)g_pd3dCommandList);
-        }
     }
 
     void ImGuiLayer::onImGuiRender() {
-        static bool show = true;
+        static bool show      = true;
+        static bool show_test = true;
+
         ImGui::ShowDemoWindow(&show);
+
+        {
+            ImGui::Begin("Test", &show_test);
+            ImGui::Text("hello world");
+            ImGui::End();
+        }
     }
 } // namespace Zero

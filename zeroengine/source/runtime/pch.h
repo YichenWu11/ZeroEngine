@@ -8,7 +8,19 @@
 #include <Windows.h>
 #include <WindowsX.h>
 
+#include <CDX12/_deps/d3dx12.h>
+#include <D3Dcompiler.h>
+#include <DirectXCollision.h>
+#include <DirectXColors.h>
+#include <DirectXPackedVector.h>
+#include <d3d12.h>
+#include <dxgi1_4.h>
+#include <dxgi1_6.h>
+#include <shellapi.h>
+#include <wrl.h>
+
 #include <algorithm>
+#include <filesystem>
 #include <functional>
 #include <iostream>
 #include <memory>

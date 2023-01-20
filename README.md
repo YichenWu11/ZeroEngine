@@ -14,7 +14,7 @@
 ## Environment
 
 * Win32
-* DirectX12
+* DirectX12 only
 * CMake
 * C++ 20
 

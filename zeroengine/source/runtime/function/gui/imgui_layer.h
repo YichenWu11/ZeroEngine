@@ -1,14 +1,18 @@
 #pragma once
 
+#include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
+
 #include "runtime/core/common/layer.h"
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
 
 namespace Zero {
+    class RenderContext;
+
     class ImGuiLayer : public Layer {
     public:
-        ImGuiLayer();
+        ImGuiLayer(RenderContext*, HWND);
         ~ImGuiLayer();
 
         void onAttach() override;
@@ -17,5 +21,9 @@ namespace Zero {
 
         void begin();
         void end();
+
+    private:
+        RenderContext* m_context;
+        HWND           m_handle;
     };
 } // namespace Zero

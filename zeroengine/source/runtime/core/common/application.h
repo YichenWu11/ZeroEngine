@@ -5,7 +5,7 @@
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
 #include "runtime/function/gui/imgui_layer.h"
-#include "runtime/function/render/window_system/i_window_system.h"
+#include "runtime/function/render/window_system/window_system.h"
 
 namespace Zero {
     class Application {

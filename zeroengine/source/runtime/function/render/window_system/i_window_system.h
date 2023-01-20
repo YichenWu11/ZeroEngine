@@ -21,6 +21,8 @@ namespace Zero {
         virtual int getWidth() const  = 0;
         virtual int getHeight() const = 0;
 
+        virtual HWND getNativeWindowHandle() = 0;
+
         // window attributes
         virtual void setEventCallback(const EventCallbackFn& callback) = 0;
         virtual void setVSync(bool enabled)                            = 0;

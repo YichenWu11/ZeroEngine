@@ -1,9 +1,13 @@
-#include "runtime/function/render/window_system/window_system.h"
+#include <backends/imgui_impl_win32.h>
+
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
-#include "runtime/function/render/render_system/dx12/dx12_context.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/window_system/i_window_system.h"
+#include "runtime/function/render/window_system/window_system.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Zero {
 
@@ -15,6 +19,9 @@ namespace Zero {
 
     LRESULT CALLBACK
     MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+            return true;
+
         return WindowSystem::msgProc(hwnd, msg, wParam, lParam);
     }
 
@@ -117,6 +124,8 @@ namespace Zero {
     }
 
     // *************************************************************************************************
+    // *************************************************************************************************
+    // *************************************************************************************************
 
     IWindowSystem* IWindowSystem::create(const WindowCreateInfo& create_info) {
         return new WindowSystem(create_info);
@@ -127,6 +136,7 @@ namespace Zero {
     }
 
     WindowSystem::~WindowSystem() {
+        delete m_context;
         shutdown();
     }
 
@@ -154,14 +164,14 @@ namespace Zero {
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
 
-        m_context = new DX12Context(m_window);
-        m_context->init();
+        m_context = new RenderContext(m_window);
+        m_context->init(m_data.width, m_data.height);
 
         if (create_info.is_fullscreen)
-            ::ShowWindow(m_window, SW_MAXIMIZE);
+            ShowWindow(m_window, SW_MAXIMIZE);
         else
-            ::ShowWindow(m_window, SW_SHOWDEFAULT);
-        ::UpdateWindow(m_window);
+            ShowWindow(m_window, SW_SHOWDEFAULT);
+        UpdateWindow(m_window);
 
         setVSync(true);
     }
@@ -176,9 +186,6 @@ namespace Zero {
         while (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT) {
-                // TODO: quit
-            }
         }
 
         m_context->swapBuffer();

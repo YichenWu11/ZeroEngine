@@ -1,12 +1,16 @@
 set(imgui_SOURCE_DIR_ ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 
-file(GLOB imgui_sources CONFIGURE_DEPENDS "${imgui_SOURCE_DIR_}/*.cpp")
-file(GLOB imgui_impl CONFIGURE_DEPENDS
-    "${imgui_SOURCE_DIR_}/backends/imgui_impl_win32.cpp"
-    "${imgui_SOURCE_DIR_}/backends/imgui_impl_win32.h"
-    "${imgui_SOURCE_DIR_}/backends/imgui_impl_dx12.cpp"
-    "${imgui_SOURCE_DIR_}/backends/imgui_impl_dx12.h")
+message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 
-add_library(imgui STATIC ${imgui_sources} ${imgui_impl})
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR_}/backends/imgui_impl_win32.cpp
+    ${imgui_SOURCE_DIR_}/backends/imgui_impl_dx12.cpp
+    ${imgui_SOURCE_DIR_}/imgui.cpp
+    ${imgui_SOURCE_DIR_}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR_}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR_}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR_}/imgui_widgets.cpp
+)
+
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR_})
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR_}/backends)
