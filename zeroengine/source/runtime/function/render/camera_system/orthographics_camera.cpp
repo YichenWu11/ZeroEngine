@@ -5,7 +5,7 @@ using namespace DirectX::SimpleMath;
 
 namespace Zero {
     // XMMatrixOrthographicLH
-    OrthographicsCamera::OrthographicsCamera(float left, float right, float top, float bottom) :
+    OrthographicsCamera::OrthographicsCamera(float left, float right, float bottom, float top) :
         m_projection_matrix(XMMatrixOrthographicLH(right - left, top - bottom, -1.0f, 1.0f)) {
     }
 

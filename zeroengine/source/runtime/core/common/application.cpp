@@ -136,7 +136,8 @@ namespace Zero {
         depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         depthStencilState.StencilEnable  = false;
 
-        Matrix viewProjMatrix = Matrix::Identity;
+        Matrix viewProjMatrix = m_camera.getProjectionMatrix() * m_camera.getViewMatrix();
+        // Matrix viewProjMatrix = Matrix::Identity;
 
         ShaderParamBindTable::bindParam(shader, "_Global", std::span<const uint8_t>{reinterpret_cast<uint8_t const*>(&viewProjMatrix), sizeof(viewProjMatrix)});
 
