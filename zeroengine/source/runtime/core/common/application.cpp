@@ -54,6 +54,7 @@ namespace Zero {
 
         // *******************************************************************************************
         // create mesh for test
+
         VertexBufferLayout                 layout;
         std::vector<::rtti::Struct const*> structs;
         structs.emplace_back(&layout);
@@ -92,20 +93,10 @@ namespace Zero {
 
         ThrowIfFailed(commandList->Close());
 
-        //// Execute CommandList
         ID3D12CommandList* ppCommandLists[] = {commandList.Get()};
         render_context->getCommandQueue()->ExecuteCommandLists(array_count(ppCommandLists), ppCommandLists);
+        render_context->flush();
 
-        {
-            render_context->getCommandQueue()->Signal(render_context->getFence(), 1);
-            if (render_context->getFence()->GetCompletedValue() < 1) {
-                LPCWSTR falseValue  = 0;
-                HANDLE  eventHandle = CreateEventEx(nullptr, falseValue, false, EVENT_ALL_ACCESS);
-                ThrowIfFailed(render_context->getFence()->SetEventOnCompletion(1, eventHandle));
-                WaitForSingleObject(eventHandle, INFINITE);
-                CloseHandle(eventHandle);
-            }
-        }
         // create mesh for test
         // *******************************************************************************************
 
@@ -136,6 +127,7 @@ namespace Zero {
 
     bool Application::onWindowClose(WindowCloseEvent& e) {
         m_running = false;
+        PostQuitMessage(0);
         return true;
     }
 } // namespace Zero

@@ -162,7 +162,7 @@ namespace Zero {
         SetRect(&rc, 0, 0, m_data.width, m_data.height);
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
 
-        m_window = CreateWindow(wc.lpszClassName, L"Zero Engine", WS_POPUPWINDOW | WS_CAPTION, CW_USEDEFAULT, CW_USEDEFAULT, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
+        m_window = CreateWindow(wc.lpszClassName, L"Zero Engine", WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
 
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");

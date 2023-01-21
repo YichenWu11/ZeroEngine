@@ -19,6 +19,8 @@ namespace Zero {
     }
 
     RenderContext::~RenderContext() {
+        flushCommandQueue();
+
         m_frameResourceMngr->CleanUp();
 
         if (!m_rtvCpuDH.IsNull())
@@ -31,7 +33,7 @@ namespace Zero {
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
 
 #if defined(DEBUG) || defined(_DEBUG)
-            // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+         // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
 #endif
     }
 
@@ -157,8 +159,6 @@ namespace Zero {
 #endif
             LOG_INFO(std::filesystem::current_path().string());
 
-            // std::filesystem::path(RT_XSTR(RT_ROOT_DIR))
-
             auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
             std::wstring path        = AnsiToWString(shader_path.string());
 
@@ -179,11 +179,28 @@ namespace Zero {
 
         {
             ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-            m_fenceValue = 1;
+            m_fenceValue = 0;
+            flushCommandQueue();
         }
     }
 
-    void RenderContext::swapBuffer() {
+    void RenderContext::flushCommandQueue() {
+        m_fenceValue++;
+
+        ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValue));
+
+        if (m_fence->GetCompletedValue() < m_fenceValue) {
+            HANDLE eventHandle = CreateEventEx(nullptr, nullptr, false, EVENT_ALL_ACCESS);
+
+            ThrowIfFailed(m_fence->SetEventOnCompletion(m_fenceValue, eventHandle));
+
+            WaitForSingleObject(eventHandle, INFINITE);
+            CloseHandle(eventHandle);
+        }
+    }
+
+    void
+    RenderContext::swapBuffer() {
         m_backBufferIndex = (m_backBufferIndex + 1) % s_frame_count;
     }
 
@@ -208,12 +225,12 @@ namespace Zero {
 
     void RenderContext::populateCommandList(FrameResource& frameRes, uint frameIndex) {
         auto cmdListHandle = frameRes.Command();
-        auto cmdList       = cmdListHandle.CmdList();
+        GCmdList cmdList(cmdListHandle.CmdList());
 
         // Set necessary state.
         m_stateTracker.RecordState(m_renderTargets[frameIndex].get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
         m_stateTracker.RecordState(m_depthTargets[frameIndex].get(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
-        m_stateTracker.UpdateState(cmdList);
+        m_stateTracker.UpdateState(cmdList.Get());
 
         CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvCpuDH.GetCpuHandle(0), frameIndex, m_rtvCpuDH.GetDescriptorSize());
         CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvCpuDH.GetCpuHandle(0), frameIndex, m_dsvCpuDH.GetDescriptorSize());
@@ -241,10 +258,10 @@ namespace Zero {
                 bindProperties);
         }
 
-        m_stateTracker.RestoreState(cmdList);
-
         cmdList->SetDescriptorHeaps(1, get_rvalue_ptr(m_csuGpuDH.GetDescriptorHeap()));
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList);
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
+
+        m_stateTracker.RestoreState(cmdList.Get());
 
         // clear mesh
         m_draw_list.clear();

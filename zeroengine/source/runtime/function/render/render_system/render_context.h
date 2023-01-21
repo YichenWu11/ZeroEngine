@@ -29,6 +29,8 @@ namespace Zero {
 
         void submitMesh(Chen::CDX12::Mesh* mesh) { m_draw_list.push_back(mesh); }
 
+        void flush() { flushCommandQueue(); }
+
         ID3D12Device*              getGraphicsDevice() { return m_device.Get(); }
         ID3D12GraphicsCommandList* getCommandList() { return m_frameResourceMngr->GetCurrentFrameResource()->GetCmdList().Get(); }
         ID3D12CommandQueue*        getCommandQueue() { return m_commandQueue.Get(); }
@@ -40,23 +42,23 @@ namespace Zero {
 
     private:
         void populateCommandList(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
+        void flushCommandQueue();
 
     private:
-        HWND               m_window_handle;
-        static DXGI_FORMAT s_colorFormat;
-        static DXGI_FORMAT s_depthFormat;
-
+        HWND                  m_window_handle;
+        static DXGI_FORMAT    s_colorFormat;
+        static DXGI_FORMAT    s_depthFormat;
         static const uint32_t s_frame_count = 3; // triple buffering by default
 
-        // Pipeline objects.
-        CD3DX12_VIEWPORT        m_viewport;
-        CD3DX12_RECT            m_scissorRect;
-        ComPtr<IDXGISwapChain3> m_swapChain;
-
-        Chen::CDX12::Device                   m_device;
-        Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
+        Chen::CDX12::Device m_device;
 
         Chen::CDX12::CmdQueue m_commandQueue;
+
+        CD3DX12_VIEWPORT m_viewport;
+        CD3DX12_RECT     m_scissorRect;
+
+        Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
+        ComPtr<IDXGISwapChain3>               m_swapChain;
 
         std::unique_ptr<Chen::CDX12::PSOManager>  psoManager;
         std::unique_ptr<Chen::CDX12::BasicShader> colorShader;
