@@ -13,12 +13,12 @@ namespace Zero {
         }
 
         void onUpdate() override {
-            if (InputSystem::isMouseButtonPressed(VK_LBUTTON))
-                LOG_TRACE("lbutton is pressed");
-            if (InputSystem::isMouseButtonPressed(VK_RBUTTON))
-                LOG_TRACE("rbutton is pressed");
-            if (InputSystem::isKeyPressed('A'))
-                LOG_TRACE("A is pressed");
+            // if (InputSystem::isMouseButtonPressed(VK_LBUTTON))
+            //     LOG_TRACE("lbutton is pressed");
+            // if (InputSystem::isMouseButtonPressed(VK_RBUTTON))
+            //     LOG_TRACE("rbutton is pressed");
+            // if (InputSystem::isKeyPressed('A'))
+            //     LOG_TRACE("A is pressed");
         }
 
         void onEvent(Event& event) override {

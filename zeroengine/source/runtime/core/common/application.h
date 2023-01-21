@@ -7,6 +7,8 @@
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/render/window_system/window_system.h"
 
+#include "runtime/function/render/camera_system/orthographics_camera.h"
+
 namespace Zero {
     class Application {
     public:
@@ -32,6 +34,8 @@ namespace Zero {
         ImGuiLayer*                    m_ImGuiLayer;
         bool                           m_running = true;
         LayerStack                     m_layerStack;
+
+        OrthographicsCamera m_camera;
 
     private:
         static Application* s_instance;

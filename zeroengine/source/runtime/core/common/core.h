@@ -13,3 +13,8 @@
 // https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
 #define ZERO_XSTR(s) ZERO_STR(s)
 #define ZERO_STR(s) #s
+
+template <class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;

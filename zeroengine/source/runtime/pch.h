@@ -24,15 +24,18 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include <array>
 #include <map>
+#include <optional>
 #include <set>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 #include <SimpleMath.h>

@@ -7,12 +7,16 @@
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
 
+#include "runtime/function/render/render_system/shader_param_bind_table.h"
+
 using namespace Chen::CDX12;
+using namespace DirectX::SimpleMath;
 
 namespace Zero {
     Application* Application::s_instance = nullptr;
 
-    Application::Application() {
+    Application::Application() :
+        m_camera(-1.0f, 1.0f, -1.0f, 1.0f) {
         ZE_ASSERT(!s_instance && "Application already exists!");
         s_instance = this;
 
@@ -101,9 +105,48 @@ namespace Zero {
         // create mesh for test
         // *******************************************************************************************
 
+        // *******************************************************************************************
+        // create shader for test
+
+        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
+        std::wstring path        = AnsiToWString(shader_path.string());
+
+        std::vector<std::pair<std::string, Shader::Property>> properties;
+        properties.emplace_back(
+            "_Global",
+            Shader::Property(
+                ShaderVariableType::ConstantBuffer,
+                0,
+                0,
+                0));
+
+        ShaderParamBindTable::bindDevice(device);
+
+        ShaderParamBindTable::registerShader("common", properties);
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
+
+        shader->SetVsShader(path.c_str());
+        shader->SetPsShader(path.c_str());
+        shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+        shader->blendState               = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+        auto&& depthStencilState         = shader->depthStencilState;
+        depthStencilState.DepthEnable    = true;
+        depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS;
+        depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilState.StencilEnable  = false;
+
+        Matrix viewProjMatrix = Matrix::Identity;
+
+        ShaderParamBindTable::bindParam(shader, "_Global", std::span<const uint8_t>{reinterpret_cast<uint8_t const*>(&viewProjMatrix), sizeof(viewProjMatrix)});
+
+        // create shader for test
+        // *******************************************************************************************
+
         while (m_running) {
-            for (Layer* layer : m_layerStack)
-                layer->onUpdate();
+            DirectX::SimpleMath::Color clear_color = {0.1f, 0.1f, 0.1f, 1.0f};
+            RenderCommand::setClearColor(clear_color);
+            RenderCommand::clear();
 
             // imgui draw
             m_ImGuiLayer->begin();
@@ -111,14 +154,12 @@ namespace Zero {
                 layer->onImGuiRender();
             m_ImGuiLayer->end();
 
-            DirectX::SimpleMath::Color clear_color = {0.1f, 0.1f, 0.1f, 1.0f};
-
-            RenderCommand::setClearColor(clear_color);
-            RenderCommand::clear();
-
             Renderer::beginScene();
             Renderer::submit(triangle_mesh.get());
             Renderer::endScene();
+
+            for (Layer* layer : m_layerStack)
+                layer->onUpdate();
 
             m_window->onUpdate();
         }

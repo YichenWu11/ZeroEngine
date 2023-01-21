@@ -68,8 +68,7 @@ namespace Zero {
         Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
         ComPtr<IDXGISwapChain3>               m_swapChain;
 
-        std::unique_ptr<Chen::CDX12::PSOManager>  psoManager;
-        std::unique_ptr<Chen::CDX12::BasicShader> colorShader;
+        std::unique_ptr<Chen::CDX12::PSOManager> psoManager;
 
         std::vector<Chen::CDX12::BindProperty> bindProperties;
 

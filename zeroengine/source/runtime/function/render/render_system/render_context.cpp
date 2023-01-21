@@ -1,10 +1,12 @@
 #include <CDX12/DescriptorHeapMngr.h>
+#include <CDX12/Resource/DescHeapAllocView.h>
 #include <CDX12/Shader/PSOManager.h>
 #include <backends/imgui_impl_dx12.h>
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
 #include "runtime/function/render/render_system/render_context.h"
+#include "runtime/function/render/render_system/shader_param_bind_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -133,44 +135,6 @@ namespace Zero {
 
         {
             psoManager = std::unique_ptr<PSOManager>(new PSOManager(m_device.Get()));
-
-            std::vector<std::pair<std::string, Shader::Property>> properties;
-            properties.emplace_back(
-                "_Global",
-                Shader::Property(
-                    ShaderVariableType::ConstantBuffer,
-                    0,
-                    0,
-                    0));
-
-            colorShader = std::unique_ptr<BasicShader>(
-                new BasicShader(
-                    properties,
-                    m_device.Get()));
-
-            ComPtr<ID3DBlob> vertexShader;
-            ComPtr<ID3DBlob> pixelShader;
-
-#if defined(_DEBUG)
-            // Enable better shader debugging with the graphics debugging tools.
-            uint32_t compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#else
-            uint32_t compileFlags = 0;
-#endif
-            auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
-            std::wstring path        = AnsiToWString(shader_path.string());
-
-            ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr));
-            ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
-            colorShader->vsShader            = std::move(vertexShader);
-            colorShader->psShader            = std::move(pixelShader);
-            colorShader->rasterizerState     = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-            colorShader->blendState          = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-            auto&& depthStencilState         = colorShader->depthStencilState;
-            depthStencilState.DepthEnable    = true;
-            depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS;
-            depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-            depthStencilState.StencilEnable  = false;
         }
 
         {
@@ -221,7 +185,7 @@ namespace Zero {
             s_colorFormat,
             0));
 
-        // because after `onResize`, the window system will call the `swapBuffer()` 
+        // because after `onResize`, the window system will call the `swapBuffer()`
         // before the next draw call
         m_backBufferIndex = -1;
 
@@ -297,16 +261,29 @@ namespace Zero {
         frameRes.ClearRTV(rtvHandle);
         frameRes.ClearDSV(dsvHandle);
 
-        Matrix viewProjMatrix = Matrix::Identity;
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
 
-        auto constBuffer = frameRes.AllocateConstBuffer({reinterpret_cast<uint8_t const*>(&viewProjMatrix), sizeof(viewProjMatrix)});
+        auto& prop_table = ShaderParamBindTable::getShaderPropTable(shader);
 
         bindProperties.clear();
-        bindProperties.emplace_back("_Global", constBuffer);
+
+        for (auto& prop : prop_table) {
+            auto name = prop.first;
+            std::visit(overloaded{
+                           [&](std::span<const uint8_t> data) {
+                auto buffer = frameRes.AllocateConstBuffer(data);
+                bindProperties.emplace_back(name, buffer);
+                           },
+                           [&](DescriptorHeapAllocation const* data) {
+                bindProperties.emplace_back(name, DescriptorHeapAllocView(data));
+            }},
+                prop.second);
+        }
 
         for (auto& mesh : m_draw_list) {
             frameRes.DrawMesh(
-                colorShader.get(),
+                shader,
                 psoManager.get(),
                 mesh,
                 s_colorFormat,
@@ -322,5 +299,4 @@ namespace Zero {
         // clear mesh
         m_draw_list.clear();
     }
-
 } // namespace Zero
