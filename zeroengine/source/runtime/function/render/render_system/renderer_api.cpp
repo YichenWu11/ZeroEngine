@@ -6,7 +6,6 @@ namespace Zero {
     RendererAPI::API RendererAPI::s_api = RendererAPI::API::DX12;
 
     void RendererAPI::clear() {
-        // TODO: impl `clear`
     }
 
     void RendererAPI::setClearColor(const DirectX::SimpleMath::Vector4& color) {

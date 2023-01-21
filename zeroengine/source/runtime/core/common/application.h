@@ -26,6 +26,7 @@ namespace Zero {
 
     private:
         bool onWindowClose(WindowCloseEvent& e);
+        bool onWindowResize(WindowResizeEvent& e);
 
         std::unique_ptr<IWindowSystem> m_window;
         ImGuiLayer*                    m_ImGuiLayer;

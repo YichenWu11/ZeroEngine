@@ -1,9 +1,11 @@
 #pragma once
 
+/*
+    NOTE: core render class
+*/
+
 #include <CDX12/CmdQueue.h>
-#include <CDX12/DescripitorHeap/CPUDescriptorHeap.h>
-#include <CDX12/DescripitorHeap/DescriptorHeapWrapper.h>
-#include <CDX12/DescripitorHeap/GPUDescriptorHeap.h>
+#include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
 #include <CDX12/Device.h>
 #include <CDX12/FrameResourceMngr.h>
 #include <CDX12/Resource/ResourceStateTracker.h>
@@ -16,6 +18,12 @@ namespace Chen::CDX12 {
 }
 
 namespace Zero {
+    struct ImGuiInitInfo {
+        D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle;
+        D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle;
+        ID3D12DescriptorHeap*       descriptor_heap;
+    };
+
     class RenderContext {
     public:
         RenderContext(HWND window_handle);
@@ -31,14 +39,14 @@ namespace Zero {
 
         void flush() { flushCommandQueue(); }
 
-        ID3D12Device*              getGraphicsDevice() { return m_device.Get(); }
-        ID3D12GraphicsCommandList* getCommandList() { return m_frameResourceMngr->GetCurrentFrameResource()->GetCmdList().Get(); }
-        ID3D12CommandQueue*        getCommandQueue() { return m_commandQueue.Get(); }
-        ID3D12Fence*               getFence() { return m_fence.Get(); }
+        void onResize(int width, int height);
 
-        D3D12_CPU_DESCRIPTOR_HANDLE getImGuiInitCPUHandle() { return m_csuGpuDH.GetCpuHandle(); }
-        D3D12_GPU_DESCRIPTOR_HANDLE getImGuiInitGPUHandle() { return m_csuGpuDH.GetGpuHandle(); }
-        ID3D12DescriptorHeap*       getImGuiDH() { return m_csuGpuDH.GetDescriptorHeap(); }
+        ID3D12Device*       getGraphicsDevice() { return m_device.Get(); }
+        ID3D12CommandQueue* getCommandQueue() { return m_commandQueue.Get(); }
+
+        ImGuiInitInfo getImGuiInitInfo() {
+            return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
+        }
 
     private:
         void populateCommandList(Chen::CDX12::FrameResource& frameRes, uint frameIndex);

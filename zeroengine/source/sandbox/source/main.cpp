@@ -3,7 +3,7 @@
 int main(int /*argc*/, char** /*argv*/) {
     Zero::LogSystem::init();
 
-    LOG_INFO("zeroengine start {}", 1);
+    LOG_INFO("zeroengine start");
 
     auto editor_app = Zero::createApplication();
 

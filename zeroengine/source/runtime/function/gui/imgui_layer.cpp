@@ -31,8 +31,6 @@ namespace Zero {
         // ImGui::StyleColorsClassic();
         ImGui::StyleColorsLight();
 
-        // When viewports are enabled we tweak WindowRounding/WindowBg
-        // so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             style.WindowRounding              = 0.0f;
@@ -42,14 +40,16 @@ namespace Zero {
         auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/ZeroEngineFont.ttf";
         io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 20.0f);
 
+        ImGuiInitInfo init_info = m_context->getImGuiInitInfo();
+
         ImGui_ImplWin32_Init(m_handle);
 
         ImGui_ImplDX12_Init(m_context->getGraphicsDevice(),
                             3,
                             DXGI_FORMAT_R8G8B8A8_UNORM,
-                            m_context->getImGuiDH(),
-                            m_context->getImGuiInitCPUHandle(),
-                            m_context->getImGuiInitGPUHandle());
+                            init_info.descriptor_heap,
+                            init_info.cpu_handle,
+                            init_info.gpu_handle);
     }
 
     void ImGuiLayer::onDetach() {

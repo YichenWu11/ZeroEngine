@@ -3,6 +3,7 @@ build-vs/
 build-clion/
 bin/
 lib/
+log/
 
 docs/zeroengine-design/.obsidian
 

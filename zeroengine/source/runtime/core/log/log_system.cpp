@@ -8,9 +8,11 @@ namespace Zero {
     std::shared_ptr<spdlog::logger> LogSystem::s_logger;
 
     void LogSystem::init() {
+        auto log_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "log/zeroengine.log";
+
         std::vector<spdlog::sink_ptr> logSinks;
         logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-        logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("zeroengine.log", true));
+        logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_path.string(), true));
 
         logSinks[0]->set_pattern("%^[%T] %n: %v%$");
         logSinks[1]->set_pattern("[%T] [%l] %n: %v");

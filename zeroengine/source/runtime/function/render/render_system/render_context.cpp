@@ -33,7 +33,7 @@ namespace Zero {
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
 
 #if defined(DEBUG) || defined(_DEBUG)
-         // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+            // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
 #endif
     }
 
@@ -97,7 +97,7 @@ namespace Zero {
                 numGpuCSU_static,
                 numGpuCSU_dynamic);
 
-            m_rtvCpuDH = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(30);
+            m_rtvCpuDH = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(10);
             m_dsvCpuDH = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(10);
             m_csuGpuDH = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(10);
         }
@@ -157,15 +157,11 @@ namespace Zero {
 #else
             uint32_t compileFlags = 0;
 #endif
-            LOG_INFO(std::filesystem::current_path().string());
-
             auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
             std::wstring path        = AnsiToWString(shader_path.string());
 
             ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr));
             ThrowIfFailed(D3DCompileFromFile(path.c_str(), nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
-            // ThrowIfFailed(D3DCompileFromFile(L"../../../../zeroengine/shader/shader.hlsl", nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr));
-            // ThrowIfFailed(D3DCompileFromFile(L"../../../../zeroengine/shader/shader.hlsl", nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
             colorShader->vsShader            = std::move(vertexShader);
             colorShader->psShader            = std::move(pixelShader);
             colorShader->rasterizerState     = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -199,8 +195,66 @@ namespace Zero {
         }
     }
 
-    void
-    RenderContext::swapBuffer() {
+    void RenderContext::onResize(int width, int height) {
+        flushCommandQueue();
+
+        m_viewport    = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+        m_scissorRect = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
+
+        ComPtr<ID3D12CommandAllocator>    cmdAllocator;
+        ComPtr<ID3D12GraphicsCommandList> commandList;
+        ThrowIfFailed(
+            m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(cmdAllocator.GetAddressOf())));
+        ThrowIfFailed(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList)));
+        ThrowIfFailed(commandList->Close());
+        ThrowIfFailed(cmdAllocator->Reset());
+        ThrowIfFailed(commandList->Reset(cmdAllocator.Get(), nullptr));
+
+        for (int i = 0; i < s_frame_count; ++i) {
+            m_renderTargets[i].reset();
+            m_depthTargets[i].reset();
+        }
+
+        ThrowIfFailed(m_swapChain->ResizeBuffers(
+            s_frame_count,
+            width, height,
+            s_colorFormat,
+            0));
+
+        // because after `onResize`, the window system will call the `swapBuffer()` 
+        // before the next draw call
+        m_backBufferIndex = -1;
+
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvCpuDH.GetCpuHandle());
+        CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvCpuDH.GetCpuHandle());
+
+        for (uint32_t n = 0; n < s_frame_count; ++n) {
+            m_renderTargets[n] = std::unique_ptr<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+            m_depthTargets[n]  = std::unique_ptr<Texture>(
+                new Texture(
+                     m_device.Get(),
+                     m_scissorRect.right,
+                     m_scissorRect.bottom,
+                     DXGI_FORMAT_D24_UNORM_S8_UINT,
+                     TextureDimension::Tex2D,
+                     1,
+                     1,
+                     Texture::TextureUsage::DepthStencil,
+                     D3D12_RESOURCE_STATE_DEPTH_READ));
+
+            m_device->CreateRenderTargetView(m_renderTargets[n]->GetResource(), nullptr, rtvHandle);
+            m_device->CreateDepthStencilView(m_depthTargets[n]->GetResource(), nullptr, dsvHandle);
+            rtvHandle.Offset(1, m_rtvCpuDH.GetDescriptorSize());
+            dsvHandle.Offset(1, m_dsvCpuDH.GetDescriptorSize());
+        }
+
+        ThrowIfFailed(commandList->Close());
+        m_commandQueue.Execute(commandList.Get());
+
+        flushCommandQueue();
+    }
+
+    void RenderContext::swapBuffer() {
         m_backBufferIndex = (m_backBufferIndex + 1) % s_frame_count;
     }
 
@@ -216,7 +270,9 @@ namespace Zero {
         // Update and Render additional Platform Windows
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault(NULL, (void*)getCommandList());
+            ImGui::RenderPlatformWindowsDefault(
+                NULL,
+                (void*)(m_frameResourceMngr->GetCurrentFrameResource()->GetCmdList().Get()));
         }
 
         ThrowIfFailed(m_swapChain->Present(0, 0));
@@ -224,7 +280,7 @@ namespace Zero {
     }
 
     void RenderContext::populateCommandList(FrameResource& frameRes, uint frameIndex) {
-        auto cmdListHandle = frameRes.Command();
+        auto     cmdListHandle = frameRes.Command();
         GCmdList cmdList(cmdListHandle.CmdList());
 
         // Set necessary state.

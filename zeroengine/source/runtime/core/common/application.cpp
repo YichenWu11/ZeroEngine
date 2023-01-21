@@ -39,6 +39,7 @@ namespace Zero {
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(ZE_BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(Application::onWindowResize));
 
         for (auto it = m_layerStack.end(); it != m_layerStack.begin();) {
             (*--it)->onEvent(e);
@@ -75,16 +76,16 @@ namespace Zero {
         ThrowIfFailed(commandList->Reset(cmdAllocator.Get(), nullptr));
 
         std::unique_ptr<Mesh> triangle_mesh = std::make_unique<Mesh>(
-            render_context->getGraphicsDevice(),
+            device,
             structs,
             array_count(vertices),
             array_count(indices));
 
-        VertexBuffer* vert_buffer = VertexBuffer::create(render_context->getGraphicsDevice(),
+        VertexBuffer* vert_buffer = VertexBuffer::create(device,
                                                          vertices,
                                                          array_count(vertices) * sizeof(DirectX::XMFLOAT3));
 
-        IndexBuffer* indi_buffer = IndexBuffer::create(render_context->getGraphicsDevice(),
+        IndexBuffer* indi_buffer = IndexBuffer::create(device,
                                                        indices,
                                                        array_count(indices) * sizeof(uint32_t));
 
@@ -104,15 +105,16 @@ namespace Zero {
             for (Layer* layer : m_layerStack)
                 layer->onUpdate();
 
-            DirectX::SimpleMath::Color clear_color = {0.1f, 0.1f, 0.1f, 1.0f};
-
-            RenderCommand::setClearColor(clear_color);
-            RenderCommand::clear();
-
+            // imgui draw
             m_ImGuiLayer->begin();
             for (Layer* layer : m_layerStack)
                 layer->onImGuiRender();
             m_ImGuiLayer->end();
+
+            DirectX::SimpleMath::Color clear_color = {0.1f, 0.1f, 0.1f, 1.0f};
+
+            RenderCommand::setClearColor(clear_color);
+            RenderCommand::clear();
 
             Renderer::beginScene();
             Renderer::submit(triangle_mesh.get());
@@ -127,7 +129,11 @@ namespace Zero {
 
     bool Application::onWindowClose(WindowCloseEvent& e) {
         m_running = false;
-        PostQuitMessage(0);
+        return true;
+    }
+
+    bool Application::onWindowResize(WindowResizeEvent& e) {
+        m_window->onResize(e.getWidth(), e.getHeight());
         return true;
     }
 } // namespace Zero

@@ -118,6 +118,11 @@ namespace Zero {
                 EVENT_CALLBACK(event)
                 return 0;
             }
+
+            case WM_DESTROY: {
+                PostQuitMessage(0);
+                return 0;
+            }
         }
 
         return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -149,7 +154,7 @@ namespace Zero {
 
         WNDCLASSEXW wc = {
             sizeof(wc),
-            CS_HREDRAW | CS_VREDRAW,
+            CS_CLASSDC,
             MainWndProc,
             0L,
             0L,
@@ -162,7 +167,21 @@ namespace Zero {
         SetRect(&rc, 0, 0, m_data.width, m_data.height);
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
 
-        m_window = CreateWindow(wc.lpszClassName, L"Zero Engine", WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX, CW_USEDEFAULT, CW_USEDEFAULT, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
+        if (create_info.is_fullscreen)
+            m_window = CreateWindow(
+                wc.lpszClassName, 
+                L"Zero Engine", 
+                WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZE | WS_SIZEBOX, 
+                CW_USEDEFAULT, CW_USEDEFAULT, 
+                m_data.width, m_data.height, 
+                NULL, NULL, wc.hInstance, NULL);
+        else
+            m_window = CreateWindow(wc.lpszClassName,
+                L"Zero Engine", 
+                WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
+                CW_USEDEFAULT, CW_USEDEFAULT, 
+                m_data.width, m_data.height, 
+                NULL, NULL, wc.hInstance, NULL);
 
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
@@ -192,6 +211,10 @@ namespace Zero {
         }
 
         m_context->swapBuffer();
+    }
+
+    void WindowSystem::onResize(int width, int height) {
+        m_context->onResize(width, height);
     }
 
     void WindowSystem::setVSync(bool enabled) {
