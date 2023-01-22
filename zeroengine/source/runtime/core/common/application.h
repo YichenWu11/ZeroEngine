@@ -1,15 +1,12 @@
 #pragma once
 
 #include "runtime/core/common/layer_stack.h"
+#include "runtime/core/util/time_step.h"
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/render/window_system/window_system.h"
-
-namespace Chen::CDX12 {
-    class Mesh;
-}
 
 namespace Zero {
     class Application {
@@ -36,12 +33,11 @@ namespace Zero {
         ImGuiLayer*                    m_ImGuiLayer;
         bool                           m_running = true;
         LayerStack                     m_layerStack;
+        float                          m_lastframe_time = 0.0f;
+        // std::chrono::steady_clock::time_point m_lastframe_time;
 
     private:
         static Application* s_instance;
-
-    protected:
-        std::unique_ptr<Chen::CDX12::Mesh> triangle_mesh;
     };
 
     // TODO: to be defined in client

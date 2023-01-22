@@ -5,6 +5,8 @@
 #include "runtime/core/common/application.h"
 #include "runtime/core/common/layer.h"
 
+#include "runtime/core/util/time_step.h"
+
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/input/input_system.h"
 

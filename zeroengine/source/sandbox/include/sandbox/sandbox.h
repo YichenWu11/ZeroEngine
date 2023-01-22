@@ -12,22 +12,22 @@ public:
         Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f) {
     }
 
-    void onUpdate() override {
+    void onUpdate(Zero::TimeStep timestep) override {
         if (Zero::InputSystem::isKeyPressed(VK_LEFT))
-            m_camera_position.x -= m_camera_move_speed;
+            m_camera_position.x -= m_camera_move_speed * timestep;
         else if (Zero::InputSystem::isKeyPressed(VK_RIGHT))
-            m_camera_position.x += m_camera_move_speed;
+            m_camera_position.x += m_camera_move_speed * timestep;
 
         if (Zero::InputSystem::isKeyPressed(VK_DOWN))
-            m_camera_position.y -= m_camera_move_speed;
+            m_camera_position.y -= m_camera_move_speed * timestep;
         else if (Zero::InputSystem::isKeyPressed(VK_UP))
-            m_camera_position.y += m_camera_move_speed;
+            m_camera_position.y += m_camera_move_speed * timestep;
 
         // FIXME: ortho camera rotation error
         if (Zero::InputSystem::isKeyPressed('A'))
-            m_camera_rotation += m_camera_rotate_speed;
+            m_camera_rotation += m_camera_rotate_speed * timestep;
         else if (Zero::InputSystem::isKeyPressed('D'))
-            m_camera_rotation -= m_camera_rotate_speed;
+            m_camera_rotation -= m_camera_rotate_speed * timestep;
 
         Zero::RenderCommand::setClearColor({0.2f, 0.2f, 0.2f, 1.0f});
         Zero::RenderCommand::clear();
@@ -58,8 +58,9 @@ private:
     Vector3 m_camera_position;
     float   m_camera_rotation = 0.0f;
 
-    float m_camera_move_speed   = 0.02f;
-    float m_camera_rotate_speed = 1.0f;
+    // per second
+    float m_camera_move_speed   = 4.0f;
+    float m_camera_rotate_speed = 50.0f;
 };
 
 class Sandbox : public Zero::Application {

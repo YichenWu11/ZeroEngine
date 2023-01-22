@@ -7,7 +7,6 @@
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
 
-
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
 
@@ -54,17 +53,20 @@ namespace Zero {
         RenderContext* render_context = static_cast<WindowSystem*>(m_window.get())->getRenderContext();
         ID3D12Device*  device         = render_context->getGraphicsDevice();
         Renderer::bindRenderContext(render_context);
-
         MeshTable::registerMesh(render_context, "triangle");
 
         while (m_running) {
+            float    time     = ImGui::GetTime();
+            TimeStep timestep = time - m_lastframe_time;
+            m_lastframe_time  = time;
+
             m_ImGuiLayer->begin();
             for (Layer* layer : m_layerStack)
                 layer->onImGuiRender();
             m_ImGuiLayer->end();
 
             for (Layer* layer : m_layerStack)
-                layer->onUpdate();
+                layer->onUpdate(timestep);
 
             m_window->onUpdate();
         }

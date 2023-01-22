@@ -20,6 +20,7 @@
 #include <wrl.h>
 
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <functional>
 #include <iostream>

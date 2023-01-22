@@ -1,5 +1,6 @@
 #pragma once
 
+#include "runtime/core/util/time_step.h"
 #include "runtime/function/event/event.h"
 
 namespace Zero {
@@ -10,7 +11,7 @@ namespace Zero {
 
         virtual void onAttach() {}
         virtual void onDetach() {}
-        virtual void onUpdate() {}
+        virtual void onUpdate(TimeStep ts) {}
         virtual void onImGuiRender() {}
         virtual void onEvent(Event& event) {}
 
