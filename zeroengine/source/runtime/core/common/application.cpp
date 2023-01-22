@@ -17,7 +17,7 @@ namespace Zero {
         ZE_ASSERT(!s_instance && "Application already exists!");
         s_instance = this;
 
-        m_window = std::unique_ptr<IWindowSystem>(IWindowSystem::create());
+        m_window = Zero::Scope<IWindowSystem>(IWindowSystem::create());
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
 
         m_ImGuiLayer = new ImGuiLayer(

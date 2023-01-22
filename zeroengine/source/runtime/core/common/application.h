@@ -29,12 +29,11 @@ namespace Zero {
         bool onWindowClose(WindowCloseEvent& e);
         bool onWindowResize(WindowResizeEvent& e);
 
-        std::unique_ptr<IWindowSystem> m_window;
-        ImGuiLayer*                    m_ImGuiLayer;
-        bool                           m_running = true;
-        LayerStack                     m_layerStack;
-        float                          m_lastframe_time = 0.0f;
-        // std::chrono::steady_clock::time_point m_lastframe_time;
+        Zero::Scope<IWindowSystem> m_window;
+        ImGuiLayer*                m_ImGuiLayer;
+        bool                       m_running = true;
+        LayerStack                 m_layerStack;
+        float                      m_lastframe_time = 0.0f;
 
     private:
         static Application* s_instance;

@@ -12,6 +12,7 @@ namespace Zero {
     ImGuiLayer::ImGuiLayer(RenderContext* context, HWND handle) :
         Layer("ImGuiLayer"),
         m_context(context),
+
         m_handle(handle) {
     }
 

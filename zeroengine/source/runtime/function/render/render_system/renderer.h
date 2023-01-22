@@ -17,7 +17,7 @@ namespace Zero {
         static void beginScene(OrthographicsCamera& camera);
         static void endScene();
 
-        static void submit(Chen::CDX12::Mesh*);
+        static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Vector3& = {0.0f, 0.0f, 0.0f});
 
         static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
 

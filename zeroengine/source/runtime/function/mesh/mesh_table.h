@@ -14,6 +14,6 @@ namespace Zero {
         static Chen::CDX12::Mesh* getMesh(const std::string&);
 
     private:
-        static std::unordered_map<std::string, std::unique_ptr<Chen::CDX12::Mesh>> s_mesh_table;
+        static std::unordered_map<std::string, Zero::Scope<Chen::CDX12::Mesh>> s_mesh_table;
     };
 } // namespace Zero

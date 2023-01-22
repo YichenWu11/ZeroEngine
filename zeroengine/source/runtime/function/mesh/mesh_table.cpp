@@ -9,12 +9,12 @@ using namespace Chen::CDX12;
 // TODO: fix
 
 namespace Zero {
-    std::unordered_map<std::string, std::unique_ptr<Chen::CDX12::Mesh>> MeshTable::s_mesh_table;
+    std::unordered_map<std::string, Zero::Scope<Chen::CDX12::Mesh>> MeshTable::s_mesh_table;
 
     void MeshTable::registerMesh(RenderContext* render_context, const std::string& mesh_name) {
         ID3D12Device* device = render_context->getGraphicsDevice();
 
-        static VertexBufferLayout                  layout;
+        static VertexBufferLayout                 layout;
         static std::vector<::rtti::Struct const*> structs;
         structs.emplace_back(&layout);
 
@@ -23,7 +23,7 @@ namespace Zero {
             DirectX::XMFLOAT3(0, 0.5, 0.5),
             DirectX::XMFLOAT3(0.5, -0.5, 0.5)};
 
-        uint                       indices[] = {0, 1, 2};
+        uint                              indices[] = {0, 1, 2};
         ComPtr<ID3D12CommandAllocator>    cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> commandList;
         ThrowIfFailed(

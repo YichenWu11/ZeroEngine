@@ -1,7 +1,7 @@
 #include "runtime/function/input/input_system.h"
 
 namespace Zero {
-    std::unique_ptr<InputSystem> InputSystem::s_instance = std::make_unique<InputSystem>();
+    Zero::Scope<InputSystem> InputSystem::s_instance = std::make_unique<InputSystem>();
 
     bool InputSystem::isKeyPressed(int keycode) {
         return GetAsyncKeyState(keycode) & 0x8000;

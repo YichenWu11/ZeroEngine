@@ -11,6 +11,6 @@ namespace Zero {
         static float                        getMouseY();
 
     private:
-        static std::unique_ptr<InputSystem> s_instance;
+        static Zero::Scope<InputSystem> s_instance;
     };
 } // namespace Zero

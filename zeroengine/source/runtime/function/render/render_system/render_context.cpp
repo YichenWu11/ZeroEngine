@@ -55,6 +55,13 @@ namespace Zero {
             "_ModelMatrix",
             Shader::Property(
                 ShaderVariableType::ConstantBuffer,
+                1,
+                0,
+                0));
+        properties.emplace_back(
+            "_Modulate",
+            Shader::Property(
+                ShaderVariableType::ConstantBuffer,
                 0,
                 1,
                 0));
@@ -148,8 +155,8 @@ namespace Zero {
 
             // Create a RTV for each frame.
             for (uint32_t n = 0; n < s_frame_count; ++n) {
-                m_renderTargets[n] = std::unique_ptr<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
-                m_depthTargets[n]  = std::unique_ptr<Texture>(
+                m_renderTargets[n] = Zero::Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+                m_depthTargets[n]  = Zero::Scope<Texture>(
                     new Texture(
                          m_device.Get(),
                          m_scissorRect.right,
@@ -171,7 +178,7 @@ namespace Zero {
         }
 
         {
-            psoManager = std::unique_ptr<PSOManager>(new PSOManager(m_device.Get()));
+            psoManager = Zero::Scope<PSOManager>(new PSOManager(m_device.Get()));
         }
 
         {
@@ -234,8 +241,8 @@ namespace Zero {
         CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvCpuDH.GetCpuHandle());
 
         for (uint32_t n = 0; n < s_frame_count; ++n) {
-            m_renderTargets[n] = std::unique_ptr<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
-            m_depthTargets[n]  = std::unique_ptr<Texture>(
+            m_renderTargets[n] = Zero::Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+            m_depthTargets[n]  = Zero::Scope<Texture>(
                 new Texture(
                      m_device.Get(),
                      m_scissorRect.right,
@@ -307,22 +314,42 @@ namespace Zero {
 
         auto& prop_table = ShaderParamBindTable::getShaderPropTable(shader);
 
-        bindProperties.clear();
+        // draw call
+        for (auto& [mesh, trans] : m_draw_list) {
+            Matrix  transform = Matrix::CreateTranslation(trans).Transpose();
+            Vector4 modulate  = {0.5f, 0.2f, 0.2f, 1.0f};
 
-        for (auto& prop : prop_table) {
-            auto name = prop.first;
-            std::visit(overloaded{
-                           [&](std::span<const uint8_t> data) {
-                auto buffer = frameRes.AllocateConstBuffer(data);
-                bindProperties.emplace_back(name, buffer);
-                           },
-                           [&](DescriptorHeapAllocation const* data) {
-                bindProperties.emplace_back(name, DescriptorHeapAllocView(data));
-            }},
-                prop.second);
-        }
+            // bind object-varying constants
+            ShaderParamBindTable::bindParam(
+                shader,
+                "_ModelMatrix",
+                std::span<const uint8_t>{
+                    reinterpret_cast<uint8_t const*>(&transform),
+                    sizeof(transform)});
 
-        for (auto& mesh : m_draw_list) {
+            ShaderParamBindTable::bindParam(
+                shader,
+                "_Modulate",
+                std::span<const uint8_t>{
+                    reinterpret_cast<uint8_t const*>(&modulate),
+                    sizeof(modulate)});
+
+            bindProperties.clear();
+
+            // bind the constants which does not differ among different objects
+            for (auto& prop : prop_table) {
+                auto name = prop.first;
+                std::visit(overloaded{
+                               [&](std::span<const uint8_t> data) {
+                    auto buffer = frameRes.AllocateConstBuffer(data);
+                    bindProperties.emplace_back(name, buffer);
+                               },
+                               [&](DescriptorHeapAllocation const* data) {
+                    bindProperties.emplace_back(name, DescriptorHeapAllocView(data));
+                }},
+                    prop.second);
+            }
+
             frameRes.DrawMesh(
                 shader,
                 psoManager.get(),

@@ -21,7 +21,7 @@ namespace Zero {
     public:
         using ParamBindTable  = std::unordered_map<std::string, std::variant<Chen::CDX12::DescriptorHeapAllocation const*, std::span<const uint8_t>>>;
         using ShaderBindTable = std::unordered_map<Chen::CDX12::Shader*, ParamBindTable>;
-        using ShaderTable     = std::unordered_map<std::string, std::unique_ptr<Chen::CDX12::Shader>>;
+        using ShaderTable     = std::unordered_map<std::string, Zero::Scope<Chen::CDX12::Shader>>;
 
     public:
         static void bindDevice(ID3D12Device*);

@@ -24,7 +24,6 @@ namespace Zero {
         ID3D12DescriptorHeap*       descriptor_heap;
     };
 
-    // TODO: 构建一个绘制map Shader2Mesh
     class RenderContext {
     public:
         RenderContext(HWND window_handle);
@@ -36,7 +35,9 @@ namespace Zero {
         void beginRender();
         void endRender();
 
-        void submitMesh(Chen::CDX12::Mesh* mesh) { m_draw_list.push_back(mesh); }
+        void submit(Chen::CDX12::Mesh* mesh, const DirectX::SimpleMath::Vector3& trans = {0.0f, 0.0f, 0.0f}) {
+            m_draw_list.emplace_back(std::make_pair(mesh, trans));
+        }
 
         void flush() { flushCommandQueue(); }
 
@@ -71,12 +72,12 @@ namespace Zero {
         Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
         ComPtr<IDXGISwapChain3>               m_swapChain;
 
-        std::unique_ptr<Chen::CDX12::PSOManager> psoManager;
+        Zero::Scope<Chen::CDX12::PSOManager> psoManager;
 
         std::vector<Chen::CDX12::BindProperty> bindProperties;
 
-        std::unique_ptr<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
-        std::unique_ptr<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
+        Zero::Scope<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
+        Zero::Scope<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
 
         // DescriptorHeap
         Chen::CDX12::DescriptorHeapAllocation m_rtvCpuDH;
@@ -84,7 +85,7 @@ namespace Zero {
         Chen::CDX12::DescriptorHeapAllocation m_csuCpuDH;
         Chen::CDX12::DescriptorHeapAllocation m_csuGpuDH;
 
-        std::unique_ptr<Chen::CDX12::FrameResourceMngr> m_frameResourceMngr;
+        Zero::Scope<Chen::CDX12::FrameResourceMngr> m_frameResourceMngr;
 
         Chen::CDX12::ResourceStateTracker m_stateTracker;
 
@@ -100,7 +101,7 @@ namespace Zero {
         uint32_t numGpuCSU_static  = 648;
         uint32_t numGpuCSU_dynamic = 648;
 
-        std::vector<Chen::CDX12::Mesh*> m_draw_list;
+        std::vector<std::pair<Chen::CDX12::Mesh*, DirectX::SimpleMath::Vector3>> m_draw_list;
 
         // debug
         ComPtr<ID3D12DebugDevice> debug_device;

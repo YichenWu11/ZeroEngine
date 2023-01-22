@@ -23,7 +23,6 @@ public:
         else if (Zero::InputSystem::isKeyPressed(VK_UP))
             m_camera_position.y += m_camera_move_speed * timestep;
 
-        // FIXME: ortho camera rotation error
         if (Zero::InputSystem::isKeyPressed('A'))
             m_camera_rotation += m_camera_rotate_speed * timestep;
         else if (Zero::InputSystem::isKeyPressed('D'))
@@ -36,11 +35,23 @@ public:
         m_camera.setRotation(m_camera_rotation);
 
         Zero::Renderer::beginScene(m_camera);
-        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"));
+
+        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"), tri_trans_0);
+        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"), {0.0f, 0.0f, 0.0f});
+        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"), {0.8f, 0.3f, 0.0f});
+
         Zero::Renderer::endScene();
     }
 
     void onImGuiRender() override {
+        ImGui::Begin("DEBUG");
+
+        ImGui::DragFloat("TRI0_X", &(tri_trans_0.x), 0.01f,
+                         -2.0f, 2.0f, "%.2f");
+        ImGui::DragFloat("TRI0_Y", &(tri_trans_0.y), 0.01f,
+                         -2.0f, 2.0f, "%.2f");
+
+        ImGui::End();
     }
 
     void onEvent(Zero::Event& event) override {
@@ -61,6 +72,9 @@ private:
     // per second
     float m_camera_move_speed   = 4.0f;
     float m_camera_rotate_speed = 50.0f;
+
+    Vector3 tri_trans_0{-0.8f, -0.3f, 0.0f};
+    Vector4 tri_color_0{1.0f, 1.0f, 1.0f, 1.0f};
 };
 
 class Sandbox : public Zero::Application {

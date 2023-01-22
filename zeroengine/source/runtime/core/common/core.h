@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #ifdef NDEBUG
 #define ZE_ASSERT(statement)
 #else
@@ -18,3 +20,11 @@ template <class... Ts>
 struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
+
+namespace Zero {
+    template <typename T>
+    using Scope = std::unique_ptr<T>;
+
+    template <typename T>
+    using Ref = std::shared_ptr<T>;
+} // namespace Zero

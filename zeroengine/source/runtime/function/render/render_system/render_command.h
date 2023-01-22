@@ -14,6 +14,6 @@ namespace Zero {
         }
 
     private:
-        static std::unique_ptr<RendererAPI> s_RendererApi;
+        static Zero::Scope<RendererAPI> s_RendererApi;
     };
 } // namespace Zero

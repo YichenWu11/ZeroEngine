@@ -27,7 +27,7 @@ namespace Zero {
         s_render_context->endRender();
     }
 
-    void Renderer::submit(Mesh* mesh) {
+    void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Vector3& trans) {
         ZE_ASSERT(s_render_context && "bind the render_context first!");
 
         BasicShader* shader =
@@ -40,13 +40,6 @@ namespace Zero {
                 reinterpret_cast<uint8_t const*>(&s_scene_data->view_projection_matrix),
                 sizeof(s_scene_data->view_projection_matrix)});
 
-        ShaderParamBindTable::bindParam(
-            shader,
-            "_ModelMatrix",
-            std::span<const uint8_t>{
-                reinterpret_cast<uint8_t const*>(&s_scene_data->model_matrix),
-                sizeof(s_scene_data->model_matrix)});
-
-        s_render_context->submitMesh(mesh);
+        s_render_context->submit(mesh, trans);
     }
 } // namespace Zero

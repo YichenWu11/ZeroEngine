@@ -1,2 +1,2 @@
-cmake -G ninja -B ./build
+cmake -G Ninja -B ./build
 pause
