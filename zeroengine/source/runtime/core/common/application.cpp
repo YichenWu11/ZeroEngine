@@ -1,3 +1,5 @@
+#include <imgui.h>
+
 #include "runtime/core/common/application.h"
 #include "runtime/core/common/layer.h"
 #include "runtime/core/log/log_system.h"
@@ -16,7 +18,7 @@ namespace Zero {
     Application* Application::s_instance = nullptr;
 
     Application::Application() :
-        m_camera(-1.0f, 1.0f, -1.0f, 1.0f) {
+        m_camera(-1.6f, 1.6f, -0.9f, 0.9f) {
         ZE_ASSERT(!s_instance && "Application already exists!");
         s_instance = this;
 
@@ -105,57 +107,36 @@ namespace Zero {
         // create mesh for test
         // *******************************************************************************************
 
-        // *******************************************************************************************
-        // create shader for test
-
-        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
-        std::wstring path        = AnsiToWString(shader_path.string());
-
-        std::vector<std::pair<std::string, Shader::Property>> properties;
-        properties.emplace_back(
-            "_Global",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                0,
-                0,
-                0));
-
-        ShaderParamBindTable::bindDevice(device);
-
-        ShaderParamBindTable::registerShader("common", properties);
-        BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
-
-        shader->SetVsShader(path.c_str());
-        shader->SetPsShader(path.c_str());
-        shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        shader->blendState               = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-        auto&& depthStencilState         = shader->depthStencilState;
-        depthStencilState.DepthEnable    = true;
-        depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS;
-        depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-        depthStencilState.StencilEnable  = false;
-
-        Matrix viewProjMatrix = m_camera.getProjectionMatrix() * m_camera.getViewMatrix();
-        // Matrix viewProjMatrix = Matrix::Identity;
-
-        ShaderParamBindTable::bindParam(shader, "_Global", std::span<const uint8_t>{reinterpret_cast<uint8_t const*>(&viewProjMatrix), sizeof(viewProjMatrix)});
-
-        // create shader for test
-        // *******************************************************************************************
-
         while (m_running) {
             DirectX::SimpleMath::Color clear_color = {0.1f, 0.1f, 0.1f, 1.0f};
             RenderCommand::setClearColor(clear_color);
             RenderCommand::clear();
 
+            static float r = 0.0f;
+            static float x = 0.0f;
+            static float y = 0.0f;
+            static float z = 0.0f;
+
+            m_camera.setPosition({x, y, z});
+            m_camera.setRotation(r);
+
             // imgui draw
             m_ImGuiLayer->begin();
             for (Layer* layer : m_layerStack)
                 layer->onImGuiRender();
+
+            ImGui::DragFloat("ROTATION", &r, 0.5f,
+                             0.0f, 90.0f, "%.2f");
+            ImGui::DragFloat("X", &x, 0.01f,
+                             -1.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("Y", &y, 0.01f,
+                             -1.0f, 1.0f, "%.2f");
+            ImGui::DragFloat("Z", &z, 0.01f,
+                             0.0f, 1.0f, "%.2f");
+
             m_ImGuiLayer->end();
 
-            Renderer::beginScene();
+            Renderer::beginScene(m_camera);
             Renderer::submit(triangle_mesh.get());
             Renderer::endScene();
 

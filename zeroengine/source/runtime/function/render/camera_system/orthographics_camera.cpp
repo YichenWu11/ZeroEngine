@@ -13,6 +13,6 @@ namespace Zero {
         Matrix transform = Matrix::CreateTranslation(m_position);
         Matrix rotation  = Matrix::CreateRotationZ(XMConvertToRadians(m_rotation));
 
-        m_view_matrix = (rotation * transform).Invert();
+        m_view_matrix = (transform * rotation).Invert();
     }
 } // namespace Zero

@@ -39,6 +39,43 @@ namespace Zero {
 #endif
     }
 
+    void RenderContext::buildShaders() {
+        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
+        std::wstring path        = AnsiToWString(shader_path.string());
+
+        std::vector<std::pair<std::string, Shader::Property>> properties;
+        properties.emplace_back(
+            "_ViewProjMatrix",
+            Shader::Property(
+                ShaderVariableType::ConstantBuffer,
+                0,
+                0,
+                0));
+        properties.emplace_back(
+            "_ModelMatrix",
+            Shader::Property(
+                ShaderVariableType::ConstantBuffer,
+                0,
+                1,
+                0));
+
+        ShaderParamBindTable::bindDevice(m_device.Get());
+
+        ShaderParamBindTable::registerShader("common", properties);
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
+
+        shader->SetVsShader(path.c_str());
+        shader->SetPsShader(path.c_str());
+        shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+        shader->blendState               = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+        auto&& depthStencilState         = shader->depthStencilState;
+        depthStencilState.DepthEnable    = true;
+        depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS;
+        depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        depthStencilState.StencilEnable  = false;
+    }
+
     void RenderContext::init(int width, int height) {
         m_viewport    = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
         m_scissorRect = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
@@ -141,6 +178,10 @@ namespace Zero {
             ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
             m_fenceValue = 0;
             flushCommandQueue();
+        }
+
+        {
+            buildShaders();
         }
     }
 

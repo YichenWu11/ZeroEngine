@@ -169,18 +169,19 @@ namespace Zero {
 
         if (create_info.is_fullscreen)
             m_window = CreateWindow(
-                wc.lpszClassName, 
-                L"Zero Engine", 
-                WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZE | WS_SIZEBOX, 
-                CW_USEDEFAULT, CW_USEDEFAULT, 
-                m_data.width, m_data.height, 
+                wc.lpszClassName,
+                L"Zero Engine",
+                WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZE | WS_SIZEBOX,
+                300, 200,
+                m_data.width, m_data.height,
                 NULL, NULL, wc.hInstance, NULL);
         else
-            m_window = CreateWindow(wc.lpszClassName,
-                L"Zero Engine", 
+            m_window = CreateWindow(
+                wc.lpszClassName,
+                L"Zero Engine",
                 WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
-                CW_USEDEFAULT, CW_USEDEFAULT, 
-                m_data.width, m_data.height, 
+                300, 200,
+                m_data.width, m_data.height,
                 NULL, NULL, wc.hInstance, NULL);
 
         if (!m_window)

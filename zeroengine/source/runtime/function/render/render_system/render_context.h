@@ -24,6 +24,7 @@ namespace Zero {
         ID3D12DescriptorHeap*       descriptor_heap;
     };
 
+    // TODO: 构建一个绘制map Shader2Mesh
     class RenderContext {
     public:
         RenderContext(HWND window_handle);
@@ -49,6 +50,8 @@ namespace Zero {
         }
 
     private:
+        void buildShaders();
+
         void populateCommandList(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
         void flushCommandQueue();
 

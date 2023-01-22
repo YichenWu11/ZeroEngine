@@ -15,6 +15,7 @@ namespace Zero {
             m_rotation = rotation;
             recalculateViewMatrix();
         }
+
         float getRotation() const { return m_rotation; }
 
         const DirectX::SimpleMath::Matrix& getProjectionMatrix() const { return m_projection_matrix; }
