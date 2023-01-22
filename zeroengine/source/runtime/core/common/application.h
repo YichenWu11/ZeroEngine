@@ -7,7 +7,9 @@
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/render/window_system/window_system.h"
 
-#include "runtime/function/render/camera_system/orthographics_camera.h"
+namespace Chen::CDX12 {
+    class Mesh;
+}
 
 namespace Zero {
     class Application {
@@ -35,10 +37,11 @@ namespace Zero {
         bool                           m_running = true;
         LayerStack                     m_layerStack;
 
-        OrthographicsCamera m_camera;
-
     private:
         static Application* s_instance;
+
+    protected:
+        std::unique_ptr<Chen::CDX12::Mesh> triangle_mesh;
     };
 
     // TODO: to be defined in client

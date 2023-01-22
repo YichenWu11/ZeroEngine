@@ -5,7 +5,7 @@ int main(int /*argc*/, char** /*argv*/) {
 
     LOG_INFO("zeroengine start");
 
-    auto editor_app = Zero::createApplication();
+    auto editor_app = createApplication();
 
     editor_app->run();
 

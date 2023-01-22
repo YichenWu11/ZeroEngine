@@ -4,11 +4,11 @@ namespace Zero {
     std::unique_ptr<InputSystem> InputSystem::s_instance = std::make_unique<InputSystem>();
 
     bool InputSystem::isKeyPressed(int keycode) {
-        return GetAsyncKeyState(keycode) & 0x0001;
+        return GetAsyncKeyState(keycode) & 0x8000;
     }
 
     bool InputSystem::isMouseButtonPressed(int button) {
-        return GetAsyncKeyState(button) & 0x0001;
+        return GetAsyncKeyState(button) & 0x8000;
     }
 
     DirectX::SimpleMath::Vector2 InputSystem::getMousePosition() {

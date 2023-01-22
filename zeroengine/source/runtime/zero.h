@@ -1,0 +1,15 @@
+#pragma once
+
+// runtime included
+
+#include "runtime/core/common/application.h"
+#include "runtime/core/common/layer.h"
+
+#include "runtime/function/gui/imgui_layer.h"
+#include "runtime/function/input/input_system.h"
+
+#include "runtime/function/mesh/mesh_table.h"
+
+#include "runtime/function/render/camera_system/orthographics_camera.h"
+#include "runtime/function/render/render_system/render_command.h"
+#include "runtime/function/render/render_system/renderer.h"
