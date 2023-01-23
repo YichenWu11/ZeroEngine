@@ -12,7 +12,7 @@ namespace Zero {
 
     class Renderer {
     public:
-        static void bindRenderContext(RenderContext* context) { s_render_context = context; }
+        static void init(RenderContext* context);
 
         static void beginScene(OrthographicsCamera& camera);
         static void endScene();

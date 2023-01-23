@@ -21,19 +21,19 @@ namespace Zero {
     // };
 
     struct VertexBufferLayout : public Chen::CDX12::rtti::Struct {
-        Chen::CDX12::rtti::Var<DirectX::XMFLOAT3> position = "POSITION";
-        Chen::CDX12::rtti::Var<DirectX::XMFLOAT4> color    = "COLOR";
+        Chen::CDX12::rtti::Var<DirectX::XMFLOAT3> position  = "POSITION";
+        Chen::CDX12::rtti::Var<DirectX::XMFLOAT2> tex_coord = "TEXCOORD";
     };
 
     class VertexBuffer {
     public:
-        VertexBuffer(ID3D12Device* device, DirectX::XMFLOAT3* vertices, uint32_t size);
+        VertexBuffer(ID3D12Device* device, float* vertices, uint32_t size);
         ~VertexBuffer();
 
         void bind(ID3D12GraphicsCommandList* cmdlist, Chen::CDX12::Mesh*) const;
         void unbind() const;
 
-        static VertexBuffer* create(ID3D12Device* device, DirectX::XMFLOAT3* vertices, uint32_t size);
+        static VertexBuffer* create(ID3D12Device* device, float* vertices, uint32_t size);
 
     private:
         Chen::CDX12::UploadBuffer* m_vertex_upload;

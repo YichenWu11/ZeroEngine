@@ -2,10 +2,11 @@
 
 #include "runtime/core/common/application.h"
 #include "runtime/core/common/layer.h"
-#include "runtime/function/mesh/mesh_table.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
+#include "runtime/function/table/mesh_table.h"
+#include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -20,8 +21,12 @@ namespace Zero {
         m_window = Zero::Scope<IWindowSystem>(IWindowSystem::create());
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
 
+        RenderContext* render_context = static_cast<WindowSystem*>(m_window.get())->getRenderContext();
+
+        Renderer::init(render_context);
+
         m_ImGuiLayer = new ImGuiLayer(
-            static_cast<WindowSystem*>(m_window.get())->getRenderContext(),
+            render_context,
             m_window->getNativeWindowHandle());
         pushOverlay(m_ImGuiLayer);
     }
@@ -50,10 +55,12 @@ namespace Zero {
     }
 
     void Application::run() {
-        RenderContext* render_context = static_cast<WindowSystem*>(m_window.get())->getRenderContext();
-        ID3D12Device*  device         = render_context->getGraphicsDevice();
-        Renderer::bindRenderContext(render_context);
-        MeshTable::registerMesh(render_context, "triangle");
+        MeshTable::getInstance().buildBasicMesh();
+
+        auto asoul_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png";
+
+        TextureInitInfo init_info{AnsiToWString(asoul_path.string()).c_str(), "BELLA"};
+        TextureTable::getInstance().registerTex(init_info);
 
         while (m_running) {
             float    time     = ImGui::GetTime();

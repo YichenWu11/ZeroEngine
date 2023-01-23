@@ -36,22 +36,34 @@ public:
 
         Zero::Renderer::beginScene(m_camera);
 
-        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"), tri_trans_0);
-        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"), {0.0f, 0.0f, 0.0f});
-        Zero::Renderer::submit(Zero::MeshTable::getMesh("triangle"), {0.8f, 0.3f, 0.0f});
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), tri_trans_0);
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), {0.0f, 0.0f, 0.0f});
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), {0.8f, 0.3f, 0.0f});
 
         Zero::Renderer::endScene();
     }
 
     void onImGuiRender() override {
-        ImGui::Begin("DEBUG");
+        {
+            ImGui::Begin("DEBUG");
 
-        ImGui::DragFloat("TRI0_X", &(tri_trans_0.x), 0.01f,
-                         -2.0f, 2.0f, "%.2f");
-        ImGui::DragFloat("TRI0_Y", &(tri_trans_0.y), 0.01f,
-                         -2.0f, 2.0f, "%.2f");
+            ImGui::DragFloat("TRI0_X", &(tri_trans_0.x), 0.01f,
+                             -2.0f, 2.0f, "%.2f");
+            ImGui::DragFloat("TRI0_Y", &(tri_trans_0.y), 0.01f,
+                             -2.0f, 2.0f, "%.2f");
 
-        ImGui::End();
+            ImGui::End();
+        }
+
+        {
+            ImGui::Begin("IMAGE");
+
+            static auto tex_alloc = Zero::TextureTable::getInstance().getTexAllocation();
+
+            ImGui::Image(ImTextureID(tex_alloc->GetGpuHandle(0).ptr), ImVec2(190, 190));
+
+            ImGui::End();
+        }
     }
 
     void onEvent(Zero::Event& event) override {

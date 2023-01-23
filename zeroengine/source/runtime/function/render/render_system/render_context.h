@@ -52,6 +52,7 @@ namespace Zero {
 
     private:
         void buildShaders();
+        void buildTextures();
 
         void populateCommandList(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
         void flushCommandQueue();

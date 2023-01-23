@@ -26,7 +26,7 @@ namespace Zero {
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
         // ImGui::StyleColorsDark();
         // ImGui::StyleColorsClassic();
@@ -74,7 +74,5 @@ namespace Zero {
     }
 
     void ImGuiLayer::onImGuiRender() {
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
     }
 } // namespace Zero

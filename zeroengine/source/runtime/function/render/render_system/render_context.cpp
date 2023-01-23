@@ -7,6 +7,7 @@
 
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
+#include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -65,12 +66,19 @@ namespace Zero {
                 0,
                 1,
                 0));
+        properties.emplace_back(
+            "TextureMap",
+            Shader::Property(
+                ShaderVariableType::SRVDescriptorHeap,
+                0,
+                0,
+                50));
 
-        ShaderParamBindTable::bindDevice(m_device.Get());
+        ShaderParamBindTable::getInstance().bindDevice(m_device.Get());
 
-        ShaderParamBindTable::registerShader("common", properties);
+        ShaderParamBindTable::getInstance().registerShader("common", properties);
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("common"));
 
         shader->SetVsShader(path.c_str());
         shader->SetPsShader(path.c_str());
@@ -81,6 +89,38 @@ namespace Zero {
         depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS;
         depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         depthStencilState.StencilEnable  = false;
+
+        ShaderParamBindTable::getInstance().registerShader("transparent", properties);
+        BasicShader* trans_shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+        trans_shader->SetVsShader(path.c_str());
+        trans_shader->SetPsShader(path.c_str());
+        trans_shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+        trans_shader->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+
+        trans_shader->blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+        D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;
+        transparencyBlendDesc.BlendEnable           = true;
+        transparencyBlendDesc.LogicOpEnable         = false;
+        transparencyBlendDesc.SrcBlend              = D3D12_BLEND_SRC_ALPHA;
+        transparencyBlendDesc.DestBlend             = D3D12_BLEND_INV_SRC_ALPHA;
+        transparencyBlendDesc.BlendOp               = D3D12_BLEND_OP_ADD;
+        transparencyBlendDesc.SrcBlendAlpha         = D3D12_BLEND_ONE;
+        transparencyBlendDesc.DestBlendAlpha        = D3D12_BLEND_ZERO;
+        transparencyBlendDesc.BlendOpAlpha          = D3D12_BLEND_OP_ADD;
+        transparencyBlendDesc.LogicOp               = D3D12_LOGIC_OP_NOOP;
+        transparencyBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+        trans_shader->blendState.RenderTarget[0]    = transparencyBlendDesc;
+
+        auto&& trans_depthStencilState         = trans_shader->depthStencilState;
+        trans_depthStencilState.DepthEnable    = true;
+        trans_depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        trans_depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+        trans_depthStencilState.StencilEnable  = true;
+    }
+
+    void RenderContext::buildTextures() {
+        // do nothing
     }
 
     void RenderContext::init(int width, int height) {
@@ -189,6 +229,7 @@ namespace Zero {
 
         {
             buildShaders();
+            buildTextures();
         }
     }
 
@@ -309,10 +350,14 @@ namespace Zero {
         frameRes.ClearRTV(rtvHandle);
         frameRes.ClearDSV(dsvHandle);
 
-        BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
+        cmdList->SetDescriptorHeaps(
+            1,
+            get_rvalue_ptr(TextureTable::getInstance().getTexAllocation()->GetDescriptorHeap()));
 
-        auto& prop_table = ShaderParamBindTable::getShaderPropTable(shader);
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+
+        auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
 
         // draw call
         for (auto& [mesh, trans] : m_draw_list) {
@@ -320,14 +365,14 @@ namespace Zero {
             Vector4 modulate  = {0.5f, 0.2f, 0.2f, 1.0f};
 
             // bind object-varying constants
-            ShaderParamBindTable::bindParam(
+            ShaderParamBindTable::getInstance().bindParam(
                 shader,
                 "_ModelMatrix",
                 std::span<const uint8_t>{
                     reinterpret_cast<uint8_t const*>(&transform),
                     sizeof(transform)});
 
-            ShaderParamBindTable::bindParam(
+            ShaderParamBindTable::getInstance().bindParam(
                 shader,
                 "_Modulate",
                 std::span<const uint8_t>{
@@ -344,8 +389,8 @@ namespace Zero {
                     auto buffer = frameRes.AllocateConstBuffer(data);
                     bindProperties.emplace_back(name, buffer);
                                },
-                               [&](DescriptorHeapAllocation const* data) {
-                    bindProperties.emplace_back(name, DescriptorHeapAllocView(data));
+                               [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
+                    bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
                 }},
                     prop.second);
             }
@@ -359,7 +404,6 @@ namespace Zero {
                 bindProperties);
         }
 
-        cmdList->SetDescriptorHeaps(1, get_rvalue_ptr(m_csuGpuDH.GetDescriptorHeap()));
         ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
 
         m_stateTracker.RestoreState(cmdList.Get());

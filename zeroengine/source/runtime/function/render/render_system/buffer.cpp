@@ -15,19 +15,15 @@ namespace Zero {
         VertexBuffer
     */
 
-    VertexBuffer::VertexBuffer(ID3D12Device* device, XMFLOAT3* vertices, uint32_t size) {
-        size_t             VERTEX_COUNT = size / sizeof(XMFLOAT3);
-        std::vector<vbyte> vertex_data(buffer_layout.structSize * VERTEX_COUNT);
+    VertexBuffer::VertexBuffer(ID3D12Device* device, float* vertices, uint32_t size) {
+        size_t             VERTEX_COUNT = size / sizeof(float);
+        std::vector<vbyte> vertex_data(size);
         vbyte*             vertex_dataPtr = vertex_data.data();
-        for (size_t i = 0; i < VERTEX_COUNT; ++i) {
-            XMFLOAT3 vert                              = vertices[i];
+        for (size_t i = 0; i < VERTEX_COUNT; i += buffer_layout.structSize / sizeof(float)) {
+            XMFLOAT3 vert{vertices[i], vertices[i + 1], vertices[i + 2]};
             buffer_layout.position.Get(vertex_dataPtr) = vert;
-            XMFLOAT4 color(
-                vert.x + 0.5f,
-                vert.y + 0.5f,
-                vert.z + 0.5f,
-                1);
-            buffer_layout.color.Get(vertex_dataPtr) = color;
+            XMFLOAT2 tex_coord(vertices[i + 3], vertices[i + 4]);
+            buffer_layout.tex_coord.Get(vertex_dataPtr) = tex_coord;
             vertex_dataPtr += buffer_layout.structSize;
         }
 
@@ -53,7 +49,7 @@ namespace Zero {
     void VertexBuffer::unbind() const {
     }
 
-    VertexBuffer* VertexBuffer::create(ID3D12Device* device, XMFLOAT3* vertices, uint32_t size) {
+    VertexBuffer* VertexBuffer::create(ID3D12Device* device, float* vertices, uint32_t size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");

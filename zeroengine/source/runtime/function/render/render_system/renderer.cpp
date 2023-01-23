@@ -3,6 +3,8 @@
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
+#include "runtime/function/table/mesh_table.h"
+#include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -10,6 +12,12 @@ using namespace DirectX::SimpleMath;
 namespace Zero {
     RenderContext*       Renderer::s_render_context = nullptr;
     Renderer::SceneData* Renderer::s_scene_data     = new Renderer::SceneData();
+
+    void Renderer::init(RenderContext* context) {
+        s_render_context = context;
+        MeshTable::getInstance().bindRenderContext(context);
+        TextureTable::getInstance().bindRenderContext(context);
+    }
 
     void Renderer::beginScene(OrthographicsCamera& camera) {
         ZE_ASSERT(s_render_context && "bind the render_context first!");
@@ -31,14 +39,21 @@ namespace Zero {
         ZE_ASSERT(s_render_context && "bind the render_context first!");
 
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getShader("common"));
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
 
-        ShaderParamBindTable::bindParam(
+        ShaderParamBindTable::getInstance().bindParam(
             shader,
             "_ViewProjMatrix",
             std::span<const uint8_t>{
                 reinterpret_cast<uint8_t const*>(&s_scene_data->view_projection_matrix),
                 sizeof(s_scene_data->view_projection_matrix)});
+
+        auto tex_alloc = TextureTable::getInstance().getTexAllocation();
+
+        ShaderParamBindTable::getInstance().bindParam(
+            shader,
+            "TextureMap",
+            std::make_pair(tex_alloc, 0));
 
         s_render_context->submit(mesh, trans);
     }
