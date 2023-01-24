@@ -1,9 +1,11 @@
 set(TARGET_NAME ZE_Editor)
 
-file(GLOB_RECURSE srcs CONFIGURE_DEPENDS source/*.cpp include/*.h)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ./*.cpp)
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS ./*.h)
 
-# add_library(${TARGET_NAME} SHARED ${srcs})
-add_executable(${TARGET_NAME} ${srcs})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${HEADER_FILES} ${SOURCE_FILES})
+
+add_executable(${TARGET_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
 set_target_properties(${TARGET_NAME} PROPERTIES
     CXX_STANDARD 20

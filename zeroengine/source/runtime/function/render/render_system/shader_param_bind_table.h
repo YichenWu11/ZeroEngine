@@ -3,7 +3,7 @@
 /*
     Binding Rule:
         - For BufferView, bind the actual data
-        - For DescriptorAllocView, bind the pointer
+        - For DescriptorAllocView, bind the pointer and the offset
 
 */
 
@@ -12,13 +12,16 @@
 #include <CDX12/Util/BindProperty.h>
 
 namespace Zero {
-    // uint8_t const*
+    enum class ShaderUsage : uint8_t {
+        BASIC = 0,
+        COMPUTE
+    };
 
     class ShaderParamBindTable {
     public:
         using ParamBindTable  = std::unordered_map<std::string, std::variant<std::pair<Chen::CDX12::DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>>>;
         using ShaderBindTable = std::unordered_map<Chen::CDX12::Shader*, ParamBindTable>;
-        using ShaderTable     = std::unordered_map<std::string, Zero::Scope<Chen::CDX12::Shader>>;
+        using ShaderTable     = std::unordered_map<std::string, Zero::Ref<Chen::CDX12::Shader>>;
 
     public:
         static ShaderParamBindTable& getInstance() {
@@ -37,6 +40,8 @@ namespace Zero {
             const std::string&                                                     shader_name,
             std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
             ComPtr<ID3D12RootSignature>&&                                          rootSig);
+
+        void removeShader(const std::string& shader_name);
 
         void bindParam(Chen::CDX12::Shader*, const std::string&, std::variant<std::pair<Chen::CDX12::DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>>);
 

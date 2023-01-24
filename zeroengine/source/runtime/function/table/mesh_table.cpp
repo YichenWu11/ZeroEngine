@@ -32,7 +32,7 @@ namespace Zero {
             0.0f,
         };
 
-        uint indices_tri[] = {0, 1, 2};
+        uint32_t indices_tri[] = {0, 1, 2};
 
         float vertices_square[] = {
             -0.5f,
@@ -57,7 +57,7 @@ namespace Zero {
             1.0f,
         };
 
-        uint indices_square[] = {0, 2, 1, 2, 3, 1};
+        uint32_t indices_square[] = {0, 2, 1, 2, 3, 1};
 
         ComPtr<ID3D12CommandAllocator>    cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> commandList;
@@ -68,7 +68,7 @@ namespace Zero {
         ThrowIfFailed(cmdAllocator->Reset());
         ThrowIfFailed(commandList->Reset(cmdAllocator.Get(), nullptr));
 
-        auto triangle_mesh = std::make_unique<Mesh>(
+        auto triangle_mesh = std::make_shared<Mesh>(
             device,
             structs,
             array_count(vertices_tri) * sizeof(float) / layout.structSize,
@@ -85,7 +85,7 @@ namespace Zero {
         vert_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
         indi_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
 
-        auto square_mesh = std::make_unique<Mesh>(
+        auto square_mesh = std::make_shared<Mesh>(
             device,
             structs,
             array_count(vertices_square) * sizeof(float) / layout.structSize,
@@ -117,7 +117,7 @@ namespace Zero {
         delete indi_buffer_square;
     }
 
-    void MeshTable::registerMesh(const std::string& mesh_name) {
+    void MeshTable::registerMesh(const std::string& mesh_name, float* vertices, uint32_t* indices) {
         ZE_ASSERT(m_render_context && "Bind the render_context first (MeshTable)!");
     }
 

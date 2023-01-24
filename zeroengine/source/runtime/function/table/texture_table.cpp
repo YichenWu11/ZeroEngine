@@ -19,18 +19,28 @@ namespace Zero {
         m_tex_alloc      = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
     }
 
+    void TextureTable::registerTex(const std::filesystem::path& tex_path, TexFileFormat file_format) {
+        if (!std::filesystem::exists(tex_path)) {
+            LOG_WARN("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
+            return;
+        }
+
+        TextureInitInfo init_info{AnsiToWString(tex_path.string()).c_str(), tex_path.stem().string()};
+        registerTex(init_info, file_format);
+    }
+
     void TextureTable::registerTex(
         const TextureInitInfo& info,
         TexFileFormat          file_format) {
         ZE_ASSERT(m_render_context && "Bind the device first(TextureTable)!");
 
-        if (m_textures.contains(info.name)) {
+        if (m_texture_table.contains(info.name)) {
             LOG_WARN("The texture with this name({0}) has exsited!", info.name);
             return;
         }
 
         ID3D12Device* device = m_render_context->getGraphicsDevice();
-        auto          tex    = std::make_unique<Texture>(
+        auto          tex    = std::make_shared<Texture>(
             device,
             info.width,
             info.height,
@@ -68,13 +78,13 @@ namespace Zero {
                 break;
         }
 
-        m_textures[info.name] = std::move(tex);
+        m_texture_table[info.name] = std::move(tex);
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC desc = m_textures[info.name]->GetColorSrvDesc(0);
+        D3D12_SHADER_RESOURCE_VIEW_DESC desc = m_texture_table[info.name]->GetColorSrvDesc(0);
         device->CreateShaderResourceView(
-            m_textures[info.name]->GetResource(),
+            m_texture_table[info.name]->GetResource(),
             &desc,
-            m_tex_alloc.GetCpuHandle(m_textures.size() - 1));
+            m_tex_alloc.GetCpuHandle(m_texture_table.size() - 1));
 
         auto uploadResourcesFinished = resourceUpload.End(m_render_context->getCommandQueue());
         uploadResourcesFinished.wait();

@@ -57,23 +57,23 @@ namespace Zero {
     void Application::run() {
         MeshTable::getInstance().buildBasicMesh();
 
-        auto asoul_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png";
-
-        TextureInitInfo init_info{AnsiToWString(asoul_path.string()).c_str(), "BELLA"};
-        TextureTable::getInstance().registerTex(init_info);
+        TextureTable::getInstance().registerTex(
+            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png");
 
         while (m_running) {
             float    time     = ImGui::GetTime();
             TimeStep timestep = time - m_lastframe_time;
             m_lastframe_time  = time;
 
-            m_ImGuiLayer->begin();
-            for (Layer* layer : m_layerStack)
-                layer->onImGuiRender();
-            m_ImGuiLayer->end();
+            if (!m_minimized) {
+                m_ImGuiLayer->begin();
+                for (Layer* layer : m_layerStack)
+                    layer->onImGuiRender();
+                m_ImGuiLayer->end();
 
-            for (Layer* layer : m_layerStack)
-                layer->onUpdate(timestep);
+                for (Layer* layer : m_layerStack)
+                    layer->onUpdate(timestep);
+            }
 
             m_window->onUpdate();
         }
@@ -85,7 +85,13 @@ namespace Zero {
     }
 
     bool Application::onWindowResize(WindowResizeEvent& e) {
-        m_window->onResize(e.getWidth(), e.getHeight());
-        return true;
+        if (e.getWidth() == 0 || e.getHeight() == 0) {
+            m_minimized = true;
+            return false;
+        }
+
+        m_minimized = false;
+        Renderer::onWindowResize(e.getWidth(), e.getHeight());
+        return false;
     }
 } // namespace Zero

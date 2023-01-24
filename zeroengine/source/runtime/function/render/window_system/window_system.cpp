@@ -114,7 +114,8 @@ namespace Zero {
             case WM_MOUSEWHEEL: {
                 MouseScrolledEvent event(
                     static_cast<float>(GET_X_LPARAM(lParam)),
-                    static_cast<float>(GET_Y_LPARAM(lParam)));
+                    static_cast<float>(GET_Y_LPARAM(lParam)),
+                    static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)));
                 EVENT_CALLBACK(event)
                 return 0;
             }
@@ -212,10 +213,6 @@ namespace Zero {
         }
 
         m_context->swapBuffer();
-    }
-
-    void WindowSystem::onResize(int width, int height) {
-        m_context->onResize(width, height);
     }
 
     void WindowSystem::setVSync(bool enabled) {

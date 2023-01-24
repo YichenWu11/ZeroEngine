@@ -1,7 +1,5 @@
 #pragma once
 
-#include <imgui.h>
-
 #include "runtime/zero.h"
 
 using namespace DirectX::SimpleMath;
@@ -9,32 +7,18 @@ using namespace DirectX::SimpleMath;
 class ExampleLayer : public Zero::Layer {
 public:
     ExampleLayer() :
-        Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f) {
+        Layer("Example"), m_camera_controller(1280.0f / 720.0f) {
     }
 
     void onUpdate(Zero::TimeStep timestep) override {
-        if (Zero::InputSystem::isKeyPressed(VK_LEFT))
-            m_camera_position.x -= m_camera_move_speed * timestep;
-        else if (Zero::InputSystem::isKeyPressed(VK_RIGHT))
-            m_camera_position.x += m_camera_move_speed * timestep;
+        // update
+        m_camera_controller.onUpdate(timestep);
 
-        if (Zero::InputSystem::isKeyPressed(VK_DOWN))
-            m_camera_position.y -= m_camera_move_speed * timestep;
-        else if (Zero::InputSystem::isKeyPressed(VK_UP))
-            m_camera_position.y += m_camera_move_speed * timestep;
-
-        if (Zero::InputSystem::isKeyPressed('A'))
-            m_camera_rotation += m_camera_rotate_speed * timestep;
-        else if (Zero::InputSystem::isKeyPressed('D'))
-            m_camera_rotation -= m_camera_rotate_speed * timestep;
-
-        Zero::RenderCommand::setClearColor({0.2f, 0.2f, 0.2f, 1.0f});
+        // render
+        Zero::RenderCommand::setClearColor(clear_color);
         Zero::RenderCommand::clear();
 
-        m_camera.setPosition(m_camera_position);
-        m_camera.setRotation(m_camera_rotation);
-
-        Zero::Renderer::beginScene(m_camera);
+        Zero::Renderer::beginScene(m_camera_controller.getCamera());
 
         Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), tri_trans_0);
         Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), {0.0f, 0.0f, 0.0f});
@@ -52,6 +36,8 @@ public:
             ImGui::DragFloat("TRI0_Y", &(tri_trans_0.y), 0.01f,
                              -2.0f, 2.0f, "%.2f");
 
+            ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
+
             ImGui::End();
         }
 
@@ -67,6 +53,8 @@ public:
     }
 
     void onEvent(Zero::Event& event) override {
+        m_camera_controller.onEvent(event);
+
         Zero::EventDispatcher dispatcher(event);
         dispatcher.Dispatch<Zero::KeyPressedEvent>(ZE_BIND_EVENT_FN(ExampleLayer::onKeyPressedEvent));
     }
@@ -76,17 +64,10 @@ public:
     }
 
 private:
-    Zero::OrthographicsCamera m_camera;
-
-    Vector3 m_camera_position;
-    float   m_camera_rotation = 0.0f;
-
-    // per second
-    float m_camera_move_speed   = 4.0f;
-    float m_camera_rotate_speed = 50.0f;
+    Zero::OrthographicsCameraController m_camera_controller;
 
     Vector3 tri_trans_0{-0.8f, -0.3f, 0.0f};
-    Vector4 tri_color_0{1.0f, 1.0f, 1.0f, 1.0f};
+    Color   clear_color{0.2f, 0.2f, 0.2f, 1.0f};
 };
 
 class Sandbox : public Zero::Application {

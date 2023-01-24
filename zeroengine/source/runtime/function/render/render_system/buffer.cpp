@@ -9,13 +9,13 @@ using namespace Chen::CDX12;
 using namespace DirectX;
 
 namespace Zero {
-    static VertexBufferLayout buffer_layout;
-
     /*
         VertexBuffer
     */
 
     VertexBuffer::VertexBuffer(ID3D12Device* device, float* vertices, uint32_t size) {
+        static VertexBufferLayout buffer_layout;
+
         size_t             VERTEX_COUNT = size / sizeof(float);
         std::vector<vbyte> vertex_data(size);
         vbyte*             vertex_dataPtr = vertex_data.data();

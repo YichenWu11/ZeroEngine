@@ -16,7 +16,7 @@ namespace Zero {
 
         void buildBasicMesh();
 
-        void registerMesh(const std::string&);
+        void registerMesh(const std::string&, float*, uint32_t*);
 
         Chen::CDX12::Mesh* getMesh(const std::string&);
 
@@ -24,7 +24,7 @@ namespace Zero {
         MeshTable()  = default;
         ~MeshTable() = default;
 
-        RenderContext*                                                  m_render_context;
-        std::unordered_map<std::string, Zero::Scope<Chen::CDX12::Mesh>> m_mesh_table;
+        RenderContext*                                                m_render_context;
+        std::unordered_map<std::string, Zero::Ref<Chen::CDX12::Mesh>> m_mesh_table;
     };
 } // namespace Zero

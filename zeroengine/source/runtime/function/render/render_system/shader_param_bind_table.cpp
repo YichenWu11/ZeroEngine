@@ -25,7 +25,7 @@ namespace Zero {
             return;
         }
 
-        auto shader = std::make_unique<BasicShader>(properties, m_device, samplers);
+        auto shader = std::make_shared<BasicShader>(properties, m_device, samplers);
 
         m_shader_bind_table[shader.get()] = ParamBindTable();
         m_shader_table[shader_name]       = std::move(shader);
@@ -42,10 +42,22 @@ namespace Zero {
             return;
         }
 
-        auto shader = std::make_unique<BasicShader>(properties, std::move(rootSig));
+        auto shader = std::make_shared<BasicShader>(properties, std::move(rootSig));
 
         m_shader_bind_table[shader.get()] = ParamBindTable();
         m_shader_table[shader_name]       = std::move(shader);
+    }
+
+    void ShaderParamBindTable::removeShader(const std::string& shader_name) {
+        if (!m_shader_table.contains(shader_name)) {
+            LOG_WARN("The shader with this name ({}) does not exist!", shader_name);
+            return;
+        }
+
+        m_shader_bind_table.erase(m_shader_table[shader_name].get());
+        m_shader_table.erase(shader_name);
+
+        LOG_INFO("The shader with this name ({}) has been removed!", shader_name);
     }
 
     void ShaderParamBindTable::bindParam(Shader* shader, const std::string& prop_name, std::variant<std::pair<DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>> data) {
@@ -61,7 +73,7 @@ namespace Zero {
 
     ShaderParamBindTable::ParamBindTable& ShaderParamBindTable::getShaderPropTable(Shader* shader) {
         if (!m_shader_bind_table.contains(shader)) {
-            LOG_WARN("The shader with does not exist!");
+            LOG_WARN("This shader does not exist in the ShaderBindTable!");
         }
 
         return m_shader_bind_table[shader];

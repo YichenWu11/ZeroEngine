@@ -32,9 +32,10 @@ namespace Zero {
 
         void bindRenderContext(RenderContext* context);
 
-        Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
-
+        void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureInitInfo&, TexFileFormat = TexFileFormat::WIC);
+
+        Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 
     private:
         TextureTable() = default;
@@ -44,7 +45,7 @@ namespace Zero {
         RenderContext*                        m_render_context{nullptr};
         Chen::CDX12::DescriptorHeapAllocation m_tex_alloc;
 
-        std::map<std::string, Scope<Chen::CDX12::Texture>> m_textures;
+        std::map<std::string, Ref<Chen::CDX12::Texture>> m_texture_table;
     };
 
 } // namespace Zero

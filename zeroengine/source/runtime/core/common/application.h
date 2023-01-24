@@ -31,7 +31,8 @@ namespace Zero {
 
         Zero::Scope<IWindowSystem> m_window;
         ImGuiLayer*                m_ImGuiLayer;
-        bool                       m_running = true;
+        bool                       m_running   = true;
+        bool                       m_minimized = false;
         LayerStack                 m_layerStack;
         float                      m_lastframe_time = 0.0f;
 

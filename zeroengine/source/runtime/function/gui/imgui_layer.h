@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
+#include <imgui.h>
 
 #include "runtime/core/common/layer.h"
 #include "runtime/function/event/application_event.h"
@@ -21,6 +22,9 @@ namespace Zero {
 
         void begin();
         void end();
+
+    private:
+        void setPurpleStyle(ImGuiStyle&);
 
     private:
         RenderContext* m_context;

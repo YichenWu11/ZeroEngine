@@ -11,7 +11,6 @@ namespace Zero {
         virtual ~WindowSystem();
 
         void onUpdate() override;
-        void onResize(int, int) override;
 
         int getWidth() const override { return m_data.width; }
         int getHeight() const override { return m_data.height; }

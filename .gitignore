@@ -21,7 +21,6 @@ imgui.ini
 .idea/
 compiledDependencies/
 cmake-build-*
-build-*
 
 # CMake.gitignore https://github.com/github/gitignore/blob/master/CMake.gitignore
 CMakeLists.txt.user

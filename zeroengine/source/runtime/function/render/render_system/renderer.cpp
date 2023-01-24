@@ -19,11 +19,17 @@ namespace Zero {
         TextureTable::getInstance().bindRenderContext(context);
     }
 
+    void Renderer::onWindowResize(int width, int height) {
+        ZE_ASSERT(s_render_context && "bind the render_context first!");
+
+        s_render_context->onResize(width, height);
+    }
+
     void Renderer::beginScene(OrthographicsCamera& camera) {
         ZE_ASSERT(s_render_context && "bind the render_context first!");
 
         // takes all the scene settings(camera, lights, environment etc)
-        s_scene_data->view_projection_matrix = (camera.getViewMatrix() * camera.getProjectionMatrix()).Transpose();
+        s_scene_data->view_projection_matrix = (camera.getViewProjectionMatrix()).Transpose();
 
         s_scene_data->model_matrix = (Matrix::CreateTranslation(0.0f, 0.0f, 0.0f)).Transpose();
     }

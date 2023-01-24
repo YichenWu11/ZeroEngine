@@ -16,8 +16,7 @@ namespace Zero {
 
         virtual ~IWindowSystem() = default;
 
-        virtual void onUpdate()         = 0;
-        virtual void onResize(int, int) = 0;
+        virtual void onUpdate() = 0;
 
         virtual int getWidth() const  = 0;
         virtual int getHeight() const = 0;

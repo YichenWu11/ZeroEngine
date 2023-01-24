@@ -362,7 +362,7 @@ namespace Zero {
         // draw call
         for (auto& [mesh, trans] : m_draw_list) {
             Matrix  transform = Matrix::CreateTranslation(trans).Transpose();
-            Vector4 modulate  = {0.5f, 0.2f, 0.2f, 1.0f};
+            Vector4 modulate  = {0.2f, 0.2f, 0.2f, 1.0f};
 
             // bind object-varying constants
             ShaderParamBindTable::getInstance().bindParam(

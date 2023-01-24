@@ -13,6 +13,7 @@ namespace Zero {
     class Renderer {
     public:
         static void init(RenderContext* context);
+        static void onWindowResize(int, int);
 
         static void beginScene(OrthographicsCamera& camera);
         static void endScene();
