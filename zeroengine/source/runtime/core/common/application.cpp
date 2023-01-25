@@ -19,7 +19,7 @@ namespace Zero {
         ZE_ASSERT(!s_instance && "Application already exists!");
         s_instance = this;
 
-        m_window = Zero::Scope<IWindowSystem>(IWindowSystem::create());
+        m_window = IWindowSystem::create();
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
 
         RenderContext* render_context = static_cast<WindowSystem*>(m_window.get())->getRenderContext();
@@ -37,7 +37,6 @@ namespace Zero {
     }
 
     Application::~Application() {
-        Renderer2D::shutdown();
         Renderer::shutdown();
     }
 

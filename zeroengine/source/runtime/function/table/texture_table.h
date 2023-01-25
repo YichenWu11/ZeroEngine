@@ -6,7 +6,7 @@
 namespace Zero {
     class RenderContext;
 
-    struct TextureInitInfo {
+    struct TextureBuildInfo {
         std::wstring                       path;
         std::string                        name;
         Chen::CDX12::TextureDimension      dimension{Chen::CDX12::TextureDimension::Tex2D};
@@ -33,7 +33,7 @@ namespace Zero {
         void bindRenderContext(RenderContext* context);
 
         void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
-        void registerTex(const TextureInitInfo&, TexFileFormat = TexFileFormat::WIC);
+        void registerTex(const TextureBuildInfo&, TexFileFormat = TexFileFormat::WIC);
 
         uint32_t getTexIndexFromName(const std::string&);
 

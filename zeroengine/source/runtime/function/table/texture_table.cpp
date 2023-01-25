@@ -25,13 +25,13 @@ namespace Zero {
             return;
         }
 
-        TextureInitInfo init_info{AnsiToWString(tex_path.string()).c_str(), tex_path.stem().string()};
+        TextureBuildInfo init_info{AnsiToWString(tex_path.string()).c_str(), tex_path.stem().string()};
         registerTex(init_info, file_format);
     }
 
     void TextureTable::registerTex(
-        const TextureInitInfo& info,
-        TexFileFormat          file_format) {
+        const TextureBuildInfo& info,
+        TexFileFormat           file_format) {
         ZE_ASSERT(m_render_context && "Bind the device first(TextureTable)!");
 
         if (m_texture_table.contains(info.name)) {
@@ -40,7 +40,7 @@ namespace Zero {
         }
 
         ID3D12Device* device = m_render_context->getGraphicsDevice();
-        auto          tex    = std::make_shared<Texture>(
+        auto          tex    = Zero::CreateRef<Texture>(
             device,
             info.width,
             info.height,

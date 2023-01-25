@@ -24,7 +24,7 @@ namespace Zero {
         void end();
 
     private:
-        void setPurpleStyle(ImGuiStyle&);
+        void setZeroImGuiStyle();
 
     private:
         RenderContext* m_context;

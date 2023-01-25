@@ -49,12 +49,12 @@ namespace Zero {
     void VertexBuffer::unbind() const {
     }
 
-    VertexBuffer* VertexBuffer::create(ID3D12Device* device, float* vertices, uint32_t size) {
+    Zero::Ref<VertexBuffer> VertexBuffer::create(ID3D12Device* device, float* vertices, uint32_t size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");
             case RendererAPI::API::DX12:
-                return new VertexBuffer(device, vertices, size);
+                return Zero::CreateRef<VertexBuffer>(device, vertices, size);
         }
 
         ZE_ASSERT(false && "Unknown RendererAPI");
@@ -89,12 +89,12 @@ namespace Zero {
     void IndexBuffer::unbind() const {
     }
 
-    IndexBuffer* IndexBuffer::create(ID3D12Device* device, uint32_t* indices, uint32_t size) {
+    Zero::Ref<IndexBuffer> IndexBuffer::create(ID3D12Device* device, uint32_t* indices, uint32_t size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");
             case RendererAPI::API::DX12:
-                return new IndexBuffer(device, indices, size);
+                return Zero::CreateRef<IndexBuffer>(device, indices, size);
         }
 
         ZE_ASSERT(false && "Unknown RendererAPI");

@@ -222,7 +222,7 @@ namespace Zero {
                 dsvHandle.Offset(1, m_dsvCpuDH.GetDescriptorSize());
             }
 
-            m_frameResourceMngr = std::make_unique<FrameResourceMngr>(s_frame_count, m_device.Get());
+            m_frameResourceMngr = Zero::CreateScope<FrameResourceMngr>(s_frame_count, m_device.Get());
         }
 
         {

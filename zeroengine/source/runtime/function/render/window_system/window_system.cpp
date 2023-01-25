@@ -133,8 +133,8 @@ namespace Zero {
     // *************************************************************************************************
     // *************************************************************************************************
 
-    IWindowSystem* IWindowSystem::create(const WindowCreateInfo& create_info) {
-        return new WindowSystem(create_info);
+    Zero::Scope<IWindowSystem> IWindowSystem::create(const WindowCreateInfo& create_info) {
+        return Zero::CreateScope<WindowSystem>(create_info);
     }
 
     WindowSystem::WindowSystem(const WindowCreateInfo& create_info) {
@@ -142,7 +142,6 @@ namespace Zero {
     }
 
     WindowSystem::~WindowSystem() {
-        delete m_context;
         shutdown();
     }
 
@@ -188,7 +187,7 @@ namespace Zero {
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
 
-        m_context = new RenderContext(m_window);
+        m_context = Zero::CreateRef<RenderContext>(m_window);
         m_context->init(m_data.width, m_data.height);
 
         if (create_info.is_fullscreen)

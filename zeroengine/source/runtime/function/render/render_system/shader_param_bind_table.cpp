@@ -25,7 +25,7 @@ namespace Zero {
             return;
         }
 
-        auto shader = std::make_shared<BasicShader>(properties, m_device, samplers);
+        auto shader = Zero::CreateRef<BasicShader>(properties, m_device, samplers);
 
         m_shader_bind_table[shader.get()] = ParamBindTable();
         m_shader_table[shader_name]       = std::move(shader);
@@ -42,7 +42,7 @@ namespace Zero {
             return;
         }
 
-        auto shader = std::make_shared<BasicShader>(properties, std::move(rootSig));
+        auto shader = Zero::CreateRef<BasicShader>(properties, std::move(rootSig));
 
         m_shader_bind_table[shader.get()] = ParamBindTable();
         m_shader_table[shader_name]       = std::move(shader);

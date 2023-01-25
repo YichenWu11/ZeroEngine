@@ -68,36 +68,36 @@ namespace Zero {
         ThrowIfFailed(cmdAllocator->Reset());
         ThrowIfFailed(commandList->Reset(cmdAllocator.Get(), nullptr));
 
-        auto triangle_mesh = std::make_shared<Mesh>(
+        auto triangle_mesh = Zero::CreateRef<Mesh>(
             device,
             structs,
             array_count(vertices_tri) * sizeof(float) / layout.structSize,
             array_count(indices_tri));
 
-        VertexBuffer* vert_buffer_tri = VertexBuffer::create(device,
-                                                             vertices_tri,
-                                                             array_count(vertices_tri) * sizeof(float));
+        auto vert_buffer_tri = VertexBuffer::create(device,
+                                                    vertices_tri,
+                                                    array_count(vertices_tri) * sizeof(float));
 
-        IndexBuffer* indi_buffer_tri = IndexBuffer::create(device,
-                                                           indices_tri,
-                                                           array_count(indices_tri) * sizeof(uint32_t));
+        auto indi_buffer_tri = IndexBuffer::create(device,
+                                                   indices_tri,
+                                                   array_count(indices_tri) * sizeof(uint32_t));
 
         vert_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
         indi_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
 
-        auto square_mesh = std::make_shared<Mesh>(
+        auto square_mesh = Zero::CreateRef<Mesh>(
             device,
             structs,
             array_count(vertices_square) * sizeof(float) / layout.structSize,
             array_count(indices_square));
 
-        VertexBuffer* vert_buffer_square = VertexBuffer::create(device,
-                                                                vertices_square,
-                                                                array_count(vertices_square) * sizeof(float));
+        auto vert_buffer_square = VertexBuffer::create(device,
+                                                       vertices_square,
+                                                       array_count(vertices_square) * sizeof(float));
 
-        IndexBuffer* indi_buffer_square = IndexBuffer::create(device,
-                                                              indices_square,
-                                                              array_count(indices_square) * sizeof(uint32_t));
+        auto indi_buffer_square = IndexBuffer::create(device,
+                                                      indices_square,
+                                                      array_count(indices_square) * sizeof(uint32_t));
 
         vert_buffer_square->bind(commandList.Get(), square_mesh.get());
         indi_buffer_square->bind(commandList.Get(), square_mesh.get());
@@ -110,11 +110,6 @@ namespace Zero {
 
         m_mesh_table["triangle"] = std::move(triangle_mesh);
         m_mesh_table["square"]   = std::move(square_mesh);
-
-        delete vert_buffer_tri;
-        delete indi_buffer_tri;
-        delete vert_buffer_square;
-        delete indi_buffer_square;
     }
 
     void MeshTable::registerMesh(const std::string& mesh_name, float* vertices, uint32_t* indices) {

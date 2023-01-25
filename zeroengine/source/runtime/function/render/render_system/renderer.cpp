@@ -23,6 +23,8 @@ namespace Zero {
 
     void Renderer::shutdown() {
         ZE_ASSERT(s_render_context && "init the renderer first!");
+
+        Renderer2D::shutdown();
     }
 
     void Renderer::onWindowResize(int width, int height) {

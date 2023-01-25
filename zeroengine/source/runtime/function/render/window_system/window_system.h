@@ -17,7 +17,7 @@ namespace Zero {
 
         HWND getNativeWindowHandle() override { return m_window; }
 
-        RenderContext* getRenderContext() { return m_context; }
+        RenderContext* getRenderContext() { return m_context.get(); }
 
         // window attributes
         void setEventCallback(const EventCallbackFn& callback) override { m_data.event_callback = callback; }
@@ -30,8 +30,8 @@ namespace Zero {
 
     private:
         // hwnd
-        HWND           m_window;
-        RenderContext* m_context;
+        HWND                     m_window;
+        Zero::Ref<RenderContext> m_context;
 
         static POINT m_last_mouse_pos;
 

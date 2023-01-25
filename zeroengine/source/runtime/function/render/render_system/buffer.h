@@ -33,7 +33,7 @@ namespace Zero {
         void bind(ID3D12GraphicsCommandList* cmdlist, Chen::CDX12::Mesh*) const;
         void unbind() const;
 
-        static VertexBuffer* create(ID3D12Device* device, float* vertices, uint32_t size);
+        static Zero::Ref<VertexBuffer> create(ID3D12Device* device, float* vertices, uint32_t size);
 
     private:
         Chen::CDX12::UploadBuffer* m_vertex_upload;
@@ -48,7 +48,7 @@ namespace Zero {
         void     unbind() const;
         uint32_t getCount() const { return m_index_count; }
 
-        static IndexBuffer* create(ID3D12Device* device, uint32_t* indices, uint32_t size);
+        static Zero::Ref<IndexBuffer> create(ID3D12Device* device, uint32_t* indices, uint32_t size);
 
     private:
         uint32_t                   m_index_count;

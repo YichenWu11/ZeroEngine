@@ -49,7 +49,7 @@ void Sandbox2D::onImGuiRender() {
 
     {
         ImGui::Begin("IMAGE");
-        ImGui::Image(ImTextureID(tex_alloc->GetGpuHandle(1).ptr), ImVec2(190, 190));
+        ImGui::Image(ImTextureID(tex_alloc->GetGpuHandle(2).ptr), ImVec2(190, 190));
         ImGui::End();
     }
 }
