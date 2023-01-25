@@ -2,6 +2,8 @@
 
 #include "runtime/zero.h"
 
+#include "sandbox/sandbox_2d.h"
+
 using namespace DirectX::SimpleMath;
 
 class ExampleLayer : public Zero::Layer {
@@ -20,9 +22,10 @@ public:
 
         Zero::Renderer::beginScene(m_camera_controller.getCamera());
 
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), tri_trans_0);
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), {0.0f, 0.0f, 0.0f});
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"), {0.8f, 0.3f, 0.0f});
+        // NOTE: USELESS
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"));
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"));
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"));
 
         Zero::Renderer::endScene();
     }
@@ -30,24 +33,14 @@ public:
     void onImGuiRender() override {
         {
             ImGui::Begin("DEBUG");
-
-            ImGui::DragFloat("TRI0_X", &(tri_trans_0.x), 0.01f,
-                             -2.0f, 2.0f, "%.2f");
-            ImGui::DragFloat("TRI0_Y", &(tri_trans_0.y), 0.01f,
-                             -2.0f, 2.0f, "%.2f");
-
             ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
-
             ImGui::End();
         }
 
         {
             ImGui::Begin("IMAGE");
-
             static auto tex_alloc = Zero::TextureTable::getInstance().getTexAllocation();
-
             ImGui::Image(ImTextureID(tex_alloc->GetGpuHandle(0).ptr), ImVec2(190, 190));
-
             ImGui::End();
         }
     }
@@ -66,14 +59,14 @@ public:
 private:
     Zero::OrthographicsCameraController m_camera_controller;
 
-    Vector3 tri_trans_0{-0.8f, -0.3f, 0.0f};
-    Color   clear_color{0.2f, 0.2f, 0.2f, 1.0f};
+    Color clear_color{0.2f, 0.2f, 0.2f, 1.0f};
 };
 
 class Sandbox : public Zero::Application {
 public:
     Sandbox() {
-        pushLayer(new ExampleLayer());
+        // pushLayer(new ExampleLayer());
+        pushLayer(new Sandbox2D());
     }
 
     ~Sandbox() {

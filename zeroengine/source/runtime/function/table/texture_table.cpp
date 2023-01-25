@@ -78,6 +78,7 @@ namespace Zero {
                 break;
         }
 
+        m_texname2index[info.name] = m_texture_table.size();
         m_texture_table[info.name] = std::move(tex);
 
         D3D12_SHADER_RESOURCE_VIEW_DESC desc = m_texture_table[info.name]->GetColorSrvDesc(0);
@@ -88,5 +89,16 @@ namespace Zero {
 
         auto uploadResourcesFinished = resourceUpload.End(m_render_context->getCommandQueue());
         uploadResourcesFinished.wait();
+    }
+
+    int32_t TextureTable::getTexIndexFromName(const std::string& tex_name) {
+        ZE_ASSERT(m_render_context && "Bind the device first(TextureTable)!");
+
+        if (!m_texture_table.contains(tex_name)) {
+            LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
+            return -1;
+        }
+
+        return m_texname2index[tex_name];
     }
 } // namespace Zero

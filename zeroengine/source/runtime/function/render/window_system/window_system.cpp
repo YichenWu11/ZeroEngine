@@ -197,7 +197,7 @@ namespace Zero {
             ShowWindow(m_window, SW_SHOWDEFAULT);
         UpdateWindow(m_window);
 
-        setVSync(true);
+        setVSync(false);
     }
 
     void WindowSystem::shutdown() {
@@ -217,7 +217,7 @@ namespace Zero {
 
     void WindowSystem::setVSync(bool enabled) {
         if (enabled) {
-            // do something to enable vertical sync
+            m_context->setVsync(true);
         }
 
         m_data.v_sync = enabled;

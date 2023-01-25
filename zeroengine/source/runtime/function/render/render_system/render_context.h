@@ -32,11 +32,18 @@ namespace Zero {
         void init(int width, int height);
         void swapBuffer();
 
+        void setVsync(bool vsync) { m_is_vsync_enable = vsync; }
+
         void beginRender();
         void endRender();
 
-        void submit(Chen::CDX12::Mesh* mesh, const DirectX::SimpleMath::Vector3& trans = {0.0f, 0.0f, 0.0f}) {
-            m_draw_list.emplace_back(std::make_pair(mesh, trans));
+        void submit(
+            Chen::CDX12::Mesh*                 mesh,
+            const DirectX::SimpleMath::Matrix& trans     = DirectX::SimpleMath::Matrix::Identity,
+            const DirectX::SimpleMath::Color&  color     = {1.0f, 1.0f, 1.0f, 1.0f},
+            int32_t                            tex_index = -1) {
+            m_draw_2d_list.emplace_back(
+                std::make_tuple(mesh, trans, color, tex_index));
         }
 
         void flush() { flushCommandQueue(); }
@@ -58,6 +65,8 @@ namespace Zero {
         void flushCommandQueue();
 
     private:
+        bool m_is_vsync_enable{false};
+
         HWND                  m_window_handle;
         static DXGI_FORMAT    s_colorFormat;
         static DXGI_FORMAT    s_depthFormat;
@@ -102,7 +111,7 @@ namespace Zero {
         uint32_t numGpuCSU_static  = 648;
         uint32_t numGpuCSU_dynamic = 648;
 
-        std::vector<std::pair<Chen::CDX12::Mesh*, DirectX::SimpleMath::Vector3>> m_draw_list;
+        std::vector<std::tuple<Chen::CDX12::Mesh*, DirectX::SimpleMath::Matrix, DirectX::SimpleMath::Color, int32_t>> m_draw_2d_list;
 
         // debug
         ComPtr<ID3D12DebugDevice> debug_device;

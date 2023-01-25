@@ -13,12 +13,14 @@ namespace Zero {
     class Renderer {
     public:
         static void init(RenderContext* context);
+        static void shutdown();
+
         static void onWindowResize(int, int);
 
-        static void beginScene(OrthographicsCamera& camera);
+        static void beginScene(const OrthographicsCamera& camera);
         static void endScene();
 
-        static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Vector3& = {0.0f, 0.0f, 0.0f});
+        static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Matrix& = DirectX::SimpleMath::Matrix::Identity);
 
         static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
 

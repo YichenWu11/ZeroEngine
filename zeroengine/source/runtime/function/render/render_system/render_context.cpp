@@ -10,6 +10,7 @@
 #include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
+using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 namespace Zero {
@@ -73,6 +74,13 @@ namespace Zero {
                 0,
                 0,
                 50));
+        properties.emplace_back(
+            "_TexIndex",
+            Shader::Property(
+                ShaderVariableType::ConstantBuffer,
+                1,
+                1,
+                0));
 
         ShaderParamBindTable::getInstance().bindDevice(m_device.Get());
 
@@ -328,7 +336,7 @@ namespace Zero {
                 (void*)(m_frameResourceMngr->GetCurrentFrameResource()->GetCmdList().Get()));
         }
 
-        ThrowIfFailed(m_swapChain->Present(0, 0));
+        ThrowIfFailed(m_swapChain->Present((m_is_vsync_enable) ? 1 : 0, 0));
         m_frameResourceMngr->EndFrame(m_commandQueue.Get());
     }
 
@@ -360,24 +368,29 @@ namespace Zero {
         auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
 
         // draw call
-        for (auto& [mesh, trans] : m_draw_list) {
-            Matrix  transform = Matrix::CreateTranslation(trans).Transpose();
-            Vector4 modulate  = {0.2f, 0.2f, 0.2f, 1.0f};
-
+        for (auto& [mesh, transform, color, tex_index] : m_draw_2d_list) {
             // bind object-varying constants
             ShaderParamBindTable::getInstance().bindParam(
                 shader,
                 "_ModelMatrix",
                 std::span<const uint8_t>{
-                    reinterpret_cast<uint8_t const*>(&transform),
-                    sizeof(transform)});
+                    reinterpret_cast<uint8_t const*>(get_rvalue_ptr(transform.Transpose())),
+                    sizeof(transform.Transpose())});
 
             ShaderParamBindTable::getInstance().bindParam(
                 shader,
                 "_Modulate",
                 std::span<const uint8_t>{
-                    reinterpret_cast<uint8_t const*>(&modulate),
-                    sizeof(modulate)});
+                    reinterpret_cast<uint8_t const*>(&color),
+                    sizeof(color)});
+
+            ShaderParamBindTable::getInstance()
+                .bindParam(
+                    shader,
+                    "_TexIndex",
+                    std::span<const uint8_t>{
+                        reinterpret_cast<uint8_t const*>(&tex_index),
+                        sizeof(tex_index)});
 
             bindProperties.clear();
 
@@ -409,6 +422,6 @@ namespace Zero {
         m_stateTracker.RestoreState(cmdList.Get());
 
         // clear mesh
-        m_draw_list.clear();
+        m_draw_2d_list.clear();
     }
 } // namespace Zero

@@ -4,6 +4,7 @@
 #include "runtime/core/common/layer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
+#include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/window_system/window_system.h"
 #include "runtime/function/table/mesh_table.h"
 #include "runtime/function/table/texture_table.h"
@@ -32,6 +33,8 @@ namespace Zero {
     }
 
     Application::~Application() {
+        Renderer2D::shutdown();
+        Renderer::shutdown();
     }
 
     void Application::pushLayer(Layer* layer) {
@@ -47,8 +50,8 @@ namespace Zero {
         dispatcher.Dispatch<WindowCloseEvent>(ZE_BIND_EVENT_FN(Application::onWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(Application::onWindowResize));
 
-        for (auto it = m_layerStack.end(); it != m_layerStack.begin();) {
-            (*--it)->onEvent(e);
+        for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
+            (*it)->onEvent(e);
             if (e.m_handled)
                 break;
         }
@@ -56,9 +59,6 @@ namespace Zero {
 
     void Application::run() {
         MeshTable::getInstance().buildBasicMesh();
-
-        TextureTable::getInstance().registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png");
 
         while (m_running) {
             float    time     = ImGui::GetTime();

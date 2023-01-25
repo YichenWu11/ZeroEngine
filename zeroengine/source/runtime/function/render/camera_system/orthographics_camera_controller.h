@@ -25,10 +25,10 @@ namespace Zero {
         bool onWindowResize(WindowResizeEvent& e);
 
     private:
-        float               m_aspect_ratio;
+        float               m_aspect_ratio = 16.0f / 9.0f;
         float               m_zoom_level = 1.0f;
-        OrthographicsCamera m_camera;
 
+        OrthographicsCamera m_camera;
         bool m_rotation_enabled;
 
         DirectX::SimpleMath::Vector3 m_camera_position{0.0f, 0.0f, 0.0f};

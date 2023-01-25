@@ -2,6 +2,7 @@
 
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
+#include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 #include "runtime/function/table/mesh_table.h"
 #include "runtime/function/table/texture_table.h"
@@ -17,32 +18,26 @@ namespace Zero {
         s_render_context = context;
         MeshTable::getInstance().bindRenderContext(context);
         TextureTable::getInstance().bindRenderContext(context);
+        Renderer2D::init(context);
+    }
+
+    void Renderer::shutdown() {
+        ZE_ASSERT(s_render_context && "init the renderer first!");
     }
 
     void Renderer::onWindowResize(int width, int height) {
-        ZE_ASSERT(s_render_context && "bind the render_context first!");
+        ZE_ASSERT(s_render_context && "init the renderer first!");
 
         s_render_context->onResize(width, height);
     }
 
-    void Renderer::beginScene(OrthographicsCamera& camera) {
-        ZE_ASSERT(s_render_context && "bind the render_context first!");
+    void Renderer::beginScene(const OrthographicsCamera& camera) {
+        ZE_ASSERT(s_render_context && "init the renderer first!");
 
         // takes all the scene settings(camera, lights, environment etc)
         s_scene_data->view_projection_matrix = (camera.getViewProjectionMatrix()).Transpose();
 
         s_scene_data->model_matrix = (Matrix::CreateTranslation(0.0f, 0.0f, 0.0f)).Transpose();
-    }
-
-    void Renderer::endScene() {
-        ZE_ASSERT(s_render_context && "bind the render_context first!");
-
-        s_render_context->beginRender();
-        s_render_context->endRender();
-    }
-
-    void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Vector3& trans) {
-        ZE_ASSERT(s_render_context && "bind the render_context first!");
 
         BasicShader* shader =
             static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
@@ -60,7 +55,18 @@ namespace Zero {
             shader,
             "TextureMap",
             std::make_pair(tex_alloc, 0));
+    }
 
-        s_render_context->submit(mesh, trans);
+    void Renderer::endScene() {
+        ZE_ASSERT(s_render_context && "init the renderer first!");
+
+        s_render_context->beginRender();
+        s_render_context->endRender();
+    }
+
+    void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Matrix& transfrom) {
+        ZE_ASSERT(s_render_context && "init the renderer first!");
+
+        // s_render_context->submit(mesh, transfrom);
     }
 } // namespace Zero

@@ -35,9 +35,5 @@ PSInput VSMain(VSInput input) {
 
 float4 PSMain(PSInput input) : SV_TARGET {
   float2 tex_coord = float2(input.tex_coord.x, input.tex_coord.y);
-  if (u_TexIndex == -1)
-    return u_ModulateColor;
-  else
-    return TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap, tex_coord) *
-           u_ModulateColor;
+  return TextureMap[0].Sample(u_samAnisotropicWrap, tex_coord);
 }

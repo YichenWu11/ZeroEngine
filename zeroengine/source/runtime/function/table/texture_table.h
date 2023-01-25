@@ -35,6 +35,8 @@ namespace Zero {
         void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureInitInfo&, TexFileFormat = TexFileFormat::WIC);
 
+        int32_t getTexIndexFromName(const std::string&);
+
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 
     private:
@@ -45,6 +47,7 @@ namespace Zero {
         RenderContext*                        m_render_context{nullptr};
         Chen::CDX12::DescriptorHeapAllocation m_tex_alloc;
 
+        std::map<std::string, uint32_t>                  m_texname2index;
         std::map<std::string, Ref<Chen::CDX12::Texture>> m_texture_table;
     };
 
