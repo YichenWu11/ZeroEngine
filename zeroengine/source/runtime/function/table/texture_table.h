@@ -35,7 +35,7 @@ namespace Zero {
         void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureInitInfo&, TexFileFormat = TexFileFormat::WIC);
 
-        int32_t getTexIndexFromName(const std::string&);
+        uint32_t getTexIndexFromName(const std::string&);
 
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 

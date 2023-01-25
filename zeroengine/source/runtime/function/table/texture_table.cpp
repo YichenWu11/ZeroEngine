@@ -91,7 +91,7 @@ namespace Zero {
         uploadResourcesFinished.wait();
     }
 
-    int32_t TextureTable::getTexIndexFromName(const std::string& tex_name) {
+    uint32_t TextureTable::getTexIndexFromName(const std::string& tex_name) {
         ZE_ASSERT(m_render_context && "Bind the device first(TextureTable)!");
 
         if (!m_texture_table.contains(tex_name)) {

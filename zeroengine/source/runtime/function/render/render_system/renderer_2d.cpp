@@ -61,7 +61,7 @@ namespace Zero {
         const DirectX::SimpleMath::Vector2& position,
         const DirectX::SimpleMath::Vector2& size,
         const DirectX::SimpleMath::Color&   color,
-        int32_t                             tex_index) {
+        uint32_t                            tex_index) {
         ZE_ASSERT(s_render_context && "init the renderer2d first!");
 
         drawQuad({position.x, position.y, 0.0f}, size, color, tex_index);
@@ -71,7 +71,7 @@ namespace Zero {
         const DirectX::SimpleMath::Vector3& position,
         const DirectX::SimpleMath::Vector2& size,
         const DirectX::SimpleMath::Color&   color,
-        int32_t                             tex_index) {
+        uint32_t                            tex_index) {
         ZE_ASSERT(s_render_context && "init the renderer2d first!");
 
         Matrix transform = Matrix::CreateScale(size.x, size.y, 1.0f) * Matrix::CreateTranslation(position);

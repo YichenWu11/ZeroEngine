@@ -41,7 +41,7 @@ namespace Zero {
             Chen::CDX12::Mesh*                 mesh,
             const DirectX::SimpleMath::Matrix& trans     = DirectX::SimpleMath::Matrix::Identity,
             const DirectX::SimpleMath::Color&  color     = {1.0f, 1.0f, 1.0f, 1.0f},
-            int32_t                            tex_index = -1) {
+            uint32_t                           tex_index = 0) {
             m_draw_2d_list.emplace_back(
                 std::make_tuple(mesh, trans, color, tex_index));
         }

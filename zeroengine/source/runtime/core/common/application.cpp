@@ -26,6 +26,10 @@ namespace Zero {
 
         Renderer::init(render_context);
 
+        MeshTable::getInstance().buildBasicMesh();
+        Zero::TextureTable::getInstance().registerTex(
+            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png");
+
         m_ImGuiLayer = new ImGuiLayer(
             render_context,
             m_window->getNativeWindowHandle());
@@ -58,8 +62,6 @@ namespace Zero {
     }
 
     void Application::run() {
-        MeshTable::getInstance().buildBasicMesh();
-
         while (m_running) {
             float    time     = ImGui::GetTime();
             TimeStep timestep = time - m_lastframe_time;

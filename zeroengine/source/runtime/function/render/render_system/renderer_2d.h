@@ -17,12 +17,12 @@ namespace Zero {
             const DirectX::SimpleMath::Vector2& position,
             const DirectX::SimpleMath::Vector2& size,
             const DirectX::SimpleMath::Color&   color,
-            int32_t                             tex_index = -1);
+            uint32_t                            tex_index = 0);
         static void drawQuad(
             const DirectX::SimpleMath::Vector3& position,
             const DirectX::SimpleMath::Vector2& size,
             const DirectX::SimpleMath::Color&   color,
-            int32_t                             tex_index = -1);
+            uint32_t                            tex_index = 0);
 
     private:
         static RenderContext* s_render_context;
