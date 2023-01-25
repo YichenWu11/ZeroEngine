@@ -73,9 +73,6 @@ namespace Zero {
         ImGui::Render();
     }
 
-    void ImGuiLayer::onImGuiRender() {
-    }
-
     void ImGuiLayer::setZeroImGuiStyle() {
         auto& colors              = ImGui::GetStyle().Colors;
         colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};

@@ -17,7 +17,8 @@ namespace Zero {
     void ShaderParamBindTable::registerShader(
         const std::string&                                                     shader_name,
         std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
-        std::span<D3D12_STATIC_SAMPLER_DESC>                                   samplers) {
+        std::span<D3D12_STATIC_SAMPLER_DESC>                                   samplers,
+        ShaderUsage                                                            usage) {
         ZE_ASSERT(m_device && "bind the device before registerShader!");
 
         if (m_shader_table.contains(shader_name)) {
@@ -25,16 +26,23 @@ namespace Zero {
             return;
         }
 
-        auto shader = Zero::CreateRef<BasicShader>(properties, m_device, samplers);
-
-        m_shader_bind_table[shader.get()] = ParamBindTable();
-        m_shader_table[shader_name]       = std::move(shader);
+        switch (usage) {
+            case ShaderUsage::BASIC: {
+                auto shader                       = Zero::CreateRef<BasicShader>(properties, m_device, samplers);
+                m_shader_bind_table[shader.get()] = ParamBindTable();
+                m_shader_table[shader_name]       = std::move(shader);
+                break;
+            }
+            case ShaderUsage::COMPUTE:
+                break;
+        }
     }
 
     void ShaderParamBindTable::registerShader(
         const std::string&                                                     shader_name,
         std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
-        ComPtr<ID3D12RootSignature>&&                                          rootSig) {
+        ComPtr<ID3D12RootSignature>&&                                          rootSig,
+        ShaderUsage                                                            usage) {
         ZE_ASSERT(m_device && "bind the device before registerShader!");
 
         if (m_shader_table.contains(shader_name)) {
@@ -42,10 +50,16 @@ namespace Zero {
             return;
         }
 
-        auto shader = Zero::CreateRef<BasicShader>(properties, std::move(rootSig));
-
-        m_shader_bind_table[shader.get()] = ParamBindTable();
-        m_shader_table[shader_name]       = std::move(shader);
+        switch (usage) {
+            case ShaderUsage::BASIC: {
+                auto shader                       = Zero::CreateRef<BasicShader>(properties, std::move(rootSig));
+                m_shader_bind_table[shader.get()] = ParamBindTable();
+                m_shader_table[shader_name]       = std::move(shader);
+                break;
+            }
+            case ShaderUsage::COMPUTE:
+                break;
+        }
     }
 
     void ShaderParamBindTable::removeShader(const std::string& shader_name) {

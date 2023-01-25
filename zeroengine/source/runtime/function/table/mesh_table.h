@@ -18,7 +18,7 @@ namespace Zero {
 
         void registerMesh(const std::string&, float*, uint32_t*);
 
-        Chen::CDX12::Mesh* getMesh(const std::string&);
+        Zero::Ref<Chen::CDX12::Mesh> getMesh(const std::string&);
 
     private:
         MeshTable()  = default;

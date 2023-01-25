@@ -73,9 +73,9 @@ namespace Zero {
                 ShaderVariableType::SRVDescriptorHeap,
                 0,
                 0,
-                50));
+                168));
         properties.emplace_back(
-            "_TexIndex",
+            "_TexVariables",
             Shader::Property(
                 ShaderVariableType::ConstantBuffer,
                 1,
@@ -387,7 +387,7 @@ namespace Zero {
             ShaderParamBindTable::getInstance()
                 .bindParam(
                     shader,
-                    "_TexIndex",
+                    "_TexVariables",
                     std::span<const uint8_t>{
                         reinterpret_cast<uint8_t const*>(&tex_index),
                         sizeof(tex_index)});

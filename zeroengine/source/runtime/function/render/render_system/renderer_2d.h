@@ -16,13 +16,18 @@ namespace Zero {
         static void drawQuad(
             const DirectX::SimpleMath::Vector2& position,
             const DirectX::SimpleMath::Vector2& size,
-            const DirectX::SimpleMath::Color&   color,
-            uint32_t                            tex_index = 0);
+            float                               rotation,
+            const DirectX::SimpleMath::Color&   color         = {1.0f, 1.0f, 1.0f, 1.0f},
+            uint32_t                            tex_index     = 0,
+            float                               tiling_factor = 1.0f);
+
         static void drawQuad(
             const DirectX::SimpleMath::Vector3& position,
             const DirectX::SimpleMath::Vector2& size,
-            const DirectX::SimpleMath::Color&   color,
-            uint32_t                            tex_index = 0);
+            float                               rotation,
+            const DirectX::SimpleMath::Color&   color         = {1.0f, 1.0f, 1.0f, 1.0f},
+            uint32_t                            tex_index     = 0,
+            float                               tiling_factor = 1.0f);
 
     private:
         static RenderContext* s_render_context;

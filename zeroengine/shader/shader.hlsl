@@ -11,9 +11,12 @@ struct PSInput {
 cbuffer _ViewProjMatrix : register(b0) { float4x4 u_CameraWorldToViewMatrix; };
 cbuffer _ModelMatrix : register(b0, space1) { float4x4 u_LocalToWorldMatrix; };
 cbuffer _Modulate : register(b1) { float4 u_ModulateColor; }
-cbuffer _TexIndex : register(b1, space1) { uint u_TexIndex; }
+cbuffer _TexVariables : register(b1, space1) {
+  uint u_TexIndex;
+  uint u_TilingFactor;
+}
 
-Texture2D TextureMap[50] : register(t0);
+Texture2D TextureMap[168] : register(t0);
 
 SamplerState u_samPointWrap : register(s0);
 SamplerState u_samPointClamp : register(s1);

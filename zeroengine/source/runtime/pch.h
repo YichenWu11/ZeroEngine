@@ -29,11 +29,14 @@
 #include <utility>
 
 #include <array>
+#include <fstream>
 #include <map>
 #include <optional>
 #include <set>
 #include <sstream>
 #include <string>
+#include <string_view>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -43,3 +46,4 @@
 
 #include "runtime/core/common/core.h"
 #include "runtime/core/log/log_system.h"
+#include "runtime/function/debug/profiler.h"

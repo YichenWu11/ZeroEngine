@@ -22,10 +22,9 @@ public:
 
         Zero::Renderer::beginScene(m_camera_controller.getCamera());
 
-        // NOTE: USELESS
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"));
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"));
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square"));
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square").get());
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square").get());
+        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square").get());
 
         Zero::Renderer::endScene();
     }

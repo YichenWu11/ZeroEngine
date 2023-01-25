@@ -6,8 +6,7 @@ using namespace DirectX::SimpleMath;
 
 class Sandbox2D : public Zero::Layer {
 public:
-    Sandbox2D() :
-        Layer("Sandbox2D"), m_camera_controller(1280.0f / 720.0f) {}
+    Sandbox2D();
     virtual ~Sandbox2D() = default;
 
     void onAttach() override;

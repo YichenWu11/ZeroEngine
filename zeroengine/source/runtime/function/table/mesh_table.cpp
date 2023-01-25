@@ -116,11 +116,11 @@ namespace Zero {
         ZE_ASSERT(m_render_context && "Bind the render_context first (MeshTable)!");
     }
 
-    Mesh* MeshTable::getMesh(const std::string& mesh_name) {
+    Zero::Ref<Chen::CDX12::Mesh> MeshTable::getMesh(const std::string& mesh_name) {
         ZE_ASSERT(m_render_context && "Bind the render_context first (MeshTable)!");
 
         if (m_mesh_table.contains(mesh_name))
-            return m_mesh_table[mesh_name].get();
+            return m_mesh_table[mesh_name];
         LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         return nullptr;
     }

@@ -7,6 +7,7 @@
 #include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
+using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 namespace Zero {
@@ -60,26 +61,32 @@ namespace Zero {
     void Renderer2D::drawQuad(
         const DirectX::SimpleMath::Vector2& position,
         const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
         const DirectX::SimpleMath::Color&   color,
-        uint32_t                            tex_index) {
+        uint32_t                            tex_index,
+        float                               tiling_factor) {
         ZE_ASSERT(s_render_context && "init the renderer2d first!");
 
-        drawQuad({position.x, position.y, 0.0f}, size, color, tex_index);
+        drawQuad({position.x, position.y, 0.0f}, size, rotation, color, tex_index);
     }
 
     void Renderer2D::drawQuad(
         const DirectX::SimpleMath::Vector3& position,
         const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
         const DirectX::SimpleMath::Color&   color,
-        uint32_t                            tex_index) {
+        uint32_t                            tex_index,
+        float                               tiling_factor) {
         ZE_ASSERT(s_render_context && "init the renderer2d first!");
 
-        Matrix transform = Matrix::CreateScale(size.x, size.y, 1.0f) * Matrix::CreateTranslation(position);
+        Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
+                           * Matrix::CreateScale(size.x, size.y, 1.0f)
+                           * Matrix::CreateTranslation(position);
 
-        static Chen::CDX12::Mesh* mesh = MeshTable::getInstance().getMesh("square");
+        static Zero::Ref<Mesh> mesh = MeshTable::getInstance().getMesh("square");
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        s_render_context->submit(mesh, transform, color, tex_index);
+        s_render_context->submit(mesh.get(), transform, color, tex_index, tiling_factor);
     }
 } // namespace Zero
