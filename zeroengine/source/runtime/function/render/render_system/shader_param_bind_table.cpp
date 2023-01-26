@@ -1,12 +1,9 @@
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
+#include "runtime/function/render/render_system/render_context.h"
 
 using namespace Chen::CDX12;
 
 namespace Zero {
-    void ShaderParamBindTable::bindDevice(ID3D12Device* device) {
-        m_device = device;
-    }
-
     Shader* ShaderParamBindTable::getShader(const std::string& name) {
         if (m_shader_table.contains(name))
             return m_shader_table[name].get();
@@ -19,16 +16,16 @@ namespace Zero {
         std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
         std::span<D3D12_STATIC_SAMPLER_DESC>                                   samplers,
         ShaderUsage                                                            usage) {
-        ZE_ASSERT(m_device && "bind the device before registerShader!");
-
         if (m_shader_table.contains(shader_name)) {
             LOG_WARN("The shader with this name ({}) has existed!", shader_name);
             return;
         }
 
+        ZE_ASSERT(RenderContext::getInstance().getGraphicsDevice() && "registerShader before creating device!");
+
         switch (usage) {
             case ShaderUsage::BASIC: {
-                auto shader                       = Zero::CreateRef<BasicShader>(properties, m_device, samplers);
+                auto shader                       = Zero::CreateRef<BasicShader>(properties, RenderContext::getInstance().getGraphicsDevice(), samplers);
                 m_shader_bind_table[shader.get()] = ParamBindTable();
                 m_shader_table[shader_name]       = std::move(shader);
                 break;
@@ -43,8 +40,6 @@ namespace Zero {
         std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
         ComPtr<ID3D12RootSignature>&&                                          rootSig,
         ShaderUsage                                                            usage) {
-        ZE_ASSERT(m_device && "bind the device before registerShader!");
-
         if (m_shader_table.contains(shader_name)) {
             LOG_WARN("The shader with this name ({}) has existed!", shader_name);
             return;

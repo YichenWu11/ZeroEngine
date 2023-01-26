@@ -29,8 +29,6 @@ namespace Zero {
             return instance;
         }
 
-        void bindDevice(ID3D12Device*);
-
         void registerShader(
             const std::string&                                                     shader_name,
             std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
@@ -52,8 +50,6 @@ namespace Zero {
         ParamBindTable& getShaderPropTable(Chen::CDX12::Shader*);
 
     private:
-        ID3D12Device* m_device;
-
         ShaderTable     m_shader_table;
         ShaderBindTable m_shader_bind_table;
     };

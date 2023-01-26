@@ -77,8 +77,6 @@ namespace Zero {
                 1,
                 0));
 
-        ShaderParamBindTable::getInstance().bindDevice(m_device.Get());
-
         ShaderParamBindTable::getInstance().registerShader("common", properties);
         BasicShader* shader =
             static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("common"));
