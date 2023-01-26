@@ -1,9 +1,5 @@
 #pragma once
 
-/*
-    NOTE: core render class
-*/
-
 #include <CDX12/CmdQueue.h>
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
 #include <CDX12/Device.h>
@@ -11,7 +7,11 @@
 #include <CDX12/Resource/ResourceStateTracker.h>
 #include <CDX12/Util/BindProperty.h>
 
+#include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
+
 using Microsoft::WRL::ComPtr;
+
+#define GET_RENDER_CONTEXT() ::Zero::RenderContext::getInstance()
 
 namespace Chen::CDX12 {
     class PSOManager;
@@ -25,6 +25,8 @@ namespace Zero {
     };
 
     class RenderContext {
+        friend class MainCameraPass2D;
+
     public:
         static RenderContext& getInstance() {
             static RenderContext instance;
@@ -39,6 +41,8 @@ namespace Zero {
 
         void beginRender();
         void endRender();
+
+        void registerRenderPass();
 
         void submit(
             Chen::CDX12::Mesh*                 mesh,
@@ -68,10 +72,7 @@ namespace Zero {
         RenderContext(const RenderContext&)            = delete;
         RenderContext& operator=(const RenderContext&) = delete;
 
-        void buildShaders();
-        void buildTextures();
-
-        void populateCommandList(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
+        void drawRenderPasses(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
         void flushCommandQueue();
 
     private:
@@ -122,6 +123,9 @@ namespace Zero {
         uint32_t numGpuCSU_dynamic = 648;
 
         std::vector<std::tuple<Chen::CDX12::Mesh*, DirectX::SimpleMath::Matrix, DirectX::SimpleMath::Color, int32_t>> m_draw_2d_list;
+
+        // RenderPass
+        std::vector<Zero::Scope<RenderPass>> m_render_passes;
 
         // debug
         ComPtr<ID3D12DebugDevice> debug_device;

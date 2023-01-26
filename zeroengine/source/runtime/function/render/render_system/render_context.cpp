@@ -17,115 +17,8 @@ namespace Zero {
     DXGI_FORMAT RenderContext::s_colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
     DXGI_FORMAT RenderContext::s_depthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    void RenderContext::shutdown() {
-        flushCommandQueue();
-
-        m_frameResourceMngr->CleanUp();
-
-        if (!m_rtvCpuDH.IsNull())
-            DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Free(std::move(m_rtvCpuDH));
-        if (!m_dsvCpuDH.IsNull())
-            DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Free(std::move(m_dsvCpuDH));
-        if (!m_csuCpuDH.IsNull())
-            DescriptorHeapMngr::GetInstance().GetCSUCpuDH()->Free(std::move(m_csuCpuDH));
-        if (!m_csuGpuDH.IsNull())
-            DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
-
-#if defined(DEBUG) || defined(_DEBUG)
-            // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
-#endif
-    }
-
-    void RenderContext::buildShaders() {
-        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/2d/shader.hlsl";
-        std::wstring path        = AnsiToWString(shader_path.string());
-
-        std::vector<std::pair<std::string, Shader::Property>> properties;
-        properties.emplace_back(
-            "_ViewProjMatrix",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                0,
-                0,
-                0));
-        properties.emplace_back(
-            "_ModelMatrix",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                1,
-                0,
-                0));
-        properties.emplace_back(
-            "_Modulate",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                0,
-                1,
-                0));
-        properties.emplace_back(
-            "TextureMap",
-            Shader::Property(
-                ShaderVariableType::SRVDescriptorHeap,
-                0,
-                0,
-                168));
-        properties.emplace_back(
-            "_TexVariables",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                1,
-                1,
-                0));
-
-        ShaderParamBindTable::getInstance().registerShader("common", properties);
-        BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("common"));
-
-        shader->SetVsShader(path.c_str());
-        shader->SetPsShader(path.c_str());
-        shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        shader->blendState               = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-        auto&& depthStencilState         = shader->depthStencilState;
-        depthStencilState.DepthEnable    = true;
-        depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS;
-        depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-        depthStencilState.StencilEnable  = false;
-
-        ShaderParamBindTable::getInstance().registerShader("transparent", properties);
-        BasicShader* trans_shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
-        trans_shader->SetVsShader(path.c_str());
-        trans_shader->SetPsShader(path.c_str());
-        trans_shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-        trans_shader->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-
-        trans_shader->blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-        D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;
-        transparencyBlendDesc.BlendEnable           = true;
-        transparencyBlendDesc.LogicOpEnable         = false;
-        transparencyBlendDesc.SrcBlend              = D3D12_BLEND_SRC_ALPHA;
-        transparencyBlendDesc.DestBlend             = D3D12_BLEND_INV_SRC_ALPHA;
-        transparencyBlendDesc.BlendOp               = D3D12_BLEND_OP_ADD;
-        transparencyBlendDesc.SrcBlendAlpha         = D3D12_BLEND_ONE;
-        transparencyBlendDesc.DestBlendAlpha        = D3D12_BLEND_ZERO;
-        transparencyBlendDesc.BlendOpAlpha          = D3D12_BLEND_OP_ADD;
-        transparencyBlendDesc.LogicOp               = D3D12_LOGIC_OP_NOOP;
-        transparencyBlendDesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-        trans_shader->blendState.RenderTarget[0]    = transparencyBlendDesc;
-
-        auto&& trans_depthStencilState         = trans_shader->depthStencilState;
-        trans_depthStencilState.DepthEnable    = true;
-        trans_depthStencilState.DepthFunc      = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-        trans_depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-        trans_depthStencilState.StencilEnable  = true;
-    }
-
-    void RenderContext::buildTextures() {
-        // do nothing
-    }
-
     void RenderContext::init(HWND window_handle, int width, int height) {
-        ZE_ASSERT(window_handle && "window handle passed to dx12_context is nullptr!");
+        ZE_ASSERT(window_handle && "window handle passed to dx12_context is NULL!");
 
         m_window_handle = window_handle;
         m_viewport      = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
@@ -232,8 +125,64 @@ namespace Zero {
         }
 
         {
-            buildShaders();
-            buildTextures();
+            registerRenderPass();
+        }
+
+        LOG_INFO("dx12 render_context init success");
+    }
+
+    void RenderContext::shutdown() {
+        flushCommandQueue();
+
+        m_frameResourceMngr->CleanUp();
+
+        if (!m_rtvCpuDH.IsNull())
+            DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Free(std::move(m_rtvCpuDH));
+        if (!m_dsvCpuDH.IsNull())
+            DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Free(std::move(m_dsvCpuDH));
+        if (!m_csuCpuDH.IsNull())
+            DescriptorHeapMngr::GetInstance().GetCSUCpuDH()->Free(std::move(m_csuCpuDH));
+        if (!m_csuGpuDH.IsNull())
+            DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
+
+#if defined(DEBUG) || defined(_DEBUG)
+            // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+#endif
+    }
+
+    void RenderContext::registerRenderPass() {
+        m_render_passes.push_back(Zero::CreateScope<MainCameraPass2D>());
+    }
+
+    void RenderContext::swapBuffer() {
+        m_backBufferIndex = (m_backBufferIndex + 1) % s_frame_count;
+    }
+
+    void RenderContext::beginRender() {
+        m_frameResourceMngr->BeginFrame();
+    }
+
+    void RenderContext::endRender() {
+        drawRenderPasses(*(m_frameResourceMngr->GetCurrentFrameResource()), m_backBufferIndex);
+        m_frameResourceMngr->Execute(m_commandQueue.Get());
+
+        ImGuiIO& io = ImGui::GetIO();
+        // Update and Render additional Platform Windows
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault(
+                NULL,
+                (void*)(m_frameResourceMngr->GetCurrentFrameResource()->GetCmdList().Get()));
+        }
+
+        ThrowIfFailed(m_swapChain->Present((m_is_vsync_enable) ? 1 : 0, 0));
+        m_frameResourceMngr->EndFrame(m_commandQueue.Get());
+    }
+
+    // draw call
+    void RenderContext::drawRenderPasses(FrameResource& frameRes, uint frameIndex) {
+        for (auto&& render_pass : m_render_passes) {
+            render_pass->drawPass(frameRes, frameIndex);
         }
     }
 
@@ -309,115 +258,5 @@ namespace Zero {
         m_commandQueue.Execute(commandList.Get());
 
         flushCommandQueue();
-    }
-
-    void RenderContext::swapBuffer() {
-        m_backBufferIndex = (m_backBufferIndex + 1) % s_frame_count;
-    }
-
-    void RenderContext::beginRender() {
-        m_frameResourceMngr->BeginFrame();
-    }
-
-    void RenderContext::endRender() {
-        populateCommandList(*(m_frameResourceMngr->GetCurrentFrameResource()), m_backBufferIndex);
-        m_frameResourceMngr->Execute(m_commandQueue.Get());
-
-        ImGuiIO& io = ImGui::GetIO();
-        // Update and Render additional Platform Windows
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault(
-                NULL,
-                (void*)(m_frameResourceMngr->GetCurrentFrameResource()->GetCmdList().Get()));
-        }
-
-        ThrowIfFailed(m_swapChain->Present((m_is_vsync_enable) ? 1 : 0, 0));
-        m_frameResourceMngr->EndFrame(m_commandQueue.Get());
-    }
-
-    void RenderContext::populateCommandList(FrameResource& frameRes, uint frameIndex) {
-        auto     cmdListHandle = frameRes.Command();
-        GCmdList cmdList(cmdListHandle.CmdList());
-
-        // Set necessary state.
-        m_stateTracker.RecordState(m_renderTargets[frameIndex].get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-        m_stateTracker.RecordState(m_depthTargets[frameIndex].get(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
-        m_stateTracker.UpdateState(cmdList.Get());
-
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvCpuDH.GetCpuHandle(0), frameIndex, m_rtvCpuDH.GetDescriptorSize());
-        CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvCpuDH.GetCpuHandle(0), frameIndex, m_dsvCpuDH.GetDescriptorSize());
-        frameRes.SetRenderTarget(
-            m_renderTargets[frameIndex].get(),
-            &rtvHandle,
-            &dsvHandle);
-        frameRes.ClearRTV(rtvHandle);
-        frameRes.ClearDSV(dsvHandle);
-
-        cmdList->SetDescriptorHeaps(
-            1,
-            get_rvalue_ptr(TextureTable::getInstance().getTexAllocation()->GetDescriptorHeap()));
-
-        BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
-
-        auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
-
-        // draw call
-        for (auto& [mesh, transform, color, tex_index] : m_draw_2d_list) {
-            // bind object-varying constants
-            ShaderParamBindTable::getInstance().bindParam(
-                shader,
-                "_ModelMatrix",
-                std::span<const uint8_t>{
-                    reinterpret_cast<uint8_t const*>(get_rvalue_ptr(transform.Transpose())),
-                    sizeof(transform.Transpose())});
-
-            ShaderParamBindTable::getInstance().bindParam(
-                shader,
-                "_Modulate",
-                std::span<const uint8_t>{
-                    reinterpret_cast<uint8_t const*>(&color),
-                    sizeof(color)});
-
-            ShaderParamBindTable::getInstance()
-                .bindParam(
-                    shader,
-                    "_TexVariables",
-                    std::span<const uint8_t>{
-                        reinterpret_cast<uint8_t const*>(&tex_index),
-                        sizeof(tex_index)});
-
-            bindProperties.clear();
-
-            // bind the constants which does not differ among different objects
-            for (auto& prop : prop_table) {
-                auto name = prop.first;
-                std::visit(overloaded{
-                               [&](std::span<const uint8_t> data) {
-                    auto buffer = frameRes.AllocateConstBuffer(data);
-                    bindProperties.emplace_back(name, buffer);
-                               },
-                               [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
-                    bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
-                }},
-                    prop.second);
-            }
-
-            frameRes.DrawMesh(
-                shader,
-                psoManager.get(),
-                mesh,
-                s_colorFormat,
-                s_depthFormat,
-                bindProperties);
-        }
-
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
-
-        m_stateTracker.RestoreState(cmdList.Get());
-
-        // clear mesh
-        m_draw_2d_list.clear();
     }
 } // namespace Zero

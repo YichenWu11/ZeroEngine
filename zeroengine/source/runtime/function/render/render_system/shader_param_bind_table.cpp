@@ -21,11 +21,11 @@ namespace Zero {
             return;
         }
 
-        ZE_ASSERT(RenderContext::getInstance().getGraphicsDevice() && "registerShader before creating device!");
+        ZE_ASSERT(GET_RENDER_CONTEXT().getGraphicsDevice() && "registerShader before creating device!");
 
         switch (usage) {
             case ShaderUsage::BASIC: {
-                auto shader                       = Zero::CreateRef<BasicShader>(properties, RenderContext::getInstance().getGraphicsDevice(), samplers);
+                auto shader                       = Zero::CreateRef<BasicShader>(properties, GET_RENDER_CONTEXT().getGraphicsDevice(), samplers);
                 m_shader_bind_table[shader.get()] = ParamBindTable();
                 m_shader_table[shader_name]       = std::move(shader);
                 break;

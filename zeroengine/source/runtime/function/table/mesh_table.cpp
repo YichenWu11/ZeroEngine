@@ -6,7 +6,7 @@ using namespace Chen::CDX12;
 
 namespace Zero {
     void MeshTable::buildBasicMesh() {
-        ID3D12Device* device = RenderContext::getInstance().getGraphicsDevice();
+        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
 
         static VertexBufferLayout               layout;
         static std::vector<rtti::Struct const*> structs;
@@ -103,8 +103,8 @@ namespace Zero {
         ThrowIfFailed(commandList->Close());
 
         ID3D12CommandList* ppCommandLists[] = {commandList.Get()};
-        RenderContext::getInstance().getCommandQueue()->ExecuteCommandLists(array_count(ppCommandLists), ppCommandLists);
-        RenderContext::getInstance().flush();
+        GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppCommandLists), ppCommandLists);
+        GET_RENDER_CONTEXT().flush();
 
         m_mesh_table["triangle"] = std::move(triangle_mesh);
         m_mesh_table["square"]   = std::move(square_mesh);

@@ -32,6 +32,26 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
         ZE_PROFILE_SCOPE("Renderer2D::Render");
         Zero::Renderer2D::beginScene(m_camera_controller.getCamera());
 
+        // TODO: sort the render order by z-index
+
+        Zero::Renderer2D::drawQuad(
+            {0.0f, 0.0f, 0.2f},
+            {10.0f, 10.0f},
+            0.0f,
+            {0.8f, 0.8f, 0.8f, 1.0f},
+            Zero::TextureTable::getInstance().getTexIndexFromName("asoul"));
+
+        for (float y = -5.0f; y < 5.0f; y += 0.5f) {
+            for (float x = -5.0f; x < 5.0f; x += 0.5f) {
+                Zero::Renderer2D::drawQuad(
+                    {x, y, 0.1f},
+                    {0.45f, 0.45f},
+                    0.0f,
+                    {(x + 5.0f) / 10.0f, (y + 5.0f) / 10.0f, 1.0f, 0.8f},
+                    Zero::TextureTable::getInstance().getTexIndexFromName("bella"));
+            }
+        }
+
         Zero::Renderer2D::drawQuad(
             {-0.8f, -0.3f},
             {1.0f, 1.0f},
@@ -58,11 +78,11 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
 void Sandbox2D::onImGuiRender() {
     static auto tex_alloc = Zero::TextureTable::getInstance().getTexAllocation();
 
-    // {
-    //     ImGui::Begin("DEBUG");
-    //     ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
-    //     ImGui::End();
-    // }
+    {
+        ImGui::Begin("DEBUG");
+        ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
+        ImGui::End();
+    }
 
     {
         ImGui::Begin("IMAGE");

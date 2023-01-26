@@ -20,7 +20,7 @@ namespace Zero {
 
     void TextureTable::registerTex(const std::filesystem::path& tex_path, TexFileFormat file_format) {
         if (!std::filesystem::exists(tex_path)) {
-            LOG_WARN("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
+            LOG_ERROR("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
             return;
         }
 
@@ -36,7 +36,7 @@ namespace Zero {
             return;
         }
 
-        ID3D12Device* device = RenderContext::getInstance().getGraphicsDevice();
+        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
         auto          tex    = Zero::CreateRef<Texture>(
             device,
             info.width,
@@ -84,7 +84,7 @@ namespace Zero {
             &desc,
             m_tex_alloc.GetCpuHandle(m_texture_table.size() - 1));
 
-        auto uploadResourcesFinished = resourceUpload.End(RenderContext::getInstance().getCommandQueue());
+        auto uploadResourcesFinished = resourceUpload.End(GET_RENDER_CONTEXT().getCommandQueue());
         uploadResourcesFinished.wait();
     }
 

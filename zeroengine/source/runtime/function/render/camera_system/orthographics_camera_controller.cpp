@@ -4,7 +4,8 @@
 namespace Zero {
     OrthographicsCameraController::OrthographicsCameraController(float aspect_ratio, bool rotation_enabled) :
         m_aspect_ratio(aspect_ratio),
-        m_camera(-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level),
+        m_bounds{-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level},
+        m_camera(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top),
         m_rotation_enabled(rotation_enabled) {}
 
     void OrthographicsCameraController::onUpdate(TimeStep timestep) {
@@ -39,13 +40,15 @@ namespace Zero {
     bool OrthographicsCameraController::onMouseScrolled(MouseScrolledEvent& e) {
         m_zoom_level -= e.getZOffset() * 0.002f;
         m_zoom_level = std::max(m_zoom_level, 0.25f);
-        m_camera.setProjection(-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level);
+        m_bounds     = {-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level};
+        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
         return false;
     }
 
     bool OrthographicsCameraController::onWindowResize(WindowResizeEvent& e) {
         m_aspect_ratio = (float)e.getWidth() / (float)e.getHeight();
-        m_camera.setProjection(-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level);
+        m_bounds       = {-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level};
+        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
         return false;
     }
 

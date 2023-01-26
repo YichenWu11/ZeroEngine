@@ -45,8 +45,8 @@ namespace Zero {
     }
 
     void Renderer2D::endScene() {
-        RenderContext::getInstance().beginRender();
-        RenderContext::getInstance().endRender();
+        GET_RENDER_CONTEXT().beginRender();
+        GET_RENDER_CONTEXT().endRender();
     }
 
     void Renderer2D::drawQuad(
@@ -74,6 +74,6 @@ namespace Zero {
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        RenderContext::getInstance().submit(mesh.get(), transform, color, tex_index, tiling_factor);
+        GET_RENDER_CONTEXT().submit(mesh.get(), transform, color, tex_index, tiling_factor);
     }
 } // namespace Zero

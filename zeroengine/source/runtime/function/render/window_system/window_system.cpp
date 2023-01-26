@@ -183,7 +183,7 @@ namespace Zero {
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
 
-        RenderContext::getInstance().init(m_window, m_data.width, m_data.height);
+        GET_RENDER_CONTEXT().init(m_window, m_data.width, m_data.height);
 
         if (create_info.is_fullscreen)
             ShowWindow(m_window, SW_SHOWMAXIMIZED);
@@ -206,12 +206,12 @@ namespace Zero {
             ::DispatchMessage(&msg);
         }
 
-        RenderContext::getInstance().swapBuffer();
+        GET_RENDER_CONTEXT().swapBuffer();
     }
 
     void WindowSystem::setVSync(bool enabled) {
         if (enabled) {
-            RenderContext::getInstance().setVsync(true);
+            GET_RENDER_CONTEXT().setVsync(true);
         }
 
         m_data.v_sync = enabled;

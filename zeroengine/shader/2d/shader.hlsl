@@ -32,6 +32,7 @@ PSInput VSMain(VSInput input) {
 
   float4 posW = mul(float4(input.position, 1.0f), u_LocalToWorldMatrix);
   result.position = mul(posW, u_CameraWorldToViewMatrix);
+
   result.tex_coord = input.tex_coord;
   result.screen_pos = result.position.xy;
 

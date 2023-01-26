@@ -20,12 +20,12 @@ namespace Zero {
     }
 
     void Renderer::shutdown() {
-        RenderContext::getInstance().shutdown();
+        GET_RENDER_CONTEXT().shutdown();
         Renderer2D::shutdown();
     }
 
     void Renderer::onWindowResize(int width, int height) {
-        RenderContext::getInstance().onResize(width, height);
+        GET_RENDER_CONTEXT().onResize(width, height);
     }
 
     void Renderer::beginScene(const OrthographicsCamera& camera) {
@@ -53,8 +53,8 @@ namespace Zero {
     }
 
     void Renderer::endScene() {
-        RenderContext::getInstance().beginRender();
-        RenderContext::getInstance().endRender();
+        GET_RENDER_CONTEXT().beginRender();
+        GET_RENDER_CONTEXT().endRender();
     }
 
     void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Matrix& transfrom) {
