@@ -5,7 +5,8 @@ struct VSInput {
 
 struct PSInput {
   float4 position : SV_POSITION;
-  float2 tex_coord : TEXCOORD;
+  float2 tex_coord : TEXCOORD0;
+  float2 screen_pos : TEXCOORD1;
 };
 
 cbuffer _ViewProjMatrix : register(b0) { float4x4 u_CameraWorldToViewMatrix; };
@@ -32,11 +33,15 @@ PSInput VSMain(VSInput input) {
   float4 posW = mul(float4(input.position, 1.0f), u_LocalToWorldMatrix);
   result.position = mul(posW, u_CameraWorldToViewMatrix);
   result.tex_coord = input.tex_coord;
+  result.screen_pos = result.position.xy;
 
   return result;
 }
 
 float4 PSMain(PSInput input) : SV_TARGET {
+  float dist = 1.0f - distance(input.screen_pos * 0.8f, float2(0.0f, 0.0f));
+  dist = clamp(dist, 0.0f, 1.0f);
+  dist = sqrt(dist);
   return TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap, input.tex_coord) *
          u_ModulateColor;
 }

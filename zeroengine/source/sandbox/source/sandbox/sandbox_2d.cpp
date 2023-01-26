@@ -58,11 +58,11 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
 void Sandbox2D::onImGuiRender() {
     static auto tex_alloc = Zero::TextureTable::getInstance().getTexAllocation();
 
-    {
-        ImGui::Begin("DEBUG");
-        ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
-        ImGui::End();
-    }
+    // {
+    //     ImGui::Begin("DEBUG");
+    //     ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
+    //     ImGui::End();
+    // }
 
     {
         ImGui::Begin("IMAGE");

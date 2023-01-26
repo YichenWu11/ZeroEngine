@@ -6,9 +6,7 @@ using namespace Chen::CDX12;
 
 namespace Zero {
     void MeshTable::buildBasicMesh() {
-        ZE_ASSERT(m_render_context && "Bind the render_context first (MeshTable)!");
-
-        ID3D12Device* device = m_render_context->getGraphicsDevice();
+        ID3D12Device* device = RenderContext::getInstance().getGraphicsDevice();
 
         static VertexBufferLayout               layout;
         static std::vector<rtti::Struct const*> structs;
@@ -105,20 +103,17 @@ namespace Zero {
         ThrowIfFailed(commandList->Close());
 
         ID3D12CommandList* ppCommandLists[] = {commandList.Get()};
-        m_render_context->getCommandQueue()->ExecuteCommandLists(array_count(ppCommandLists), ppCommandLists);
-        m_render_context->flush();
+        RenderContext::getInstance().getCommandQueue()->ExecuteCommandLists(array_count(ppCommandLists), ppCommandLists);
+        RenderContext::getInstance().flush();
 
         m_mesh_table["triangle"] = std::move(triangle_mesh);
         m_mesh_table["square"]   = std::move(square_mesh);
     }
 
     void MeshTable::registerMesh(const std::string& mesh_name, float* vertices, uint32_t* indices) {
-        ZE_ASSERT(m_render_context && "Bind the render_context first (MeshTable)!");
     }
 
     Zero::Ref<Chen::CDX12::Mesh> MeshTable::getMesh(const std::string& mesh_name) {
-        ZE_ASSERT(m_render_context && "Bind the render_context first (MeshTable)!");
-
         if (m_mesh_table.contains(mesh_name))
             return m_mesh_table[mesh_name];
         LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);

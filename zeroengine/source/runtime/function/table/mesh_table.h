@@ -3,8 +3,6 @@
 #include <CDX12/Resource/Mesh.h>
 
 namespace Zero {
-    class RenderContext;
-
     class MeshTable {
     public:
         static MeshTable& getInstance() {
@@ -12,7 +10,7 @@ namespace Zero {
             return instance;
         }
 
-        void bindRenderContext(RenderContext* context) { m_render_context = context; }
+        void init() {}
 
         void buildBasicMesh();
 
@@ -24,7 +22,6 @@ namespace Zero {
         MeshTable()  = default;
         ~MeshTable() = default;
 
-        RenderContext*                                                m_render_context;
         std::unordered_map<std::string, Zero::Ref<Chen::CDX12::Mesh>> m_mesh_table;
     };
 } // namespace Zero

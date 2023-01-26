@@ -17,8 +17,6 @@ namespace Zero {
 
         HWND getNativeWindowHandle() override { return m_window; }
 
-        RenderContext* getRenderContext() { return m_context.get(); }
-
         // window attributes
         void setEventCallback(const EventCallbackFn& callback) override { m_data.event_callback = callback; }
         void setVSync(bool enabled) override;
@@ -30,10 +28,7 @@ namespace Zero {
 
     private:
         // hwnd
-        HWND                     m_window;
-        Zero::Ref<RenderContext> m_context;
-
-        static POINT m_last_mouse_pos;
+        HWND m_window;
 
         struct WindowData {
             int         width;

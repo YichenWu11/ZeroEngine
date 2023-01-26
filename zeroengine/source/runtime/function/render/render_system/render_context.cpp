@@ -17,12 +17,7 @@ namespace Zero {
     DXGI_FORMAT RenderContext::s_colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
     DXGI_FORMAT RenderContext::s_depthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    RenderContext::RenderContext(HWND window_handle) :
-        m_window_handle(window_handle) {
-        ZE_ASSERT(window_handle && "window handle passed to dx12_context is nullptr!");
-    }
-
-    RenderContext::~RenderContext() {
+    void RenderContext::shutdown() {
         flushCommandQueue();
 
         m_frameResourceMngr->CleanUp();
@@ -131,9 +126,12 @@ namespace Zero {
         // do nothing
     }
 
-    void RenderContext::init(int width, int height) {
-        m_viewport    = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
-        m_scissorRect = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
+    void RenderContext::init(HWND window_handle, int width, int height) {
+        ZE_ASSERT(window_handle && "window handle passed to dx12_context is nullptr!");
+
+        m_window_handle = window_handle;
+        m_viewport      = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+        m_scissorRect   = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
 
 #if defined(DEBUG) || defined(_DEBUG)
         {

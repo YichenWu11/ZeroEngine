@@ -15,7 +15,6 @@ namespace Zero {
     if (m_data.event_callback) m_data.event_callback(e);
 
     WindowSystem::WindowData WindowSystem::m_data;
-    POINT                    WindowSystem::m_last_mouse_pos;
 
     LRESULT CALLBACK
     MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -103,9 +102,6 @@ namespace Zero {
                     static_cast<float>(GET_X_LPARAM(lParam)),
                     static_cast<float>(GET_Y_LPARAM(lParam)));
 
-                m_last_mouse_pos.x = GET_X_LPARAM(lParam);
-                m_last_mouse_pos.y = GET_Y_LPARAM(lParam);
-
                 EVENT_CALLBACK(event)
                 return 0;
             }
@@ -187,8 +183,7 @@ namespace Zero {
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
 
-        m_context = Zero::CreateRef<RenderContext>(m_window);
-        m_context->init(m_data.width, m_data.height);
+        RenderContext::getInstance().init(m_window, m_data.width, m_data.height);
 
         if (create_info.is_fullscreen)
             ShowWindow(m_window, SW_SHOWMAXIMIZED);
@@ -211,12 +206,12 @@ namespace Zero {
             ::DispatchMessage(&msg);
         }
 
-        m_context->swapBuffer();
+        RenderContext::getInstance().swapBuffer();
     }
 
     void WindowSystem::setVSync(bool enabled) {
         if (enabled) {
-            m_context->setVsync(true);
+            RenderContext::getInstance().setVsync(true);
         }
 
         m_data.v_sync = enabled;

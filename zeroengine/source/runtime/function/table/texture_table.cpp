@@ -14,9 +14,8 @@ namespace Zero {
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_tex_alloc));
     }
 
-    void TextureTable::bindRenderContext(RenderContext* context) {
-        m_render_context = context;
-        m_tex_alloc      = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
+    void TextureTable::init() {
+        m_tex_alloc = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
     }
 
     void TextureTable::registerTex(const std::filesystem::path& tex_path, TexFileFormat file_format) {
@@ -32,14 +31,12 @@ namespace Zero {
     void TextureTable::registerTex(
         const TextureBuildInfo& info,
         TexFileFormat           file_format) {
-        ZE_ASSERT(m_render_context && "Bind the device first(TextureTable)!");
-
         if (m_texture_table.contains(info.name)) {
             LOG_WARN("The texture with this name({0}) has exsited!", info.name);
             return;
         }
 
-        ID3D12Device* device = m_render_context->getGraphicsDevice();
+        ID3D12Device* device = RenderContext::getInstance().getGraphicsDevice();
         auto          tex    = Zero::CreateRef<Texture>(
             device,
             info.width,
@@ -87,13 +84,11 @@ namespace Zero {
             &desc,
             m_tex_alloc.GetCpuHandle(m_texture_table.size() - 1));
 
-        auto uploadResourcesFinished = resourceUpload.End(m_render_context->getCommandQueue());
+        auto uploadResourcesFinished = resourceUpload.End(RenderContext::getInstance().getCommandQueue());
         uploadResourcesFinished.wait();
     }
 
     uint32_t TextureTable::getTexIndexFromName(const std::string& tex_name) {
-        ZE_ASSERT(m_render_context && "Bind the device first(TextureTable)!");
-
         if (!m_texture_table.contains(tex_name)) {
             LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
             return -1;

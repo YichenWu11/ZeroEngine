@@ -26,11 +26,14 @@ namespace Zero {
 
     class RenderContext {
     public:
-        RenderContext(HWND window_handle);
-        ~RenderContext();
+        static RenderContext& getInstance() {
+            static RenderContext instance;
+            return instance;
+        }
 
-        void init(int width, int height);
+        void init(HWND window_handle, int width, int height);
         void swapBuffer();
+        void shutdown();
 
         void setVsync(bool vsync) { m_is_vsync_enable = vsync; }
 
@@ -59,6 +62,12 @@ namespace Zero {
         }
 
     private:
+        RenderContext()  = default;
+        ~RenderContext() = default;
+
+        RenderContext(const RenderContext&)            = delete;
+        RenderContext& operator=(const RenderContext&) = delete;
+
         void buildShaders();
         void buildTextures();
 

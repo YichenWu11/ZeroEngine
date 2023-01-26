@@ -4,8 +4,6 @@
 #include <CDX12/Material/Texture.h>
 
 namespace Zero {
-    class RenderContext;
-
     struct TextureBuildInfo {
         std::wstring                       path;
         std::string                        name;
@@ -30,7 +28,7 @@ namespace Zero {
             return instance;
         }
 
-        void bindRenderContext(RenderContext* context);
+        void init();
 
         void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureBuildInfo&, TexFileFormat = TexFileFormat::WIC);
@@ -44,7 +42,6 @@ namespace Zero {
         ~TextureTable();
 
     private:
-        RenderContext*                        m_render_context{nullptr};
         Chen::CDX12::DescriptorHeapAllocation m_tex_alloc;
 
         std::map<std::string, uint32_t>                  m_texname2index;

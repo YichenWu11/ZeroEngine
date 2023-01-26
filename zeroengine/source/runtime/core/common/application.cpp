@@ -22,17 +22,13 @@ namespace Zero {
         m_window = IWindowSystem::create();
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
 
-        RenderContext* render_context = static_cast<WindowSystem*>(m_window.get())->getRenderContext();
-
-        Renderer::init(render_context);
+        Renderer::init();
 
         MeshTable::getInstance().buildBasicMesh();
         Zero::TextureTable::getInstance().registerTex(
             std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png");
 
-        m_ImGuiLayer = new ImGuiLayer(
-            render_context,
-            m_window->getNativeWindowHandle());
+        m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
         pushOverlay(m_ImGuiLayer);
     }
 

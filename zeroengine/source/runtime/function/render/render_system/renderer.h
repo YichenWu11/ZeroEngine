@@ -8,11 +8,9 @@ namespace Chen::CDX12 {
 }
 
 namespace Zero {
-    class RenderContext;
-
     class Renderer {
     public:
-        static void init(RenderContext* context);
+        static void init();
         static void shutdown();
 
         static void onWindowResize(int, int);
@@ -31,7 +29,6 @@ namespace Zero {
         };
 
     private:
-        static RenderContext* s_render_context;
-        static SceneData*     s_scene_data;
+        static SceneData* s_scene_data;
     };
 } // namespace Zero

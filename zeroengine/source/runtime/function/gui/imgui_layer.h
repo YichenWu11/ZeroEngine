@@ -9,11 +9,9 @@
 #include "runtime/function/event/mouse_event.h"
 
 namespace Zero {
-    class RenderContext;
-
     class ImGuiLayer : public Layer {
     public:
-        ImGuiLayer(RenderContext*, HWND);
+        ImGuiLayer(HWND);
         ~ImGuiLayer();
 
         void onAttach() override;
@@ -26,7 +24,6 @@ namespace Zero {
         void setZeroImGuiStyle();
 
     private:
-        RenderContext* m_context;
-        HWND           m_handle;
+        HWND m_handle;
     };
 } // namespace Zero

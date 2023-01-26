@@ -3,11 +3,9 @@
 #include "runtime/function/render/camera_system/orthographics_camera.h"
 
 namespace Zero {
-    class RenderContext;
-
     class Renderer2D {
     public:
-        static void init(RenderContext* context);
+        static void init();
         static void shutdown();
 
         static void beginScene(const OrthographicsCamera& camera);
@@ -28,8 +26,5 @@ namespace Zero {
             const DirectX::SimpleMath::Color&   color         = {1.0f, 1.0f, 1.0f, 1.0f},
             uint32_t                            tex_index     = 0,
             float                               tiling_factor = 1.0f);
-
-    private:
-        static RenderContext* s_render_context;
     };
 } // namespace Zero

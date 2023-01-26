@@ -8,10 +8,8 @@
 #include "runtime/function/render/render_system/render_context.h"
 
 namespace Zero {
-    ImGuiLayer::ImGuiLayer(RenderContext* context, HWND handle) :
+    ImGuiLayer::ImGuiLayer(HWND handle) :
         Layer("ImGuiLayer"),
-        m_context(context),
-
         m_handle(handle) {
     }
 
@@ -41,11 +39,11 @@ namespace Zero {
         auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/ZeroEngineFont.ttf";
         io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 20.0f);
 
-        ImGuiInitInfo init_info = m_context->getImGuiInitInfo();
+        ImGuiInitInfo init_info = RenderContext::getInstance().getImGuiInitInfo();
 
         ImGui_ImplWin32_Init(m_handle);
 
-        ImGui_ImplDX12_Init(m_context->getGraphicsDevice(),
+        ImGui_ImplDX12_Init(RenderContext::getInstance().getGraphicsDevice(),
                             3,
                             DXGI_FORMAT_R8G8B8A8_UNORM,
                             init_info.descriptor_heap,

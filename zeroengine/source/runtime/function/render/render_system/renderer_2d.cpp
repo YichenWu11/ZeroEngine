@@ -13,22 +13,13 @@ using namespace DirectX::SimpleMath;
 namespace Zero {
     struct Renderer2DStorage {};
 
-    RenderContext* Renderer2D::s_render_context = nullptr;
-
-    void Renderer2D::init(RenderContext* context) {
-        ZE_ASSERT(context && "render_context can not be nullptr");
-        s_render_context = context;
-        MeshTable::getInstance().bindRenderContext(context);
-        TextureTable::getInstance().bindRenderContext(context);
+    void Renderer2D::init() {
     }
 
     void Renderer2D::shutdown() {
-        ZE_ASSERT(s_render_context && "init the renderer2d first!");
     }
 
     void Renderer2D::beginScene(const OrthographicsCamera& camera) {
-        ZE_ASSERT(s_render_context && "init the renderer2d first!");
-
         // takes all the scene settings(camera, lights, environment etc)
         BasicShader* shader =
             static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
@@ -52,10 +43,8 @@ namespace Zero {
     }
 
     void Renderer2D::endScene() {
-        ZE_ASSERT(s_render_context && "init the renderer2d first!");
-
-        s_render_context->beginRender();
-        s_render_context->endRender();
+        RenderContext::getInstance().beginRender();
+        RenderContext::getInstance().endRender();
     }
 
     void Renderer2D::drawQuad(
@@ -65,8 +54,6 @@ namespace Zero {
         const DirectX::SimpleMath::Color&   color,
         uint32_t                            tex_index,
         float                               tiling_factor) {
-        ZE_ASSERT(s_render_context && "init the renderer2d first!");
-
         drawQuad({position.x, position.y, 0.0f}, size, rotation, color, tex_index);
     }
 
@@ -77,8 +64,6 @@ namespace Zero {
         const DirectX::SimpleMath::Color&   color,
         uint32_t                            tex_index,
         float                               tiling_factor) {
-        ZE_ASSERT(s_render_context && "init the renderer2d first!");
-
         Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
                            * Matrix::CreateScale(size.x, size.y, 1.0f)
                            * Matrix::CreateTranslation(position);
@@ -87,6 +72,6 @@ namespace Zero {
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        s_render_context->submit(mesh.get(), transform, color, tex_index, tiling_factor);
+        RenderContext::getInstance().submit(mesh.get(), transform, color, tex_index, tiling_factor);
     }
 } // namespace Zero
