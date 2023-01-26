@@ -26,7 +26,7 @@ namespace Zero {
 
         MeshTable::getInstance().buildBasicMesh();
         Zero::TextureTable::getInstance().registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png");
+            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png"); // default texture
 
         m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
         pushOverlay(m_ImGuiLayer);
@@ -50,9 +50,9 @@ namespace Zero {
         dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(Application::onWindowResize));
 
         for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
-            (*it)->onEvent(e);
             if (e.m_handled)
                 break;
+            (*it)->onEvent(e);
         }
     }
 

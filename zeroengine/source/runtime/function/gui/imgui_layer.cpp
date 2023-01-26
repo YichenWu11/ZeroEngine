@@ -57,6 +57,12 @@ namespace Zero {
         ImGui::DestroyContext();
     }
 
+    void ImGuiLayer::onEvent(Event& e) {
+        ImGuiIO& io = ImGui::GetIO();
+        e.m_handled |= e.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+        e.m_handled |= e.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+    }
+
     void ImGuiLayer::begin() {
         ImGui_ImplDX12_NewFrame();
         ImGui_ImplWin32_NewFrame();
@@ -98,8 +104,8 @@ namespace Zero {
         colors[ImGuiCol_TabUnfocusedActive] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
 
         // Title
-        colors[ImGuiCol_TitleBg]          = ImVec4{0.297f, 0.156f, 0.25f, 1.00f};
-        colors[ImGuiCol_TitleBgActive]    = ImVec4{0.297f, 0.156f, 0.25f, 1.00f};
-        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        colors[ImGuiCol_TitleBg]          = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
+        colors[ImGuiCol_TitleBgActive]    = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
+        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
     }
 } // namespace Zero

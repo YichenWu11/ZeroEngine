@@ -3,6 +3,7 @@
 #include <CDX12/Resource/UploadBuffer.h>
 
 #include "runtime/function/render/render_system/buffer.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 
 using namespace Chen::CDX12;
@@ -13,22 +14,25 @@ namespace Zero {
         VertexBuffer
     */
 
-    VertexBuffer::VertexBuffer(ID3D12Device* device, float* vertices, uint32_t size) {
+    VertexBuffer::VertexBuffer(float* vertices, uint32_t byte_size) {
         static VertexBufferLayout buffer_layout;
 
-        size_t             VERTEX_COUNT = size / sizeof(float);
-        std::vector<vbyte> vertex_data(size);
+        size_t             VERTEX_COUNT = byte_size / sizeof(float);
+        std::vector<vbyte> vertex_data(byte_size);
         vbyte*             vertex_dataPtr = vertex_data.data();
         for (size_t i = 0; i < VERTEX_COUNT; i += buffer_layout.structSize / sizeof(float)) {
-            XMFLOAT3 vert{vertices[i], vertices[i + 1], vertices[i + 2]};
-            buffer_layout.position.Get(vertex_dataPtr) = vert;
+            // position
+            XMFLOAT3 position{vertices[i], vertices[i + 1], vertices[i + 2]};
+            buffer_layout.position.Get(vertex_dataPtr) = position;
+            // tex_coord
             XMFLOAT2 tex_coord(vertices[i + 3], vertices[i + 4]);
             buffer_layout.tex_coord.Get(vertex_dataPtr) = tex_coord;
+
             vertex_dataPtr += buffer_layout.structSize;
         }
 
         m_vertex_upload = new UploadBuffer(
-            device,
+            RenderContext::getInstance().getGraphicsDevice(),
             vertex_data.size());
         m_vertex_upload->CopyData(0, vertex_data);
     }
@@ -49,12 +53,12 @@ namespace Zero {
     void VertexBuffer::unbind() const {
     }
 
-    Zero::Ref<VertexBuffer> VertexBuffer::create(ID3D12Device* device, float* vertices, uint32_t size) {
+    Zero::Ref<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t byte_size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");
             case RendererAPI::API::DX12:
-                return Zero::CreateRef<VertexBuffer>(device, vertices, size);
+                return Zero::CreateRef<VertexBuffer>(vertices, byte_size);
         }
 
         ZE_ASSERT(false && "Unknown RendererAPI");
@@ -65,12 +69,12 @@ namespace Zero {
         IndexBuffer
     */
 
-    IndexBuffer::IndexBuffer(ID3D12Device* device, uint32_t* indices, uint32_t size) :
-        m_index_count(size / 4) {
+    IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t byte_size) :
+        m_index_count(byte_size / 4) {
         m_index_upload = new UploadBuffer(
-            device,
-            size);
-        m_index_upload->CopyData(0, {reinterpret_cast<vbyte const*>(indices), size});
+            RenderContext::getInstance().getGraphicsDevice(),
+            byte_size);
+        m_index_upload->CopyData(0, {reinterpret_cast<vbyte const*>(indices), byte_size});
     }
 
     IndexBuffer::~IndexBuffer() {
@@ -89,12 +93,12 @@ namespace Zero {
     void IndexBuffer::unbind() const {
     }
 
-    Zero::Ref<IndexBuffer> IndexBuffer::create(ID3D12Device* device, uint32_t* indices, uint32_t size) {
+    Zero::Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t byte_size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");
             case RendererAPI::API::DX12:
-                return Zero::CreateRef<IndexBuffer>(device, indices, size);
+                return Zero::CreateRef<IndexBuffer>(indices, byte_size);
         }
 
         ZE_ASSERT(false && "Unknown RendererAPI");

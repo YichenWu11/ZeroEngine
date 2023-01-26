@@ -37,7 +37,7 @@ namespace Zero {
     }
 
     void RenderContext::buildShaders() {
-        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/shader.hlsl";
+        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/2d/shader.hlsl";
         std::wstring path        = AnsiToWString(shader_path.string());
 
         std::vector<std::pair<std::string, Shader::Property>> properties;

@@ -29,7 +29,7 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
     }
 
     {
-        ZE_PROFILE_SCOPE("Render");
+        ZE_PROFILE_SCOPE("Renderer2D::Render");
         Zero::Renderer2D::beginScene(m_camera_controller.getCamera());
 
         Zero::Renderer2D::drawQuad(

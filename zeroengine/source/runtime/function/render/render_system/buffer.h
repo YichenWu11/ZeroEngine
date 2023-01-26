@@ -27,28 +27,31 @@ namespace Zero {
 
     class VertexBuffer {
     public:
-        VertexBuffer(ID3D12Device* device, float* vertices, uint32_t size);
+        VertexBuffer(float* vertices, uint32_t byte_size);
         ~VertexBuffer();
 
-        void bind(ID3D12GraphicsCommandList* cmdlist, Chen::CDX12::Mesh*) const;
+        void bind(ID3D12GraphicsCommandList* cmdlist, Chen::CDX12::Mesh*) const; // bind to mesh (copy data to mesh)
         void unbind() const;
 
-        static Zero::Ref<VertexBuffer> create(ID3D12Device* device, float* vertices, uint32_t size);
+        void delayDispose();
+
+        static Zero::Ref<VertexBuffer> create(float* vertices, uint32_t byte_size);
 
     private:
         Chen::CDX12::UploadBuffer* m_vertex_upload;
     };
 
+    // only support `uint32_t` IndexBuffer
     class IndexBuffer {
     public:
-        IndexBuffer(ID3D12Device* device, uint32_t* indices, uint32_t size);
+        IndexBuffer(uint32_t* indices, uint32_t byte_size);
         ~IndexBuffer();
 
-        void     bind(ID3D12GraphicsCommandList* cmdlist, Chen::CDX12::Mesh*) const;
+        void     bind(ID3D12GraphicsCommandList* cmdlist, Chen::CDX12::Mesh*) const; // bind to mesh (copy data to mesh)
         void     unbind() const;
         uint32_t getCount() const { return m_index_count; }
 
-        static Zero::Ref<IndexBuffer> create(ID3D12Device* device, uint32_t* indices, uint32_t size);
+        static Zero::Ref<IndexBuffer> create(uint32_t* indices, uint32_t byte_size);
 
     private:
         uint32_t                   m_index_count;

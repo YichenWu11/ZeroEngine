@@ -90,7 +90,7 @@ namespace Zero {
     };
 } // namespace Zero
 
-// #define ZE_PROFILE 1
+#define ZE_PROFILE 0
 #if ZE_PROFILE
 #define ZE_PROFILE_SCOPE(name) ::Zero::StepTimer timer##__LINE__(name);
 #define ZE_PROFILE_FUNCTION() ZE_PROFILE_SCOPE(__FUNCSIG__)

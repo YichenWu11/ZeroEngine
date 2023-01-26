@@ -16,6 +16,7 @@ namespace Zero {
 
         void onAttach() override;
         void onDetach() override;
+        void onEvent(Event& e) override;
 
         void begin();
         void end();

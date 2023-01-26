@@ -11,7 +11,9 @@ using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
 namespace Zero {
-    struct Renderer2DStorage {};
+    struct Renderer2DData {};
+
+    static Renderer2DData s_Data;
 
     void Renderer2D::init() {
     }

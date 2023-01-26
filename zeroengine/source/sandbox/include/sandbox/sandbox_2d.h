@@ -7,7 +7,7 @@ using namespace DirectX::SimpleMath;
 class Sandbox2D : public Zero::Layer {
 public:
     Sandbox2D();
-    virtual ~Sandbox2D() = default;
+    ~Sandbox2D() = default;
 
     void onAttach() override;
     void onDetach() override;

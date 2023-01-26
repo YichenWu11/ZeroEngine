@@ -72,13 +72,13 @@ namespace Zero {
             array_count(vertices_tri) * sizeof(float) / layout.structSize,
             array_count(indices_tri));
 
-        auto vert_buffer_tri = VertexBuffer::create(device,
-                                                    vertices_tri,
-                                                    array_count(vertices_tri) * sizeof(float));
+        auto vert_buffer_tri = VertexBuffer::create(
+            vertices_tri,
+            array_count(vertices_tri) * sizeof(float));
 
-        auto indi_buffer_tri = IndexBuffer::create(device,
-                                                   indices_tri,
-                                                   array_count(indices_tri) * sizeof(uint32_t));
+        auto indi_buffer_tri = IndexBuffer::create(
+            indices_tri,
+            array_count(indices_tri) * sizeof(uint32_t));
 
         vert_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
         indi_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
@@ -89,13 +89,13 @@ namespace Zero {
             array_count(vertices_square) * sizeof(float) / layout.structSize,
             array_count(indices_square));
 
-        auto vert_buffer_square = VertexBuffer::create(device,
-                                                       vertices_square,
-                                                       array_count(vertices_square) * sizeof(float));
+        auto vert_buffer_square = VertexBuffer::create(
+            vertices_square,
+            array_count(vertices_square) * sizeof(float));
 
-        auto indi_buffer_square = IndexBuffer::create(device,
-                                                      indices_square,
-                                                      array_count(indices_square) * sizeof(uint32_t));
+        auto indi_buffer_square = IndexBuffer::create(
+            indices_square,
+            array_count(indices_square) * sizeof(uint32_t));
 
         vert_buffer_square->bind(commandList.Get(), square_mesh.get());
         indi_buffer_square->bind(commandList.Get(), square_mesh.get());
@@ -111,6 +111,19 @@ namespace Zero {
     }
 
     void MeshTable::registerMesh(const std::string& mesh_name, float* vertices, uint32_t* indices) {
+    }
+
+    void MeshTable::removeMesh(const std::string& mesh_name) {
+        if (m_mesh_table.contains(mesh_name))
+            m_mesh_table.erase(mesh_name);
+        else
+            LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
+    }
+
+    void MeshTable::delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres) {
+        if (!m_mesh_table.contains(mesh_name))
+            LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
+        m_mesh_table[mesh_name]->DelayDispose(frameres);
     }
 
     Zero::Ref<Chen::CDX12::Mesh> MeshTable::getMesh(const std::string& mesh_name) {

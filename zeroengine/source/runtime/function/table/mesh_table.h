@@ -2,6 +2,10 @@
 
 #include <CDX12/Resource/Mesh.h>
 
+namespace Chen::CDX12 {
+    class FrameResource;
+}
+
 namespace Zero {
     class MeshTable {
     public:
@@ -15,6 +19,9 @@ namespace Zero {
         void buildBasicMesh();
 
         void registerMesh(const std::string&, float*, uint32_t*);
+        void removeMesh(const std::string&);
+
+        void delayDisposeMesh(const std::string&, Chen::CDX12::FrameResource* frameres);
 
         Zero::Ref<Chen::CDX12::Mesh> getMesh(const std::string&);
 
