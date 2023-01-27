@@ -15,7 +15,7 @@ using namespace Chen::CDX12;
 
 namespace Zero {
     MainCameraPass2D::MainCameraPass2D() {
-        LOG_INFO("- MainCameraPass2D register success.");
+        LOG_INFO("-- MainCameraPass2D register success.");
     }
 
     MainCameraPass2D::~MainCameraPass2D() {
@@ -102,11 +102,18 @@ namespace Zero {
         // do nothing
     }
 
-    void MainCameraPass2D::preSortPass() {
+    void MainCameraPass2D::preZSortPass() {
+        RenderContext& render_context = GET_RENDER_CONTEXT();
+
+        // NOTE: trick here, get the z-index from the _43 of the transform matrix
+        std::sort(render_context.m_draw_2d_list.begin(), render_context.m_draw_2d_list.end(),
+                  [](std::tuple<Chen::CDX12::Mesh*, ObjectConstant2D> a, std::tuple<Chen::CDX12::Mesh*, ObjectConstant2D> b) {
+            return std::get<1>(a).transform._43 > std::get<1>(b).transform._43;
+        });
     }
 
     void MainCameraPass2D::drawPass(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) {
-        preSortPass();
+        preZSortPass();
 
         RenderContext& render_context = GET_RENDER_CONTEXT();
 
@@ -147,13 +154,7 @@ namespace Zero {
         auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
 
         // draw call
-        for (auto& [mesh, transform, color, tex_index] : render_context.m_draw_2d_list) {
-            ObjectConstant2D obj_constant;
-            obj_constant.transform     = transform.Transpose();
-            obj_constant.modulate      = color;
-            obj_constant.tex_index     = tex_index;
-            obj_constant.tiling_factor = 1.0f;
-
+        for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
             // bind object-varying constants
             ShaderParamBindTable::getInstance()
                 .bindParam(
@@ -199,7 +200,7 @@ namespace Zero {
 
     // multi-indirect draw
     void MainCameraPass2D::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) {
-        preSortPass();
+        preZSortPass();
 
         RenderContext& render_context = GET_RENDER_CONTEXT();
 
@@ -275,11 +276,11 @@ namespace Zero {
         auto indirectDrawBufferData = std::vector<IndirectDrawCommand>(mesh_count);
         auto obj_constant_array     = std::vector<ObjectConstant2D>(mesh_count);
         // draw call
-        for (auto& [mesh, transform, color, tex_index] : render_context.m_draw_2d_list) {
-            obj_constant_array[cnt].transform     = transform.Transpose();
-            obj_constant_array[cnt].modulate      = color;
-            obj_constant_array[cnt].tex_index     = tex_index;
-            obj_constant_array[cnt].tiling_factor = 1.0f;
+        for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
+            obj_constant_array[cnt].transform     = obj_constant.transform;
+            obj_constant_array[cnt].modulate      = obj_constant.modulate;
+            obj_constant_array[cnt].tex_index     = obj_constant.tex_index;
+            obj_constant_array[cnt].tiling_factor = obj_constant.tiling_factor;
 
             auto obj_cbuffer = frameRes.AllocateConstBuffer(
                 std::span<const uint8_t>{

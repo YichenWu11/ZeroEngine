@@ -50,8 +50,12 @@ namespace Zero {
             const DirectX::SimpleMath::Color&  color,
             uint32_t                           tex_index,
             float                              tiling_factor) {
-            m_draw_2d_list.emplace_back(
-                std::make_tuple(mesh, trans, color, tex_index));
+            ObjectConstant2D obj_constant;
+            obj_constant.transform     = trans.Transpose();
+            obj_constant.modulate      = color;
+            obj_constant.tex_index     = tex_index;
+            obj_constant.tiling_factor = tiling_factor;
+            m_draw_2d_list.emplace_back(std::make_tuple(mesh, obj_constant));
         }
 
         void flush() { flushCommandQueue(); }
@@ -122,7 +126,7 @@ namespace Zero {
         uint32_t numGpuCSU_static  = 648;
         uint32_t numGpuCSU_dynamic = 648;
 
-        std::vector<std::tuple<Chen::CDX12::Mesh*, DirectX::SimpleMath::Matrix, DirectX::SimpleMath::Color, int32_t>> m_draw_2d_list;
+        std::vector<std::tuple<Chen::CDX12::Mesh*, ObjectConstant2D>> m_draw_2d_list;
 
         // RenderPass
         std::vector<Zero::Scope<RenderPass>> m_render_passes;

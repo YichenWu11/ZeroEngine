@@ -35,7 +35,7 @@ namespace Zero {
         void drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) override;
 
     private:
-        void preSortPass();
+        void preZSortPass();
 
     private:
         Chen::CDX12::UploadBuffer* m_indirectDrawBuffer[3] = {nullptr};

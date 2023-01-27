@@ -32,14 +32,12 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
         ZE_PROFILE_SCOPE("Renderer2D::Render");
         Zero::Renderer2D::beginScene(m_camera_controller.getCamera());
 
-        // TODO: sort the render order by z-index
-
         Zero::Renderer2D::drawQuad(
             {0.0f, 0.0f, 0.2f},
             {10.0f, 10.0f},
             0.0f,
             {0.8f, 0.8f, 0.8f, 1.0f},
-            GET_TEXTURE_TABLE().getTexIndexFromName("asoul"));
+            GET_TEXTURE_TABLE().getTexIndexFromName("asoul"), 10.0f);
 
         for (float y = -5.0f; y < 5.0f; y += 0.5f) {
             for (float x = -5.0f; x < 5.0f; x += 0.5f) {
