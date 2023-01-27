@@ -6,6 +6,8 @@ namespace Chen::CDX12 {
     class FrameResource;
 }
 
+#define GET_MESH_TABLE() ::Zero::MeshTable::getInstance()
+
 namespace Zero {
     class MeshTable {
     public:

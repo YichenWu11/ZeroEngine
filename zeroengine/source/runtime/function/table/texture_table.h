@@ -3,6 +3,8 @@
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
 #include <CDX12/Material/Texture.h>
 
+#define GET_TEXTURE_TABLE() ::Zero::TextureTable::getInstance()
+
 namespace Zero {
     struct TextureBuildInfo {
         std::wstring                       path;

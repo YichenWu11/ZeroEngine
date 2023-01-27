@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 #include "runtime/function/render/render_system/render_context.h"
+#include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 #include "runtime/function/table/texture_table.h"
 
@@ -119,13 +120,35 @@ namespace Zero {
         }
 
         {
-            ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
-            m_fenceValue = 0;
-            flushCommandQueue();
+            registerRenderPass();
         }
 
         {
-            registerRenderPass();
+            D3D12_COMMAND_SIGNATURE_DESC desc;
+
+            D3D12_INDIRECT_ARGUMENT_DESC ind_desc[4];
+            ZeroMemory(ind_desc, 4 * sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
+            ind_desc[0].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW;
+            ind_desc[0].ConstantBufferView.RootParameterIndex = ShaderParamBindTable::getInstance().getShader("transparent")->GetPropRootSigPos("_ObjectConstant");
+            ind_desc[1].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW;
+            ind_desc[1].VertexBuffer.Slot                     = 0;
+            ind_desc[2].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW;
+            ind_desc[3].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+            desc.ByteStride       = sizeof(IndirectDrawCommand);
+            desc.NodeMask         = 0;
+            desc.NumArgumentDescs = 4;
+            desc.pArgumentDescs   = ind_desc;
+            m_device->CreateCommandSignature(
+                &desc,
+                ShaderParamBindTable::getInstance().getShader("transparent")->RootSig(),
+                IID_PPV_ARGS(&m_command_signature));
+        }
+
+        {
+            ThrowIfFailed(m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)));
+            m_fenceValue = 0;
+            flushCommandQueue();
         }
 
         LOG_INFO("dx12 render_context init success");
@@ -151,7 +174,14 @@ namespace Zero {
     }
 
     void RenderContext::registerRenderPass() {
+        LOG_INFO("begin to register render pass: ");
+
         m_render_passes.push_back(Zero::CreateScope<MainCameraPass2D>());
+
+        for (auto&& render_pass : m_render_passes)
+            render_pass->preLoadResource();
+
+        LOG_INFO("register render pass success!");
     }
 
     void RenderContext::swapBuffer() {
@@ -182,9 +212,14 @@ namespace Zero {
     // draw call
     void RenderContext::drawRenderPasses(FrameResource& frameRes, uint frameIndex) {
         for (auto&& render_pass : m_render_passes) {
-            render_pass->drawPass(frameRes, frameIndex);
+            if (RendererAPI::isMultiIndirectDrawEnable())
+                render_pass->drawPassIndirect(frameRes, frameIndex);
+            else
+                render_pass->drawPass(frameRes, frameIndex);
         }
     }
+
+    // *******************************************************************************************************
 
     void RenderContext::flushCommandQueue() {
         m_fenceValue++;

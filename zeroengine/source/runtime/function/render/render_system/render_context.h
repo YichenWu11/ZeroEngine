@@ -83,9 +83,9 @@ namespace Zero {
         static DXGI_FORMAT    s_depthFormat;
         static const uint32_t s_frame_count = 3; // triple buffering by default
 
-        Chen::CDX12::Device m_device;
-
-        Chen::CDX12::CmdQueue m_commandQueue;
+        Chen::CDX12::Device            m_device;
+        Chen::CDX12::CmdQueue          m_commandQueue;
+        ComPtr<ID3D12CommandSignature> m_command_signature;
 
         CD3DX12_VIEWPORT m_viewport;
         CD3DX12_RECT     m_scissorRect;

@@ -14,8 +14,8 @@ namespace Zero {
     Renderer::SceneData* Renderer::s_scene_data = new Renderer::SceneData();
 
     void Renderer::init() {
-        MeshTable::getInstance().init();
-        TextureTable::getInstance().init();
+        GET_MESH_TABLE().init();
+        GET_TEXTURE_TABLE().init();
         Renderer2D::init();
     }
 
@@ -44,7 +44,7 @@ namespace Zero {
                 reinterpret_cast<uint8_t const*>(&s_scene_data->view_projection_matrix),
                 sizeof(s_scene_data->view_projection_matrix)});
 
-        auto tex_alloc = TextureTable::getInstance().getTexAllocation();
+        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
 
         ShaderParamBindTable::getInstance().bindParam(
             shader,

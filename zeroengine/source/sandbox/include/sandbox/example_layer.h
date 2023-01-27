@@ -20,9 +20,9 @@ public:
 
         Zero::Renderer::beginScene(m_camera_controller.getCamera());
 
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square").get());
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square").get());
-        Zero::Renderer::submit(Zero::MeshTable::getInstance().getMesh("square").get());
+        Zero::Renderer::submit(GET_MESH_TABLE().getMesh("square").get());
+        Zero::Renderer::submit(GET_MESH_TABLE().getMesh("square").get());
+        Zero::Renderer::submit(GET_MESH_TABLE().getMesh("square").get());
 
         Zero::Renderer::endScene();
     }
@@ -36,7 +36,7 @@ public:
 
         {
             ImGui::Begin("IMAGE");
-            static auto tex_alloc = Zero::TextureTable::getInstance().getTexAllocation();
+            static auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
             ImGui::Image(ImTextureID(tex_alloc->GetGpuHandle(0).ptr), ImVec2(190, 190));
             ImGui::End();
         }

@@ -7,10 +7,23 @@
 #include "runtime/function/render/render_system/render_pass.h"
 
 namespace Chen::CDX12 {
-    class Mesh;
-}
+    class UploadBuffer;
+} // namespace Chen::CDX12
+
+using Microsoft::WRL::ComPtr;
 
 namespace Zero {
+    // TODO: ObjectConstant Here
+    struct ObjectConstant2D {
+        DirectX::SimpleMath::Matrix transform;
+        DirectX::SimpleMath::Color  modulate;
+        UINT                        tex_index{0};
+        UINT                        pad0{0};
+        UINT                        pad1{0};
+        UINT                        pad2{0};
+        float                       tiling_factor{1.0f};
+    };
+
     class MainCameraPass2D final : public RenderPass {
     public:
         MainCameraPass2D();
@@ -19,8 +32,12 @@ namespace Zero {
         void preLoadResource() override;
         void delayDisposeResource(Chen::CDX12::FrameResource&) override;
         void drawPass(Chen::CDX12::FrameResource&, uint32_t frameIndex) override;
+        void drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) override;
 
     private:
-        // std::vector<std::tuple<Chen::CDX12::Mesh*, DirectX::SimpleMath::Matrix, DirectX::SimpleMath::Color, int32_t>> m_draw_2d_list;
+        void preSortPass();
+
+    private:
+        Chen::CDX12::UploadBuffer* m_indirectDrawBuffer[3] = {nullptr};
     };
 } // namespace Zero

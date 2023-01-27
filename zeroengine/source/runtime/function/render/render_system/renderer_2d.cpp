@@ -2,6 +2,7 @@
 
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
+#include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 #include "runtime/function/table/mesh_table.h"
 #include "runtime/function/table/texture_table.h"
@@ -36,7 +37,7 @@ namespace Zero {
                 reinterpret_cast<uint8_t const*>(&view_proj_matrix),
                 sizeof(view_proj_matrix)});
 
-        auto tex_alloc = TextureTable::getInstance().getTexAllocation();
+        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
 
         ShaderParamBindTable::getInstance().bindParam(
             shader,
@@ -45,6 +46,10 @@ namespace Zero {
     }
 
     void Renderer2D::endScene() {
+        // FIXME: the last object can not be rendered in multi-indirect draw
+        if (RendererAPI::isMultiIndirectDrawEnable())
+            Zero::Renderer2D::drawQuad({0.0f, 0.0f}, {1.0f, 1.0f}, 0.0f);
+
         GET_RENDER_CONTEXT().beginRender();
         GET_RENDER_CONTEXT().endRender();
     }
@@ -70,7 +75,7 @@ namespace Zero {
                            * Matrix::CreateScale(size.x, size.y, 1.0f)
                            * Matrix::CreateTranslation(position);
 
-        static Zero::Ref<Mesh> mesh = MeshTable::getInstance().getMesh("square");
+        static Zero::Ref<Mesh> mesh = GET_MESH_TABLE().getMesh("square");
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
 

@@ -10,11 +10,15 @@ struct PSInput {
 };
 
 cbuffer _ViewProjMatrix : register(b0) { float4x4 u_CameraWorldToViewMatrix; };
-cbuffer _ModelMatrix : register(b0, space1) { float4x4 u_LocalToWorldMatrix; };
-cbuffer _Modulate : register(b1) { float4 u_ModulateColor; }
-cbuffer _TexVariables : register(b1, space1) {
+
+cbuffer _ObjectConstant : register(b1) {
+  float4x4 u_LocalToWorldMatrix;
+  float4 u_ModulateColor;
   uint u_TexIndex;
-  uint u_TilingFactor;
+  uint pad0;
+  uint pad1;
+  uint pad2;
+  float u_TilingFactor;
 }
 
 Texture2D TextureMap[168] : register(t0);
@@ -40,9 +44,11 @@ PSInput VSMain(VSInput input) {
 }
 
 float4 PSMain(PSInput input) : SV_TARGET {
-  float dist = 1.0f - distance(input.screen_pos * 0.8f, float2(0.0f, 0.0f));
+  float dist = 1.0f - distance(input.screen_pos * 0.9f, float2(0.0f, 0.0f));
   dist = clamp(dist, 0.0f, 1.0f);
   dist = sqrt(dist);
-  return TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap, input.tex_coord) *
+
+  return TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap,
+                                       input.tex_coord * u_TilingFactor) *
          u_ModulateColor;
 }

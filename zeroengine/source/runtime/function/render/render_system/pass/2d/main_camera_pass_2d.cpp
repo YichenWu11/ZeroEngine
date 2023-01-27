@@ -15,10 +15,17 @@ using namespace Chen::CDX12;
 
 namespace Zero {
     MainCameraPass2D::MainCameraPass2D() {
-        preLoadResource();
+        LOG_INFO("- MainCameraPass2D register success.");
     }
 
     MainCameraPass2D::~MainCameraPass2D() {
+        RenderContext& render_context = GET_RENDER_CONTEXT();
+        for (int i = 0; i < render_context.s_frame_count; ++i) {
+            if (m_indirectDrawBuffer[i] != nullptr) {
+                delete m_indirectDrawBuffer[i];
+                m_indirectDrawBuffer[i] = nullptr;
+            }
+        }
     }
 
     void MainCameraPass2D::preLoadResource() {
@@ -34,14 +41,7 @@ namespace Zero {
                 0,
                 0));
         properties.emplace_back(
-            "_ModelMatrix",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                1,
-                0,
-                0));
-        properties.emplace_back(
-            "_Modulate",
+            "_ObjectConstant",
             Shader::Property(
                 ShaderVariableType::ConstantBuffer,
                 0,
@@ -54,13 +54,6 @@ namespace Zero {
                 0,
                 0,
                 168));
-        properties.emplace_back(
-            "_TexVariables",
-            Shader::Property(
-                ShaderVariableType::ConstantBuffer,
-                1,
-                1,
-                0));
 
         ShaderParamBindTable::getInstance().registerShader("common", properties);
         BasicShader* shader =
@@ -109,7 +102,12 @@ namespace Zero {
         // do nothing
     }
 
+    void MainCameraPass2D::preSortPass() {
+    }
+
     void MainCameraPass2D::drawPass(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) {
+        preSortPass();
+
         RenderContext& render_context = GET_RENDER_CONTEXT();
 
         auto     cmdListHandle = frameRes.Command();
@@ -141,7 +139,7 @@ namespace Zero {
 
         cmdList->SetDescriptorHeaps(
             1,
-            get_rvalue_ptr(TextureTable::getInstance().getTexAllocation()->GetDescriptorHeap()));
+            get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
 
         BasicShader* shader =
             static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
@@ -150,28 +148,20 @@ namespace Zero {
 
         // draw call
         for (auto& [mesh, transform, color, tex_index] : render_context.m_draw_2d_list) {
+            ObjectConstant2D obj_constant;
+            obj_constant.transform     = transform.Transpose();
+            obj_constant.modulate      = color;
+            obj_constant.tex_index     = tex_index;
+            obj_constant.tiling_factor = 1.0f;
+
             // bind object-varying constants
-            ShaderParamBindTable::getInstance().bindParam(
-                shader,
-                "_ModelMatrix",
-                std::span<const uint8_t>{
-                    reinterpret_cast<uint8_t const*>(get_rvalue_ptr(transform.Transpose())),
-                    sizeof(transform.Transpose())});
-
-            ShaderParamBindTable::getInstance().bindParam(
-                shader,
-                "_Modulate",
-                std::span<const uint8_t>{
-                    reinterpret_cast<uint8_t const*>(&color),
-                    sizeof(color)});
-
             ShaderParamBindTable::getInstance()
                 .bindParam(
                     shader,
-                    "_TexVariables",
+                    "_ObjectConstant",
                     std::span<const uint8_t>{
-                        reinterpret_cast<uint8_t const*>(&tex_index),
-                        sizeof(tex_index)});
+                        reinterpret_cast<uint8_t const*>(&obj_constant),
+                        sizeof(obj_constant)});
 
             render_context.bindProperties.clear();
 
@@ -207,4 +197,121 @@ namespace Zero {
         render_context.m_draw_2d_list.clear();
     }
 
+    // multi-indirect draw
+    void MainCameraPass2D::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) {
+        preSortPass();
+
+        RenderContext& render_context = GET_RENDER_CONTEXT();
+
+        auto     cmdListHandle = frameRes.Command();
+        GCmdList cmdList(cmdListHandle.CmdList());
+
+        // Set necessary state.
+        render_context.m_stateTracker.RecordState(
+            render_context.m_renderTargets[frameIndex].get(),
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
+        render_context.m_stateTracker.RecordState(
+            render_context.m_depthTargets[frameIndex].get(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
+        render_context.m_stateTracker.UpdateState(cmdList.Get());
+
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(
+            render_context.m_rtvCpuDH.GetCpuHandle(0),
+            frameIndex,
+            render_context.m_rtvCpuDH.GetDescriptorSize());
+        CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(
+            render_context.m_dsvCpuDH.GetCpuHandle(0),
+            frameIndex,
+            render_context.m_dsvCpuDH.GetDescriptorSize());
+
+        frameRes.SetRenderTarget(
+            render_context.m_renderTargets[frameIndex].get(),
+            &rtvHandle,
+            &dsvHandle);
+        frameRes.ClearRTV(rtvHandle);
+        frameRes.ClearDSV(dsvHandle);
+
+        cmdList->SetDescriptorHeaps(
+            1,
+            get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
+
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+
+        auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
+
+        render_context.bindProperties.clear();
+
+        // bind the constants which does not differ among different objects
+        for (auto& prop : prop_table) {
+            auto name = prop.first;
+            std::visit(overloaded{
+                           [&](std::span<const uint8_t> data) {
+                auto buffer = frameRes.AllocateConstBuffer(data);
+                render_context.bindProperties.emplace_back(name, buffer);
+                           },
+                           [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
+                render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
+            }},
+                prop.second);
+        }
+
+        // delete last frame uploadbuffer
+        auto last_frame_index = (frameIndex + render_context.s_frame_count - 1) % render_context.s_frame_count;
+        if (m_indirectDrawBuffer[last_frame_index] != nullptr) {
+            delete m_indirectDrawBuffer[last_frame_index];
+            m_indirectDrawBuffer[last_frame_index] = nullptr;
+        }
+
+        auto mesh_count = render_context.m_draw_2d_list.size();
+
+        m_indirectDrawBuffer[frameIndex] = new UploadBuffer(
+            render_context.getGraphicsDevice(),
+            mesh_count * sizeof(IndirectDrawCommand));
+
+        m_indirectDrawBuffer[frameIndex]->DelayDispose(&frameRes);
+
+        int cnt = 0;
+
+        auto indirectDrawBufferData = std::vector<IndirectDrawCommand>(mesh_count);
+        auto obj_constant_array     = std::vector<ObjectConstant2D>(mesh_count);
+        // draw call
+        for (auto& [mesh, transform, color, tex_index] : render_context.m_draw_2d_list) {
+            obj_constant_array[cnt].transform     = transform.Transpose();
+            obj_constant_array[cnt].modulate      = color;
+            obj_constant_array[cnt].tex_index     = tex_index;
+            obj_constant_array[cnt].tiling_factor = 1.0f;
+
+            auto obj_cbuffer = frameRes.AllocateConstBuffer(
+                std::span<const uint8_t>{
+                    reinterpret_cast<uint8_t const*>(&obj_constant_array[cnt]),
+                    sizeof(obj_constant_array[cnt])});
+
+            indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh, obj_cbuffer.buffer->GetAddress(), cnt, sizeof(ObjectConstant2D)));
+
+            m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),
+                                                       {reinterpret_cast<vbyte const*>(&(indirectDrawBufferData[cnt])),
+                                                        sizeof(IndirectDrawCommand)});
+
+            ++cnt;
+        }
+
+        // indirect draw call
+        frameRes.DrawMeshIndirect(
+            shader,
+            render_context.psoManager.get(),
+            (std::get<0>(render_context.m_draw_2d_list[0]))->Layout(),
+            render_context.s_colorFormat,
+            render_context.s_depthFormat,
+            render_context.bindProperties,
+            m_indirectDrawBuffer[frameIndex],
+            mesh_count,
+            render_context.m_command_signature.Get());
+
+        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
+
+        render_context.m_stateTracker.RestoreState(cmdList.Get());
+
+        // clear mesh
+        render_context.m_draw_2d_list.clear();
+    }
 } // namespace Zero
