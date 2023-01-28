@@ -9,6 +9,8 @@
 using namespace Chen::CDX12;
 
 namespace Zero {
+    uint32_t TextureTable::s_invalid_index = -1;
+
     TextureTable::~TextureTable() {
         if (!m_tex_alloc.IsNull())
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_tex_alloc));
@@ -16,6 +18,16 @@ namespace Zero {
 
     void TextureTable::init() {
         m_tex_alloc = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
+    }
+
+    void TextureTable::registerTex(const std::string& name, const std::filesystem::path& tex_path, TexFileFormat file_format) {
+        if (!std::filesystem::exists(tex_path)) {
+            LOG_ERROR("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
+            return;
+        }
+
+        TextureBuildInfo init_info{AnsiToWString(tex_path.string()).c_str(), name};
+        registerTex(init_info, file_format);
     }
 
     void TextureTable::registerTex(const std::filesystem::path& tex_path, TexFileFormat file_format) {
@@ -86,14 +98,33 @@ namespace Zero {
 
         auto uploadResourcesFinished = resourceUpload.End(GET_RENDER_CONTEXT().getCommandQueue());
         uploadResourcesFinished.wait();
+
+        LOG_INFO("register Mesh named {0} success!", info.name);
+    }
+
+    Zero::Ref<Texture> TextureTable::getTextureFromName(const std::string& tex_name) {
+        if (!m_texture_table.contains(tex_name)) {
+            LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
+            return {};
+        }
+
+        return m_texture_table[tex_name];
     }
 
     uint32_t TextureTable::getTexIndexFromName(const std::string& tex_name) {
         if (!m_texture_table.contains(tex_name)) {
             LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
-            return -1;
+            return s_invalid_index;
         }
 
         return m_texname2index[tex_name];
+    }
+
+    uint32_t TextureTable::getTexIndex(const Ref<Chen::CDX12::Texture>& target) {
+        for (auto& [name, texture] : m_texture_table) {
+            if (texture == target)
+                return getTexIndexFromName(name);
+        }
+        return s_invalid_index;
     }
 } // namespace Zero

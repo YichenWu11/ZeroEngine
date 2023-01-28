@@ -32,10 +32,13 @@ namespace Zero {
 
         void init();
 
+        void registerTex(const std::string&, const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureBuildInfo&, TexFileFormat = TexFileFormat::WIC);
 
-        uint32_t getTexIndexFromName(const std::string&);
+        Zero::Ref<Chen::CDX12::Texture> getTextureFromName(const std::string&);
+        uint32_t                        getTexIndexFromName(const std::string&);
+        uint32_t                        getTexIndex(const Ref<Chen::CDX12::Texture>&);
 
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 
@@ -48,6 +51,9 @@ namespace Zero {
 
         std::map<std::string, uint32_t>                  m_texname2index;
         std::map<std::string, Ref<Chen::CDX12::Texture>> m_texture_table;
+
+    private:
+        static uint32_t s_invalid_index;
     };
 
 } // namespace Zero

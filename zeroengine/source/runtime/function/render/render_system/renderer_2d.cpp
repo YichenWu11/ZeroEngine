@@ -52,6 +52,8 @@ namespace Zero {
 
         GET_RENDER_CONTEXT().beginRender();
         GET_RENDER_CONTEXT().endRender();
+
+        GET_MESH_TABLE().disposeTempMeshes();
     }
 
     void Renderer2D::drawQuad(

@@ -3,14 +3,16 @@
 #include "runtime/function/render/render_system/render_context.h"
 
 using namespace Chen::CDX12;
+using namespace DirectX::SimpleMath;
 
 namespace Zero {
-    void MeshTable::buildBasicMesh() {
-        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
+    static VertexBufferLayout               layout;
+    static std::vector<rtti::Struct const*> structs;
 
-        static VertexBufferLayout               layout;
-        static std::vector<rtti::Struct const*> structs;
+    void MeshTable::buildBasicMesh() {
         structs.emplace_back(&layout);
+
+        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
 
         float vertices_tri[] = {
             -0.5f,
@@ -27,8 +29,7 @@ namespace Zero {
             -0.5f,
             0.0f,
             1.0f,
-            0.0f,
-        };
+            0.0f};
 
         uint32_t indices_tri[] = {0, 1, 2};
 
@@ -43,19 +44,18 @@ namespace Zero {
             0.0f,
             1.0f,
             1.0f,
-            -0.5f,
-            0.5f,
-            0.0f,
-            0.0f,
-            0.0f,
             0.5f,
             0.5f,
             0.0f,
             1.0f,
             0.0f,
-        };
+            -0.5f,
+            0.5f,
+            0.0f,
+            0.0f,
+            0.0f};
 
-        uint32_t indices_square[] = {0, 2, 1, 2, 3, 1};
+        uint32_t indices_square[] = {0, 3, 1, 3, 2, 1};
 
         ComPtr<ID3D12CommandAllocator>    cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> commandList;
@@ -118,6 +118,9 @@ namespace Zero {
             m_mesh_table.erase(mesh_name);
         else
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
+    }
+
+    void MeshTable::disposeTempMeshes() {
     }
 
     void MeshTable::delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres) {

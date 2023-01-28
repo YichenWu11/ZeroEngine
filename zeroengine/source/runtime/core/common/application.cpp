@@ -34,6 +34,7 @@ namespace Zero {
 
     Application::~Application() {
         Renderer::shutdown();
+        LOG_INFO("zeroengine shutdown");
     }
 
     void Application::pushLayer(Layer* layer) {

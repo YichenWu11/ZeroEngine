@@ -28,10 +28,15 @@ namespace Zero {
         OrthographicsCameraBounds&       getBounds() { return m_bounds; }
         const OrthographicsCameraBounds& getBounds() const { return m_bounds; }
 
-        void  setZoomLevel(float level) { m_zoom_level = level; }
+        void setZoomLevel(float level) {
+            m_zoom_level = level;
+            calculateView();
+        }
         float getZoomLevel() const { return m_zoom_level; }
 
     private:
+        void calculateView();
+
         bool onMouseScrolled(MouseScrolledEvent& e);
         bool onWindowResize(WindowResizeEvent& e);
 

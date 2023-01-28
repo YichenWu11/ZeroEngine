@@ -18,5 +18,7 @@ public:
 private:
     Zero::OrthographicsCameraController m_camera_controller;
 
+    Zero::Ref<Zero::SubTexture2D> m_texture_stair;
+
     Color clear_color{0.2f, 0.2f, 0.2f, 1.0f};
 };

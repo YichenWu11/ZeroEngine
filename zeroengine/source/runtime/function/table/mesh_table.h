@@ -23,6 +23,7 @@ namespace Zero {
         void registerMesh(const std::string&, float*, uint32_t*);
         void removeMesh(const std::string&);
 
+        void disposeTempMeshes();
         void delayDisposeMesh(const std::string&, Chen::CDX12::FrameResource* frameres);
 
         Zero::Ref<Chen::CDX12::Mesh> getMesh(const std::string&);

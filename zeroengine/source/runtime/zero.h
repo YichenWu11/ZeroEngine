@@ -18,3 +18,4 @@
 #include "runtime/function/render/render_system/render_command.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
+#include "runtime/function/render/render_system/subtexture_2d.h"

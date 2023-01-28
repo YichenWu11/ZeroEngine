@@ -1,6 +1,7 @@
 #pragma once
 
 #include "runtime/function/render/camera_system/orthographics_camera.h"
+#include "runtime/function/render/render_system/subtexture_2d.h"
 
 namespace Zero {
     class Renderer2D {

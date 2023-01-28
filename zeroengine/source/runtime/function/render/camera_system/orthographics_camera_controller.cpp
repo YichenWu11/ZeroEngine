@@ -37,18 +37,21 @@ namespace Zero {
         dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(OrthographicsCameraController::onWindowResize));
     }
 
+    void OrthographicsCameraController::calculateView() {
+        m_bounds = {-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level};
+        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
+    }
+
     bool OrthographicsCameraController::onMouseScrolled(MouseScrolledEvent& e) {
         m_zoom_level -= e.getZOffset() * 0.002f;
         m_zoom_level = std::max(m_zoom_level, 0.25f);
-        m_bounds     = {-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level};
-        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
+        calculateView();
         return false;
     }
 
     bool OrthographicsCameraController::onWindowResize(WindowResizeEvent& e) {
         m_aspect_ratio = (float)e.getWidth() / (float)e.getHeight();
-        m_bounds       = {-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level};
-        m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
+        calculateView();
         return false;
     }
 
