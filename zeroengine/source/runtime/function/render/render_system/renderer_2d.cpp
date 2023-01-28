@@ -1,5 +1,6 @@
 #include <CDX12/Resource/Mesh.h>
 
+#include "runtime/function/render/render_system/buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/render_system/renderer_api.h"
@@ -46,14 +47,8 @@ namespace Zero {
     }
 
     void Renderer2D::endScene() {
-        // FIXME: the last object can not be rendered in multi-indirect draw
-        if (RendererAPI::isMultiIndirectDrawEnable())
-            Zero::Renderer2D::drawQuad({0.0f, 0.0f}, {1.0f, 1.0f}, 0.0f);
-
         GET_RENDER_CONTEXT().beginRender();
         GET_RENDER_CONTEXT().endRender();
-
-        GET_MESH_TABLE().disposeTempMeshes();
     }
 
     void Renderer2D::drawQuad(
@@ -81,6 +76,61 @@ namespace Zero {
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        GET_RENDER_CONTEXT().submit(mesh.get(), transform, color, tex_index, tiling_factor);
+        GET_RENDER_CONTEXT().submit(mesh, transform, color, tex_index, tiling_factor);
+    }
+
+    void Renderer2D::drawCellQuad(
+        const DirectX::SimpleMath::Vector2& position,
+        const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
+        const Zero::Ref<SubTexture2D>&      sub_texture,
+        const DirectX::SimpleMath::Color&   color) {
+        drawCellQuad({position.x, position.y, 0.0f}, size, rotation, sub_texture, color);
+    }
+
+    void Renderer2D::drawCellQuad(
+        const DirectX::SimpleMath::Vector3& position,
+        const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
+        const Zero::Ref<SubTexture2D>&      sub_texture,
+        const DirectX::SimpleMath::Color&   color) {
+        if (!GET_MESH_TABLE().isMeshExsit(sub_texture->constructSubTexName())) {
+            std::vector<VertexData2D> vertices;
+            uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
+            auto                      tex_coords = sub_texture->getTexCoords();
+            vertices.push_back(
+                VertexData2D{{-0.5f, -0.5f, 0.0f}, {tex_coords[0].x, 1.0f - tex_coords[0].y}});
+            vertices.push_back(
+                VertexData2D{{0.5f, -0.5f, 0.0f}, {tex_coords[1].x, 1.0f - tex_coords[1].y}});
+            vertices.push_back(
+                VertexData2D{{0.5f, 0.5f, 0.0f}, {tex_coords[2].x, 1.0f - tex_coords[2].y}});
+            vertices.push_back(
+                VertexData2D{{-0.5f, 0.5f, 0.0f}, {tex_coords[3].x, 1.0f - tex_coords[3].y}});
+
+            GET_MESH_TABLE().registerMesh(
+                sub_texture->constructSubTexName(),
+                vertices.data(),
+                vertices.size(),
+                indices,
+                6);
+        }
+
+        Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
+                           * Matrix::CreateScale(size.x, size.y, 1.0f)
+                           * Matrix::CreateTranslation(position);
+
+        GET_RENDER_CONTEXT().submit(
+            GET_MESH_TABLE().getMesh(sub_texture->constructSubTexName()),
+            transform,
+            color,
+            GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
+            1.0f);
+
+        // GET_RENDER_CONTEXT().submit(
+        //     GET_MESH_TABLE().getMesh(sub_texture->constructSubTexName()),
+        //     transform,
+        //     {1.0f, 1.0f, 1.0f, 0.0f},
+        //     GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
+        //     1.0f);
     }
 } // namespace Zero

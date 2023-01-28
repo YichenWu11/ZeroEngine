@@ -9,6 +9,7 @@
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
+#include "runtime/function/table/mesh_table.h"
 #include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
@@ -105,10 +106,10 @@ namespace Zero {
     void MainCameraPass2D::preZSortPass() {
         RenderContext& render_context = GET_RENDER_CONTEXT();
 
-        // NOTE: trick here, get the z-index from the _43 of the transform matrix
+        // NOTE: trick here, get the z-index from the _34 of the transform matrix
         std::sort(render_context.m_draw_2d_list.begin(), render_context.m_draw_2d_list.end(),
-                  [](std::tuple<Chen::CDX12::Mesh*, ObjectConstant2D> a, std::tuple<Chen::CDX12::Mesh*, ObjectConstant2D> b) {
-            return std::get<1>(a).transform._43 > std::get<1>(b).transform._43;
+                  [](std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D> a, std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D> b) {
+            return std::get<1>(a).transform._34 > std::get<1>(b).transform._34;
         });
     }
 
@@ -184,7 +185,7 @@ namespace Zero {
             frameRes.DrawMesh(
                 shader,
                 render_context.psoManager.get(),
-                mesh,
+                mesh.get(),
                 render_context.s_colorFormat,
                 render_context.s_depthFormat,
                 render_context.bindProperties);
@@ -271,10 +272,10 @@ namespace Zero {
 
         m_indirectDrawBuffer[frameIndex]->DelayDispose(&frameRes);
 
-        int cnt = 0;
-
+        int  cnt                    = 0;
         auto indirectDrawBufferData = std::vector<IndirectDrawCommand>(mesh_count);
         auto obj_constant_array     = std::vector<ObjectConstant2D>(mesh_count);
+
         // draw call
         for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
             obj_constant_array[cnt].transform     = obj_constant.transform;
@@ -287,13 +288,14 @@ namespace Zero {
                     reinterpret_cast<uint8_t const*>(&obj_constant_array[cnt]),
                     sizeof(obj_constant_array[cnt])});
 
-            indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh, obj_cbuffer.buffer->GetAddress(), cnt, sizeof(ObjectConstant2D)));
+            // TODO: `cnt + 1`
+            indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh.get(), obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
 
             m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),
                                                        {reinterpret_cast<vbyte const*>(&(indirectDrawBufferData[cnt])),
                                                         sizeof(IndirectDrawCommand)});
 
-            ++cnt;
+            cnt++;
         }
 
         // indirect draw call

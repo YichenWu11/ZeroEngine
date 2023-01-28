@@ -14,103 +14,89 @@ namespace Zero {
 
         ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
 
-        float vertices_tri[] = {
-            -0.5f,
-            -0.5f,
-            0.0f,
-            0.0f,
-            0.1f,
-            0.0f,
-            0.5f,
-            0.0f,
-            1.0f,
-            1.0f,
-            0.5f,
-            -0.5f,
-            0.0f,
-            1.0f,
-            0.0f};
-
-        uint32_t indices_tri[] = {0, 1, 2};
-
-        float vertices_square[] = {
-            -0.5f,
-            -0.5f,
-            0.0f,
-            0.0f,
-            1.0f,
-            0.5f,
-            -0.5f,
-            0.0f,
-            1.0f,
-            1.0f,
-            0.5f,
-            0.5f,
-            0.0f,
-            1.0f,
-            0.0f,
-            -0.5f,
-            0.5f,
-            0.0f,
-            0.0f,
-            0.0f};
+        VertexData2D vertices_square[] = {
+            {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
+            {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}},
+        };
 
         uint32_t indices_square[] = {0, 3, 1, 3, 2, 1};
 
-        ComPtr<ID3D12CommandAllocator>    cmdAllocator;
-        ComPtr<ID3D12GraphicsCommandList> commandList;
         ThrowIfFailed(
-            device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(cmdAllocator.GetAddressOf())));
-        ThrowIfFailed(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, cmdAllocator.Get(), nullptr, IID_PPV_ARGS(&commandList)));
-        ThrowIfFailed(commandList->Close());
-        ThrowIfFailed(cmdAllocator->Reset());
-        ThrowIfFailed(commandList->Reset(cmdAllocator.Get(), nullptr));
-
-        auto triangle_mesh = Zero::CreateRef<Mesh>(
-            device,
-            structs,
-            array_count(vertices_tri) * sizeof(float) / layout.structSize,
-            array_count(indices_tri));
-
-        auto vert_buffer_tri = VertexBuffer::create(
-            vertices_tri,
-            array_count(vertices_tri) * sizeof(float));
-
-        auto indi_buffer_tri = IndexBuffer::create(
-            indices_tri,
-            array_count(indices_tri) * sizeof(uint32_t));
-
-        vert_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
-        indi_buffer_tri->bind(commandList.Get(), triangle_mesh.get());
+            device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(m_cmdAllocator.GetAddressOf())));
+        ThrowIfFailed(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_cmdAllocator.Get(), nullptr, IID_PPV_ARGS(&m_commandList)));
+        ThrowIfFailed(m_commandList->Close());
+        ThrowIfFailed(m_cmdAllocator->Reset());
+        ThrowIfFailed(m_commandList->Reset(m_cmdAllocator.Get(), nullptr));
 
         auto square_mesh = Zero::CreateRef<Mesh>(
             device,
             structs,
-            array_count(vertices_square) * sizeof(float) / layout.structSize,
+            array_count(vertices_square) * sizeof(VertexData2D) / layout.structSize,
             array_count(indices_square));
 
         auto vert_buffer_square = VertexBuffer::create(
-            vertices_square,
-            array_count(vertices_square) * sizeof(float));
+            reinterpret_cast<float*>(vertices_square),
+            array_count(vertices_square) * sizeof(VertexData2D));
 
         auto indi_buffer_square = IndexBuffer::create(
             indices_square,
             array_count(indices_square) * sizeof(uint32_t));
 
-        vert_buffer_square->bind(commandList.Get(), square_mesh.get());
-        indi_buffer_square->bind(commandList.Get(), square_mesh.get());
+        vert_buffer_square->bind(m_commandList.Get(), square_mesh.get());
+        indi_buffer_square->bind(m_commandList.Get(), square_mesh.get());
 
-        ThrowIfFailed(commandList->Close());
+        ThrowIfFailed(m_commandList->Close());
 
-        ID3D12CommandList* ppCommandLists[] = {commandList.Get()};
-        GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppCommandLists), ppCommandLists);
+        ID3D12CommandList* ppM_commandLists[] = {m_commandList.Get()};
+        GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppM_commandLists), ppM_commandLists);
         GET_RENDER_CONTEXT().flush();
 
-        m_mesh_table["triangle"] = std::move(triangle_mesh);
-        m_mesh_table["square"]   = std::move(square_mesh);
+        m_mesh_table["square"] = square_mesh;
     }
 
-    void MeshTable::registerMesh(const std::string& mesh_name, float* vertices, uint32_t* indices) {
+    void MeshTable::registerMesh(const std::string& mesh_name,
+                                 VertexData2D*      vertices,
+                                 uint32_t           vertices_count,
+                                 uint32_t*          indices,
+                                 uint32_t           indices_count) {
+        if (m_mesh_table.contains(mesh_name)) {
+            LOG_WARN("mesh with this name ({}) has already exsited!", mesh_name);
+            return;
+        }
+
+        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
+
+        ThrowIfFailed(m_cmdAllocator->Reset());
+        ThrowIfFailed(m_commandList->Reset(m_cmdAllocator.Get(), nullptr));
+
+        auto mesh = Zero::CreateRef<Mesh>(
+            device,
+            structs,
+            vertices_count * sizeof(VertexData2D) / layout.structSize,
+            indices_count);
+
+        auto vert_buffer_square = VertexBuffer::create(
+            reinterpret_cast<float*>(vertices),
+            vertices_count * sizeof(VertexData2D));
+
+        auto indi_buffer_square = IndexBuffer::create(
+            indices,
+            indices_count * sizeof(uint32_t));
+
+        vert_buffer_square->bind(m_commandList.Get(), mesh.get());
+        indi_buffer_square->bind(m_commandList.Get(), mesh.get());
+
+        ThrowIfFailed(m_commandList->Close());
+
+        ID3D12CommandList* ppM_commandLists[] = {m_commandList.Get()};
+        GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppM_commandLists), ppM_commandLists);
+        GET_RENDER_CONTEXT().flush();
+
+        m_mesh_table[mesh_name] = mesh;
+
+        LOG_INFO("register mesh named {0} success!", mesh_name);
     }
 
     void MeshTable::removeMesh(const std::string& mesh_name) {
@@ -118,9 +104,6 @@ namespace Zero {
             m_mesh_table.erase(mesh_name);
         else
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
-    }
-
-    void MeshTable::disposeTempMeshes() {
     }
 
     void MeshTable::delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres) {
@@ -134,6 +117,24 @@ namespace Zero {
             return m_mesh_table[mesh_name];
         LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         return nullptr;
+    }
+
+    std::string MeshTable::getMeshName(const Zero::Ref<Chen::CDX12::Mesh>& target) {
+        for (auto& [name, mesh] : m_mesh_table) {
+            if (target == mesh)
+                return name;
+        }
+        LOG_WARN("this mesh does not exsit in m_mesh_table!");
+        return {};
+    }
+
+    std::string MeshTable::getMeshName(Chen::CDX12::Mesh* target) {
+        for (auto& [name, mesh] : m_mesh_table) {
+            if (target == mesh.get())
+                return name;
+        }
+        LOG_WARN("this mesh does not exsit in m_mesh_table!");
+        return {};
     }
 
 } // namespace Zero

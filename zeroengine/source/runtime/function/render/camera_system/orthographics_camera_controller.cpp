@@ -43,8 +43,8 @@ namespace Zero {
     }
 
     bool OrthographicsCameraController::onMouseScrolled(MouseScrolledEvent& e) {
-        m_zoom_level -= e.getZOffset() * 0.002f;
-        m_zoom_level = std::max(m_zoom_level, 0.25f);
+        m_zoom_level -= e.getZOffset() * 0.001f;
+        m_zoom_level = std::max(m_zoom_level, 0.05f);
         calculateView();
         return false;
     }

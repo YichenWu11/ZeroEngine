@@ -25,6 +25,11 @@ namespace Zero {
         Chen::CDX12::rtti::Var<DirectX::XMFLOAT2> tex_coord = "TEXCOORD";
     };
 
+    struct VertexData2D {
+        DirectX::XMFLOAT3 position;
+        DirectX::XMFLOAT2 tex_coord;
+    };
+
     class VertexBuffer {
     public:
         VertexBuffer(float* vertices, uint32_t byte_size);

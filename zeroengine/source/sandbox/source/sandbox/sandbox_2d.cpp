@@ -14,7 +14,17 @@ void Sandbox2D::onAttach() {
         "SpriteSheet",
         std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/game/texture/sprite_sheet.png");
 
-    m_camera_controller.setZoomLevel(0.5f);
+    m_texture_stair = Zero::SubTexture2D::createFromCoords(
+        GET_TEXTURE_TABLE().getTextureFromName("SpriteSheet"),
+        {7, 6},
+        {128.0f, 128.0f});
+
+    m_texture_bush = Zero::SubTexture2D::createFromCoords(
+        GET_TEXTURE_TABLE().getTextureFromName("SpriteSheet"),
+        {2, 3},
+        {256.0f, 128.0f});
+
+    m_camera_controller.setZoomLevel(1.0f);
 }
 
 void Sandbox2D::onDetach() {
@@ -37,6 +47,45 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
         ZE_PROFILE_SCOPE("Renderer2D::Render");
         Zero::Renderer2D::beginScene(m_camera_controller.getCamera());
 
+        Zero::Renderer2D::drawQuad(
+            {-0.8f, 0.0f},
+            {1.0f, 1.0f},
+            0.0f,
+            {1.0f, 1.0f, 1.0f, 1.0f},
+            GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
+
+        Zero::Renderer2D::drawQuad(
+            {0.0f, 0.0f},
+            {1.0f, 1.0f},
+            0.0f,
+            {1.0f, 1.0f, 1.0f, 1.0f},
+            GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
+
+        Zero::Renderer2D::drawQuad(
+            {0.8f, 0.0f},
+            {1.0f, 1.0f},
+            0.0f,
+            {1.0f, 1.0f, 1.0f, 1.0f},
+            GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
+
+        // Zero::Renderer2D::drawCellQuad(
+        //     {0.0f, 0.0f, 0.3f},
+        //     {1.0f, 1.0f},
+        //     0.0f,
+        //     m_texture_stair);
+
+        // Zero::Renderer2D::drawCellQuad(
+        //     {-2.0f, 0.0f, 0.2f},
+        //     {2.0f, 1.0f},
+        //     0.0f,
+        //     m_texture_bush);
+
+        // Zero::Renderer2D::drawCellQuad(
+        //     {2.0f, 0.0f, 0.1f},
+        //     {2.0f, 1.0f},
+        //     0.0f,
+        //     m_texture_bush);
+
         // Zero::Renderer2D::drawQuad(
         //     {0.0f, 0.0f, 0.2f},
         //     {10.0f, 10.0f},
@@ -54,32 +103,6 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
         //             GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
         //     }
         // }
-
-        // Zero::Renderer2D::drawQuad(
-        //     {-0.8f, -0.3f},
-        //     {1.0f, 1.0f},
-        //     0.0f,
-        //     {1.0f, 1.0f, 1.0f, 1.0f},
-        //     GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-        // Zero::Renderer2D::drawQuad(
-        //     {0.0f, 0.0f},
-        //     {1.0f, 1.0f},
-        //     0.0f,
-        //     {1.0f, 1.0f, 1.0f, 1.0f},
-        //     GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-        // Zero::Renderer2D::drawQuad(
-        //     {0.8f, 0.3f},
-        //     {1.0f, 1.0f},
-        //     0.0f,
-        //     {1.0f, 1.0f, 1.0f, 1.0f},
-        //     GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-
-        Zero::Renderer2D::drawQuad(
-            {0.0f, 0.0f},
-            {1.0f, 1.0f},
-            0.0f,
-            {1.0f, 1.0f, 1.0f, 1.0f},
-            GET_TEXTURE_TABLE().getTexIndexFromName("SpriteSheet"));
 
         Zero::Renderer2D::endScene();
     }

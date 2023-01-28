@@ -39,6 +39,7 @@ namespace Zero {
         Zero::Ref<Chen::CDX12::Texture> getTextureFromName(const std::string&);
         uint32_t                        getTexIndexFromName(const std::string&);
         uint32_t                        getTexIndex(const Ref<Chen::CDX12::Texture>&);
+        std::string                     getTextureName(const Ref<Chen::CDX12::Texture>&);
 
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 

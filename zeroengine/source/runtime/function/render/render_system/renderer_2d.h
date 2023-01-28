@@ -27,5 +27,19 @@ namespace Zero {
             const DirectX::SimpleMath::Color&   color         = {1.0f, 1.0f, 1.0f, 1.0f},
             uint32_t                            tex_index     = 0,
             float                               tiling_factor = 1.0f);
+
+        static void drawCellQuad(
+            const DirectX::SimpleMath::Vector2& position,
+            const DirectX::SimpleMath::Vector2& size,
+            float                               rotation,
+            const Zero::Ref<SubTexture2D>&      sub_texture,
+            const DirectX::SimpleMath::Color&   color = {1.0f, 1.0f, 1.0f, 1.0f});
+
+        static void drawCellQuad(
+            const DirectX::SimpleMath::Vector3& position,
+            const DirectX::SimpleMath::Vector2& size,
+            float                               rotation,
+            const Zero::Ref<SubTexture2D>&      sub_texture,
+            const DirectX::SimpleMath::Color&   color = {1.0f, 1.0f, 1.0f, 1.0f});
     };
 } // namespace Zero

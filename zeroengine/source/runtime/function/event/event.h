@@ -1,7 +1,5 @@
 #pragma once
 
-#include "runtime/core/common/core.h"
-
 namespace Zero {
 
     // Events here are currently blocking, meaning when an event occurs it

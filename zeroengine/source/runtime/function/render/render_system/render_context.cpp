@@ -174,6 +174,7 @@ namespace Zero {
     }
 
     void RenderContext::registerRenderPass() {
+        LOG_INFO("-------------------------------");
         LOG_INFO("begin to register render pass: ");
 
         m_render_passes.push_back(Zero::CreateScope<MainCameraPass2D>());
@@ -182,6 +183,7 @@ namespace Zero {
             render_pass->preLoadResource();
 
         LOG_INFO("register render pass success!");
+        LOG_INFO("-------------------------------");
     }
 
     void RenderContext::swapBuffer() {

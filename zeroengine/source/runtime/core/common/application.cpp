@@ -24,10 +24,6 @@ namespace Zero {
 
         Renderer::init();
 
-        GET_MESH_TABLE().buildBasicMesh();
-        GET_TEXTURE_TABLE().registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png"); // default texture
-
         m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
         pushOverlay(m_ImGuiLayer);
     }

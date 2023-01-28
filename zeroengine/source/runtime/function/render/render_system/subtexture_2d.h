@@ -12,6 +12,8 @@ namespace Zero {
         const Ref<Chen::CDX12::Texture>     getTexture() const { return m_texture; }
         const DirectX::SimpleMath::Vector2* getTexCoords() const { return m_tex_coords; }
 
+        std::string constructSubTexName() const;
+
         static Ref<SubTexture2D> createFromCoords(
             const Ref<Chen::CDX12::Texture>&,
             const DirectX::SimpleMath::Vector2& coords,
@@ -21,5 +23,6 @@ namespace Zero {
     private:
         Ref<Chen::CDX12::Texture>    m_texture;
         DirectX::SimpleMath::Vector2 m_tex_coords[4];
+        std::string                  m_sub_name;
     };
 } // namespace Zero

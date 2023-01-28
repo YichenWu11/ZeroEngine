@@ -45,11 +45,11 @@ namespace Zero {
         void registerRenderPass();
 
         void submit(
-            Chen::CDX12::Mesh*                 mesh,
-            const DirectX::SimpleMath::Matrix& trans,
-            const DirectX::SimpleMath::Color&  color,
-            uint32_t                           tex_index,
-            float                              tiling_factor) {
+            const Zero::Ref<Chen::CDX12::Mesh>& mesh,
+            const DirectX::SimpleMath::Matrix&  trans,
+            const DirectX::SimpleMath::Color&   color,
+            uint32_t                            tex_index,
+            float                               tiling_factor) {
             ObjectConstant2D obj_constant;
             obj_constant.transform     = trans.Transpose();
             obj_constant.modulate      = color;
@@ -126,7 +126,7 @@ namespace Zero {
         uint32_t numGpuCSU_static  = 648;
         uint32_t numGpuCSU_dynamic = 648;
 
-        std::vector<std::tuple<Chen::CDX12::Mesh*, ObjectConstant2D>> m_draw_2d_list;
+        std::vector<std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D>> m_draw_2d_list;
 
         // RenderPass
         std::vector<Zero::Scope<RenderPass>> m_render_passes;
