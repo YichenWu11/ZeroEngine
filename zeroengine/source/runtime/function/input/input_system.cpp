@@ -1,17 +1,17 @@
 #include "runtime/function/input/input_system.h"
 
 namespace Zero {
-    std::unique_ptr<InputSystem> InputSystem::s_instance = std::make_unique<InputSystem>();
+    Zero::Scope<InputSystem> InputSystem::s_instance = Zero::CreateScope<InputSystem>();
 
     bool InputSystem::isKeyPressed(int keycode) {
-        return GetAsyncKeyState(keycode) & 0x0001;
+        return GetAsyncKeyState(keycode) & 0x8000;
     }
 
     bool InputSystem::isMouseButtonPressed(int button) {
-        return GetAsyncKeyState(button) & 0x0001;
+        return GetAsyncKeyState(button) & 0x8000;
     }
 
-    std::pair<float, float> InputSystem::getMousePosition() {
+    DirectX::SimpleMath::Vector2 InputSystem::getMousePosition() {
         POINT pos;
         bool  success = GetCursorPos(&pos);
         ZE_ASSERT(success && "GetCursorPos failed!");
@@ -20,12 +20,12 @@ namespace Zero {
     }
 
     float InputSystem::getMouseX() {
-        auto [x, y] = getMousePosition();
-        return x;
+        auto pos = getMousePosition();
+        return pos.x;
     }
 
     float InputSystem::getMouseY() {
-        auto [x, y] = getMousePosition();
-        return y;
+        auto pos = getMousePosition();
+        return pos.y;
     }
 } // namespace Zero

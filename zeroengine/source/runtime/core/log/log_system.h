@@ -3,7 +3,6 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 
-
 namespace Zero {
     class LogSystem {
     public:
@@ -22,4 +21,5 @@ namespace Zero {
 #define LOG_INFO(...) ::Zero::LogSystem::getLogger()->info(__VA_ARGS__)
 #define LOG_WARN(...) ::Zero::LogSystem::getLogger()->warn(__VA_ARGS__)
 #define LOG_ERROR(...) ::Zero::LogSystem::getLogger()->error(__VA_ARGS__)
+#define LOG_FATAL(...) ::Zero::LogSystem::getLogger()->fatal(__VA_ARGS__)
 #define LOG_CRITICAL(...) ::Zero::LogSystem::getLogger()->critical(__VA_ARGS__)

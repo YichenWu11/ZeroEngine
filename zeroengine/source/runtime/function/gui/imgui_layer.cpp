@@ -1,16 +1,18 @@
+#include <CDX12/DescriptorHeapMngr.h>
 #include <backends/imgui_impl_dx12.h>
 #include <backends/imgui_impl_win32.h>
-#include <imgui.h>
 
 #include "runtime/core/common/application.h"
 #include "runtime/function/gui/imgui_layer.h"
-
-// NOTE: this layer dosen't work so far
+#include "runtime/function/input/input_system.h"
+#include "runtime/function/render/render_system/render_context.h"
 
 namespace Zero {
-    ImGuiLayer::ImGuiLayer() :
-        Layer("ImGuiLayer") {
+    ImGuiLayer::ImGuiLayer(HWND handle) :
+        Layer("ImGuiLayer"),
+        m_handle(handle) {
     }
+
     ImGuiLayer::~ImGuiLayer() {
     }
 
@@ -22,31 +24,43 @@ namespace Zero {
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
-        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-        ImGui::StyleColorsDark();
-        // ImGui::StyleColorsClassic();
-
-        // When viewports are enabled we tweak WindowRounding/WindowBg
-        // so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             style.WindowRounding              = 0.0f;
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        ImGui_ImplWin32_Init(GetModuleHandle(NULL));
+        // ImGui::StyleColorsDark();
+        // ImGui::StyleColorsClassic();
+        // ImGui::StyleColorsLight();
+        setZeroImGuiStyle();
 
-        // TODO: init imgui_impldx12
-        // ImGui_ImplDX12_Init(device, 3, DXGI_FORMAT_R8G8B8A8_UNORM, heap, cpuHandle,
-        //                     gpuHandle);
+        auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/ZeroEngineFont.ttf";
+        io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 20.0f);
+
+        ImGuiInitInfo init_info = GET_RENDER_CONTEXT().getImGuiInitInfo();
+
+        ImGui_ImplWin32_Init(m_handle);
+
+        ImGui_ImplDX12_Init(GET_RENDER_CONTEXT().getGraphicsDevice(),
+                            3,
+                            DXGI_FORMAT_R8G8B8A8_UNORM,
+                            init_info.descriptor_heap,
+                            init_info.cpu_handle,
+                            init_info.gpu_handle);
     }
 
     void ImGuiLayer::onDetach() {
         ImGui_ImplDX12_Shutdown();
         ImGui_ImplWin32_Shutdown();
         ImGui::DestroyContext();
+    }
+
+    void ImGuiLayer::onEvent(Event& e) {
+        ImGuiIO& io = ImGui::GetIO();
+        e.m_handled |= e.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+        e.m_handled |= e.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
     }
 
     void ImGuiLayer::begin() {
@@ -61,18 +75,37 @@ namespace Zero {
         io.DisplaySize   = ImVec2(app.getWindow().getWidth(), app.getWindow().getHeight());
 
         ImGui::Render();
-        // TODO: impl in render_backend
-        // ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), g_pd3dCommandList);
-
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-            ImGui::UpdatePlatformWindows();
-            // TODO: impl in render_backend
-            // ImGui::RenderPlatformWindowsDefault(NULL, (void*)g_pd3dCommandList);
-        }
     }
 
-    void ImGuiLayer::onImGuiRender() {
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
+    void ImGuiLayer::setZeroImGuiStyle() {
+        auto& colors              = ImGui::GetStyle().Colors;
+        colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
+
+        // Headers
+        colors[ImGuiCol_Header]        = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        colors[ImGuiCol_HeaderHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        colors[ImGuiCol_HeaderActive]  = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+        // Buttons
+        colors[ImGuiCol_Button]        = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        colors[ImGuiCol_ButtonHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        colors[ImGuiCol_ButtonActive]  = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+        // Frame BG
+        colors[ImGuiCol_FrameBg]        = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+        colors[ImGuiCol_FrameBgHovered] = ImVec4{0.3f, 0.305f, 0.31f, 1.0f};
+        colors[ImGuiCol_FrameBgActive]  = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+
+        // Tabs
+        colors[ImGuiCol_Tab]                = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        colors[ImGuiCol_TabHovered]         = ImVec4{0.38f, 0.3805f, 0.381f, 1.0f};
+        colors[ImGuiCol_TabActive]          = ImVec4{0.28f, 0.2805f, 0.281f, 1.0f};
+        colors[ImGuiCol_TabUnfocused]       = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
+        colors[ImGuiCol_TabUnfocusedActive] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
+
+        // Title
+        colors[ImGuiCol_TitleBg]          = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
+        colors[ImGuiCol_TitleBgActive]    = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
+        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
     }
 } // namespace Zero

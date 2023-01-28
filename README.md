@@ -14,7 +14,7 @@
 ## Environment
 
 * Win32
-* DirectX12
+* DirectX12 only
 * CMake
 * C++ 20
 
@@ -23,3 +23,5 @@
 * ImGui
 * DirectXTK12
 * DirectXMath (use DirectXTK12/SimpleMath as warpper)
+* spdlog
+* rapidjson

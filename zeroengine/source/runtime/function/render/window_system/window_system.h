@@ -3,7 +3,7 @@
 #include "runtime/function/render/window_system/i_window_system.h"
 
 namespace Zero {
-    class GraphicsContext;
+    class RenderContext;
 
     class WindowSystem : public IWindowSystem {
     public:
@@ -14,6 +14,8 @@ namespace Zero {
 
         int getWidth() const override { return m_data.width; }
         int getHeight() const override { return m_data.height; }
+
+        HWND getNativeWindowHandle() override { return m_window; }
 
         // window attributes
         void setEventCallback(const EventCallbackFn& callback) override { m_data.event_callback = callback; }
@@ -26,10 +28,7 @@ namespace Zero {
 
     private:
         // hwnd
-        HWND             m_window;
-        GraphicsContext* m_context;
-
-        static POINT m_last_mouse_pos;
+        HWND m_window;
 
         struct WindowData {
             int         width;

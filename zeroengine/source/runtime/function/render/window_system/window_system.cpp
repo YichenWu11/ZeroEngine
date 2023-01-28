@@ -1,9 +1,13 @@
-#include "runtime/function/render/window_system/window_system.h"
+#include <backends/imgui_impl_win32.h>
+
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
-#include "runtime/function/render/render_system/dx12/dx12_context.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/window_system/i_window_system.h"
+#include "runtime/function/render/window_system/window_system.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Zero {
 
@@ -11,10 +15,12 @@ namespace Zero {
     if (m_data.event_callback) m_data.event_callback(e);
 
     WindowSystem::WindowData WindowSystem::m_data;
-    POINT                    WindowSystem::m_last_mouse_pos;
 
     LRESULT CALLBACK
     MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+            return true;
+
         return WindowSystem::msgProc(hwnd, msg, wParam, lParam);
     }
 
@@ -96,9 +102,6 @@ namespace Zero {
                     static_cast<float>(GET_X_LPARAM(lParam)),
                     static_cast<float>(GET_Y_LPARAM(lParam)));
 
-                m_last_mouse_pos.x = GET_X_LPARAM(lParam);
-                m_last_mouse_pos.y = GET_Y_LPARAM(lParam);
-
                 EVENT_CALLBACK(event)
                 return 0;
             }
@@ -107,8 +110,14 @@ namespace Zero {
             case WM_MOUSEWHEEL: {
                 MouseScrolledEvent event(
                     static_cast<float>(GET_X_LPARAM(lParam)),
-                    static_cast<float>(GET_Y_LPARAM(lParam)));
+                    static_cast<float>(GET_Y_LPARAM(lParam)),
+                    static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)));
                 EVENT_CALLBACK(event)
+                return 0;
+            }
+
+            case WM_DESTROY: {
+                PostQuitMessage(0);
                 return 0;
             }
         }
@@ -117,9 +126,11 @@ namespace Zero {
     }
 
     // *************************************************************************************************
+    // *************************************************************************************************
+    // *************************************************************************************************
 
-    IWindowSystem* IWindowSystem::create(const WindowCreateInfo& create_info) {
-        return new WindowSystem(create_info);
+    Zero::Scope<IWindowSystem> IWindowSystem::create(const WindowCreateInfo& create_info) {
+        return Zero::CreateScope<WindowSystem>(create_info);
     }
 
     WindowSystem::WindowSystem(const WindowCreateInfo& create_info) {
@@ -139,31 +150,48 @@ namespace Zero {
 
         WNDCLASSEXW wc = {
             sizeof(wc),
-            CS_HREDRAW | CS_VREDRAW,
+            CS_CLASSDC,
             MainWndProc,
             0L,
             0L,
-            GetModuleHandle(NULL), NULL, NULL, (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, L"MainWnd", NULL};
+            GetModuleHandle(NULL), NULL, NULL, (HBRUSH)GetStockObject(NULL_BRUSH), NULL, L"MainWnd", NULL};
 
         if (!::RegisterClassExW(&wc))
             LOG_CRITICAL("RegisterClass Failed.");
 
-        // TODO: std::string to std::wstring
-        m_window = ::CreateWindowW(wc.lpszClassName, L"Zero Engine", WS_OVERLAPPEDWINDOW, 100, 100, m_data.width, m_data.height, NULL, NULL, wc.hInstance, NULL);
+        RECT rc;
+        SetRect(&rc, 0, 0, m_data.width, m_data.height);
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, false);
+
+        if (create_info.is_fullscreen)
+            m_window = CreateWindow(
+                wc.lpszClassName,
+                L"Zero Engine",
+                WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZE | WS_SIZEBOX,
+                300, 200,
+                m_data.width, m_data.height,
+                NULL, NULL, wc.hInstance, NULL);
+        else
+            m_window = CreateWindow(
+                wc.lpszClassName,
+                L"Zero Engine",
+                WS_POPUPWINDOW | WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX,
+                300, 200,
+                m_data.width, m_data.height,
+                NULL, NULL, wc.hInstance, NULL);
 
         if (!m_window)
             LOG_CRITICAL("CreateWindow Failed.");
 
-        m_context = new DX12Context(m_window);
-        m_context->init();
+        GET_RENDER_CONTEXT().init(m_window, m_data.width, m_data.height);
 
         if (create_info.is_fullscreen)
-            ::ShowWindow(m_window, SW_MAXIMIZE);
+            ShowWindow(m_window, SW_SHOWMAXIMIZED);
         else
-            ::ShowWindow(m_window, SW_SHOWDEFAULT);
-        ::UpdateWindow(m_window);
+            ShowWindow(m_window, SW_SHOWDEFAULT);
+        UpdateWindow(m_window);
 
-        setVSync(true);
+        setVSync(false);
     }
 
     void WindowSystem::shutdown() {
@@ -176,17 +204,14 @@ namespace Zero {
         while (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
             ::TranslateMessage(&msg);
             ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT) {
-                // TODO: quit
-            }
         }
 
-        m_context->swapBuffer();
+        GET_RENDER_CONTEXT().swapBuffer();
     }
 
     void WindowSystem::setVSync(bool enabled) {
         if (enabled) {
-            // do something to enable vertical sync
+            GET_RENDER_CONTEXT().setVsync(true);
         }
 
         m_data.v_sync = enabled;

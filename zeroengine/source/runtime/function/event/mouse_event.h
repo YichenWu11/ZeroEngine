@@ -25,22 +25,23 @@ namespace Zero {
 
     class MouseScrolledEvent : public Event {
     public:
-        MouseScrolledEvent(float xOffset, float yOffset) :
-            m_x_offset(xOffset), m_y_offset(yOffset) {}
+        MouseScrolledEvent(float xOffset, float yOffset, float zOffset) :
+            m_x_offset(xOffset), m_y_offset(yOffset), m_z_offset(zOffset) {}
 
         inline float getXOffset() const { return m_x_offset; }
         inline float getYOffset() const { return m_y_offset; }
+        inline float getZOffset() const { return m_z_offset; }
 
         std::string toString() const override {
             std::stringstream ss;
-            ss << "MouseScrolledEvent: " << getXOffset() << ", " << getYOffset();
+            ss << "MouseScrolledEvent: " << getXOffset() << ", " << getYOffset() << ", " << getZOffset();
             return ss.str();
         }
 
         EVENT_CLASS_TYPE(MouseScrolled)
         EVENT_CLASS_CATEGORY(EventCategoryMouse | EventCategoryInput)
     private:
-        float m_x_offset, m_y_offset;
+        float m_x_offset, m_y_offset, m_z_offset;
     };
 
     class MouseButtonEvent : public Event {

@@ -1,0 +1,136 @@
+#include <CDX12/Resource/Mesh.h>
+
+#include "runtime/function/render/render_system/buffer.h"
+#include "runtime/function/render/render_system/render_context.h"
+#include "runtime/function/render/render_system/renderer_2d.h"
+#include "runtime/function/render/render_system/renderer_api.h"
+#include "runtime/function/render/render_system/shader_param_bind_table.h"
+#include "runtime/function/table/mesh_table.h"
+#include "runtime/function/table/texture_table.h"
+
+using namespace Chen::CDX12;
+using namespace DirectX;
+using namespace DirectX::SimpleMath;
+
+namespace Zero {
+    struct Renderer2DData {};
+
+    static Renderer2DData s_Data;
+
+    void Renderer2D::init() {
+    }
+
+    void Renderer2D::shutdown() {
+    }
+
+    void Renderer2D::beginScene(const OrthographicsCamera& camera) {
+        // takes all the scene settings(camera, lights, environment etc)
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+
+        static Matrix view_proj_matrix;
+        view_proj_matrix = camera.getViewProjectionMatrix().Transpose();
+
+        ShaderParamBindTable::getInstance().bindParam(
+            shader,
+            "_ViewProjMatrix",
+            std::span<const uint8_t>{
+                reinterpret_cast<uint8_t const*>(&view_proj_matrix),
+                sizeof(view_proj_matrix)});
+
+        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
+
+        ShaderParamBindTable::getInstance().bindParam(
+            shader,
+            "TextureMap",
+            std::make_pair(tex_alloc, 0));
+    }
+
+    void Renderer2D::endScene() {
+        GET_RENDER_CONTEXT().beginRender();
+        GET_RENDER_CONTEXT().endRender();
+    }
+
+    void Renderer2D::drawQuad(
+        const DirectX::SimpleMath::Vector2& position,
+        const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
+        const DirectX::SimpleMath::Color&   color,
+        uint32_t                            tex_index,
+        float                               tiling_factor) {
+        drawQuad({position.x, position.y, 0.0f}, size, rotation, color, tex_index);
+    }
+
+    void Renderer2D::drawQuad(
+        const DirectX::SimpleMath::Vector3& position,
+        const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
+        const DirectX::SimpleMath::Color&   color,
+        uint32_t                            tex_index,
+        float                               tiling_factor) {
+        Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
+                           * Matrix::CreateScale(size.x, size.y, 1.0f)
+                           * Matrix::CreateTranslation(position);
+
+        static Zero::Ref<Mesh> mesh = GET_MESH_TABLE().getMesh("square");
+
+        ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
+
+        GET_RENDER_CONTEXT().submit(mesh, transform, color, tex_index, tiling_factor);
+    }
+
+    void Renderer2D::drawCellQuad(
+        const DirectX::SimpleMath::Vector2& position,
+        const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
+        const Zero::Ref<SubTexture2D>&      sub_texture,
+        const DirectX::SimpleMath::Color&   color) {
+        drawCellQuad({position.x, position.y, 0.0f}, size, rotation, sub_texture, color);
+    }
+
+    void Renderer2D::drawCellQuad(
+        const DirectX::SimpleMath::Vector3& position,
+        const DirectX::SimpleMath::Vector2& size,
+        float                               rotation,
+        const Zero::Ref<SubTexture2D>&      sub_texture,
+        const DirectX::SimpleMath::Color&   color) {
+        if (!GET_MESH_TABLE().isMeshExsit(sub_texture->constructSubTexName())) {
+            std::vector<VertexData2D> vertices;
+            uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
+            auto                      tex_coords = sub_texture->getTexCoords();
+            vertices.push_back(
+                VertexData2D{{-0.5f, -0.5f, 0.0f}, {tex_coords[0].x, 1.0f - tex_coords[0].y}});
+            vertices.push_back(
+                VertexData2D{{0.5f, -0.5f, 0.0f}, {tex_coords[1].x, 1.0f - tex_coords[1].y}});
+            vertices.push_back(
+                VertexData2D{{0.5f, 0.5f, 0.0f}, {tex_coords[2].x, 1.0f - tex_coords[2].y}});
+            vertices.push_back(
+                VertexData2D{{-0.5f, 0.5f, 0.0f}, {tex_coords[3].x, 1.0f - tex_coords[3].y}});
+
+            GET_MESH_TABLE().registerMesh(
+                sub_texture->constructSubTexName(),
+                vertices.data(),
+                vertices.size(),
+                indices,
+                6);
+        }
+
+        Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
+                           * Matrix::CreateScale(size.x, size.y, 1.0f)
+                           * Matrix::CreateTranslation(position);
+
+        GET_RENDER_CONTEXT().submit(
+            GET_MESH_TABLE().getMesh(sub_texture->constructSubTexName()),
+            transform,
+            color,
+            GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
+            1.0f);
+
+        // GET_RENDER_CONTEXT().submit(
+        //     GET_MESH_TABLE().getMesh(sub_texture->constructSubTexName()),
+        //     transform,
+        //     {1.0f, 1.0f, 1.0f, 0.0f},
+        //     GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
+        //     1.0f);
+    }
+} // namespace Zero
