@@ -55,7 +55,7 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
             GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
 
         Zero::Renderer2D::drawQuad(
-            {0.0f, 0.0f},
+            position,
             {1.0f, 1.0f},
             0.0f,
             {1.0f, 1.0f, 1.0f, 1.0f},
@@ -105,10 +105,6 @@ void Sandbox2D::onImGuiRender() {
     ZE_PROFILE_FUNCTION();
 
     static auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
-
-    // ImGui::Begin("DEBUG");
-    // ImGui::ColorEdit4("CLEAR_COLOR", reinterpret_cast<float*>(&clear_color));
-    // ImGui::End();
 
     // Note: Switch this to true to enable dockspace
     static bool dockingEnabled = true;
@@ -174,6 +170,8 @@ void Sandbox2D::onImGuiRender() {
         ImGui::Image(
             ImTextureID(tex_alloc->GetGpuHandle(2).ptr),
             ImVec2(190, 190));
+        ImGui::SameLine();
+        ImGui::DragFloat2("POSITION", reinterpret_cast<float*>(&position), 0.05f);
         ImGui::End();
 
         ImGui::Begin("IMAGE");

@@ -19,12 +19,17 @@ namespace Zero {
 
         static API       getAPI() { return s_api; }
         static Dimension getRenderDimension() { return s_dimension; }
-        static bool      isMultiIndirectDrawEnable() { return s_multi_indirect_draw_enabled; }
-        static void      setMutilIndirectDrawEnabled(bool enabled) { s_multi_indirect_draw_enabled = enabled; }
+
+        static bool isMultiIndirectDrawEnable() { return s_multi_indirect_draw_enabled; }
+        static void setMutilIndirectDrawEnabled(bool enabled) { s_multi_indirect_draw_enabled = enabled; }
+
+        static bool isEditorMode() { return is_editor_mode; }
+        static void setEditorModeEnabled(bool enabled) { is_editor_mode = enabled; }
 
     private:
         static API       s_api;
         static Dimension s_dimension;
         static bool      s_multi_indirect_draw_enabled;
+        static bool      is_editor_mode;
     };
 } // namespace Zero

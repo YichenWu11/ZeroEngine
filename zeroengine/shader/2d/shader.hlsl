@@ -1,3 +1,5 @@
+#define EDITOR_MODE
+
 struct VSInput {
   float3 position : POSITION;
   float2 tex_coord : TEXCOORD;
@@ -53,9 +55,11 @@ float4 PSMain(PSInput input) : SV_TARGET {
                                     input.tex_coord * u_TilingFactor) *
       u_ModulateColor;
 
+#ifdef EDITOR_MODE
   // editor
-  if (ret_color.a == 0.0f) {
+  if (ret_color.a == 0.0f)
     return float4(dist, 1.0f - dist, 1.0f, 0.5f);
-  }
+#endif
+
   return float4(ret_color);
 }
