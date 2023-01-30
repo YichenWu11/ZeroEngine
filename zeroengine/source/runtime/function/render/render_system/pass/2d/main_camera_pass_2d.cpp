@@ -8,6 +8,7 @@
 
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/render_context.h"
+#include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 #include "runtime/function/table/mesh_table.h"
 #include "runtime/function/table/texture_table.h"
@@ -74,7 +75,17 @@ namespace Zero {
         BasicShader* trans_shader =
             static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
         trans_shader->SetVsShader(path.c_str());
-        trans_shader->SetPsShader(path.c_str());
+
+        if (RendererAPI::isEditorMode()) {
+            const D3D_SHADER_MACRO shader_macro[] = {
+                "EDITOR_MODE", "1",
+                NULL, NULL};
+
+            trans_shader->SetPsShader(path.c_str(), shader_macro);
+        }
+        else {
+            trans_shader->SetPsShader(path.c_str());
+        }
         trans_shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
         trans_shader->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 

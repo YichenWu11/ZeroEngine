@@ -1,5 +1,3 @@
-#define EDITOR_MODE
-
 struct VSInput {
   float3 position : POSITION;
   float2 tex_coord : TEXCOORD;

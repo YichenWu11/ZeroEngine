@@ -5,9 +5,9 @@ int main(int /*argc*/, char** /*argv*/) {
 
     LOG_INFO("zeroengine start");
 
-    auto editor_app = createApplication();
+    auto sandbox_app = createApplication();
 
-    editor_app->run();
+    sandbox_app->run();
 
-    delete editor_app;
+    delete sandbox_app;
 }
