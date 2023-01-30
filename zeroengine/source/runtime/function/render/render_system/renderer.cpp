@@ -59,4 +59,8 @@ namespace Zero {
 
     void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Matrix& transfrom) {
     }
+
+    ImTextureID Renderer::getOffScreenID() {
+        return GET_RENDER_CONTEXT().getOffScreenID();
+    }
 } // namespace Zero

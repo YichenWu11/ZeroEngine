@@ -7,6 +7,7 @@
 #include <CDX12/Resource/ResourceStateTracker.h>
 #include <CDX12/Util/BindProperty.h>
 
+#include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 
 using Microsoft::WRL::ComPtr;
@@ -69,6 +70,8 @@ namespace Zero {
             return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
         }
 
+        ImTextureID getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
+
     private:
         RenderContext()  = default;
         ~RenderContext() = default;
@@ -103,6 +106,7 @@ namespace Zero {
 
         Zero::Scope<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
         Zero::Scope<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
+        Zero::Scope<FrameBuffer>          m_frameBuffers[s_frame_count];
 
         // DescriptorHeap
         Chen::CDX12::DescriptorHeapAllocation m_rtvCpuDH;

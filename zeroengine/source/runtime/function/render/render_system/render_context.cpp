@@ -81,9 +81,9 @@ namespace Zero {
                 numGpuCSU_static,
                 numGpuCSU_dynamic);
 
-            m_rtvCpuDH = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(10);
-            m_dsvCpuDH = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(10);
-            m_csuGpuDH = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(10);
+            m_rtvCpuDH = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(20);
+            m_dsvCpuDH = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(20);
+            m_csuGpuDH = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(20);
         }
 
         // Create frame resources.
@@ -105,6 +105,14 @@ namespace Zero {
                          1,
                          Texture::TextureUsage::DepthStencil,
                          D3D12_RESOURCE_STATE_DEPTH_READ));
+
+                FrameBufferConfiguration fb_config{
+                    static_cast<uint32_t>(width),
+                    static_cast<uint32_t>(height),
+                    m_rtvCpuDH.GetCpuHandle(n + 3),
+                    m_csuGpuDH.GetCpuHandle(n + 1),
+                    s_colorFormat};
+                m_frameBuffers[n] = Zero::CreateScope<FrameBuffer>(fb_config);
 
                 m_device->CreateRenderTargetView(m_renderTargets[n]->GetResource(), nullptr, rtvHandle);
                 m_device->CreateDepthStencilView(m_depthTargets[n]->GetResource(), nullptr, dsvHandle);
@@ -291,9 +299,22 @@ namespace Zero {
             dsvHandle.Offset(1, m_dsvCpuDH.GetDescriptorSize());
         }
 
+        for (int i = 0; i < s_frame_count; ++i) {
+            FrameBufferConfiguration fb_config{
+                static_cast<uint32_t>(width),
+                static_cast<uint32_t>(height),
+                m_rtvCpuDH.GetCpuHandle(i + 3),
+                m_csuGpuDH.GetCpuHandle(i + 1),
+                s_colorFormat};
+            m_frameBuffers[i]->onResize(fb_config);
+        }
+
         ThrowIfFailed(commandList->Close());
         m_commandQueue.Execute(commandList.Get());
 
         flushCommandQueue();
+
+        for (auto& shader_pass : m_render_passes)
+            shader_pass->onResize();
     }
 } // namespace Zero

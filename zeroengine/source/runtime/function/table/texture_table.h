@@ -12,7 +12,7 @@ namespace Zero {
         Chen::CDX12::TextureDimension      dimension{Chen::CDX12::TextureDimension::Tex2D};
         uint32_t                           width{100};
         uint32_t                           height{100};
-        DXGI_FORMAT                        format{DXGI_FORMAT::DXGI_FORMAT_B8G8R8A8_UNORM_SRGB};
+        DXGI_FORMAT                        format{DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM};
         uint32_t                           depth{1};
         uint32_t                           mip{1};
         Chen::CDX12::Texture::TextureUsage usage{Chen::CDX12::Texture::TextureUsage::GenericColor};

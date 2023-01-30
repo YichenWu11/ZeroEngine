@@ -44,6 +44,13 @@ namespace Zero {
             shader,
             "TextureMap",
             std::make_pair(tex_alloc, 0));
+
+        // NOTE: if editor
+        // Zero::Renderer2D::drawQuad(
+        //     {0.0f, 0.0f, -1.0f},
+        //     {10000.0f, 10000.0f},
+        //     0.0f,
+        //     {0.0f, 0.0f, 0.0f, 0.5f});
     }
 
     void Renderer2D::endScene() {
@@ -125,12 +132,5 @@ namespace Zero {
             color,
             GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
             1.0f);
-
-        // GET_RENDER_CONTEXT().submit(
-        //     GET_MESH_TABLE().getMesh(sub_texture->constructSubTexName()),
-        //     transform,
-        //     {1.0f, 1.0f, 1.0f, 0.0f},
-        //     GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
-        //     1.0f);
     }
 } // namespace Zero

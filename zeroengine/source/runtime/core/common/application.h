@@ -15,6 +15,7 @@ namespace Zero {
         virtual ~Application();
 
         void run();
+        void close();
 
         void onEvent(Event& e);
 

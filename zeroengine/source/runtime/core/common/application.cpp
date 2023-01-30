@@ -73,6 +73,10 @@ namespace Zero {
         }
     }
 
+    void Application::close() {
+        m_running = false;
+    }
+
     bool Application::onWindowClose(WindowCloseEvent& e) {
         m_running = false;
         return true;

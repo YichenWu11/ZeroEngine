@@ -1,5 +1,7 @@
 #pragma once
 
+#include <imgui.h>
+
 #include "runtime/function/render/camera_system/orthographics_camera.h"
 #include "runtime/function/render/render_system/render_command.h"
 
@@ -21,6 +23,8 @@ namespace Zero {
         static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Matrix& = DirectX::SimpleMath::Matrix::Identity);
 
         static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
+
+        static ImTextureID getOffScreenID();
 
     private:
         struct SceneData {

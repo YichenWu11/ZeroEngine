@@ -48,7 +48,14 @@ float4 PSMain(PSInput input) : SV_TARGET {
   dist = clamp(dist, 0.0f, 1.0f);
   dist = sqrt(dist);
 
-  return TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap,
-                                       input.tex_coord * u_TilingFactor) *
-         u_ModulateColor;
+  float4 ret_color =
+      TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap,
+                                    input.tex_coord * u_TilingFactor) *
+      u_ModulateColor;
+
+  // editor
+  if (ret_color.a == 0.0f) {
+    return float4(dist, 1.0f - dist, 1.0f, 0.5f);
+  }
+  return float4(ret_color);
 }
