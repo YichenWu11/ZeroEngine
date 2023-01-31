@@ -168,6 +168,7 @@ namespace Zero {
             ImGui::DragFloat2("POSITION", reinterpret_cast<float*>(&position), 0.05f);
             ImGui::End();
 
+            // Viewer
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
             ImGui::Begin("VIEWER");
             m_viewport_focused = ImGui::IsWindowFocused();
