@@ -13,12 +13,12 @@ namespace Zero {
             "SpriteSheet",
             std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/game/texture/sprite_sheet.png");
 
-        m_texture_stair = Zero::SubTexture2D::createFromCoords(
+        m_texture_stair = SubTexture2D::createFromCoords(
             GET_TEXTURE_TABLE().getTextureFromName("SpriteSheet"),
             {7, 6},
             {128.0f, 128.0f});
 
-        m_texture_bush = Zero::SubTexture2D::createFromCoords(
+        m_texture_bush = SubTexture2D::createFromCoords(
             GET_TEXTURE_TABLE().getTextureFromName("SpriteSheet"),
             {2, 3},
             {256.0f, 128.0f});
@@ -29,58 +29,59 @@ namespace Zero {
     void EditorLayer::onDetach() {
     }
 
-    void EditorLayer::onUpdate(Zero::TimeStep timestep) {
+    void EditorLayer::onUpdate(TimeStep timestep) {
         // update
         {
             ZE_PROFILE_SCOPE("CameraController::onUpdate");
-            m_camera_controller.onUpdate(timestep);
+            if (m_viewport_focused)
+                m_camera_controller.onUpdate(timestep);
         }
 
         // render
         // {
-        //     Zero::RenderCommand::setClearColor(clear_color);
-        //     Zero::RenderCommand::clear();
+        //     RenderCommand::setClearColor(clear_color);
+        //     RenderCommand::clear();
         // }
 
         {
             ZE_PROFILE_SCOPE("Renderer2D::Render");
 
-            // Zero::Renderer2D::drawCellQuad(
+            // Renderer2D::drawCellQuad(
             //     {0.0f, 1.0f, 0.3f},
             //     {1.0f, 1.0f},
             //     0.0f,
             //     m_texture_stair);
 
-            // Zero::Renderer2D::drawCellQuad(
+            // Renderer2D::drawCellQuad(
             //     {0.0f, -1.0f, 0.2f},
             //     {2.0f, 1.0f},
             //     0.0f,
             //     m_texture_bush);
 
-            Zero::Renderer2D::beginScene(m_camera_controller.getCamera());
+            Renderer2D::beginScene(m_camera_controller.getCamera());
 
-            Zero::Renderer2D::drawQuad(
+            Renderer2D::drawQuad(
                 {-0.8f, 0.0f},
                 {1.0f, 1.0f},
                 0.0f,
                 {1.0f, 1.0f, 1.0f, 1.0f},
                 GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
 
-            Zero::Renderer2D::drawQuad(
+            Renderer2D::drawQuad(
                 position,
                 {1.0f, 1.0f},
                 0.0f,
                 {1.0f, 1.0f, 1.0f, 1.0f},
                 GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
 
-            Zero::Renderer2D::drawQuad(
+            Renderer2D::drawQuad(
                 {0.8f, 0.0f},
                 {1.0f, 1.0f},
                 0.0f,
                 {1.0f, 1.0f, 1.0f, 1.0f},
                 GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
 
-            Zero::Renderer2D::drawQuad(
+            Renderer2D::drawQuad(
                 {0.0f, 0.0f, 0.2f},
                 {10.0f, 10.0f},
                 0.0f,
@@ -89,7 +90,7 @@ namespace Zero {
 
             for (float y = -5.0f; y < 5.0f; y += 0.5f) {
                 for (float x = -5.0f; x < 5.0f; x += 0.5f) {
-                    Zero::Renderer2D::drawQuad(
+                    Renderer2D::drawQuad(
                         {x, y, 0.1f},
                         {0.45f, 0.45f},
                         0.0f,
@@ -97,7 +98,7 @@ namespace Zero {
                 }
             }
 
-            Zero::Renderer2D::endScene();
+            Renderer2D::endScene();
         }
     }
 
@@ -151,7 +152,7 @@ namespace Zero {
                     // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
                     if (ImGui::MenuItem("Exit")) {
-                        Zero::Application::get().close();
+                        Application::get().close();
                     }
                     ImGui::EndMenu();
                 }
@@ -169,16 +170,19 @@ namespace Zero {
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
             ImGui::Begin("VIEWER");
-            ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
+            m_viewport_focused = ImGui::IsWindowFocused();
+            m_viewport_hovered = ImGui::IsWindowHovered();
+            Application::get().getImGuiLayer()->blockEvents(!m_viewport_focused || !m_viewport_hovered);
 
+            ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
             if (m_viewport_size != *((Vector2*)&viewport_panel_size)) {
-                Zero::Renderer::resizeFrameBuffer((uint32_t)viewport_panel_size.x, (uint32_t)viewport_panel_size.y);
+                Renderer::resizeFrameBuffer((uint32_t)viewport_panel_size.x, (uint32_t)viewport_panel_size.y);
                 m_viewport_size = Vector2{viewport_panel_size.x, viewport_panel_size.y};
                 m_camera_controller.onResize(viewport_panel_size.x, viewport_panel_size.y);
             }
 
             ImGui::Image(
-                Zero::Renderer::getOffScreenID(),
+                Renderer::getOffScreenID(),
                 ImVec2{m_viewport_size.x, m_viewport_size.y});
             ImGui::End();
             ImGui::PopStyleVar();
@@ -191,7 +195,7 @@ namespace Zero {
         }
     }
 
-    void EditorLayer::onEvent(Zero::Event& event) {
+    void EditorLayer::onEvent(Event& event) {
         m_camera_controller.onEvent(event);
     }
 

@@ -21,10 +21,14 @@ namespace Zero {
         void begin();
         void end();
 
+        void blockEvents(bool block) { m_block_events = block; }
+
     private:
         void setZeroImGuiStyle();
 
     private:
         HWND m_handle;
+
+        bool m_block_events = true;
     };
 } // namespace Zero

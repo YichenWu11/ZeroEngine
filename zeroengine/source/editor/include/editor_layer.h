@@ -20,8 +20,9 @@ namespace Zero {
         Zero::OrthographicsCameraController m_camera_controller;
 
         Vector2 m_viewport_size;
-
-        bool m_dockspace_enable = true;
+        bool    m_viewport_focused = false;
+        bool    m_viewport_hovered = false;
+        bool    m_dockspace_enable = true;
 
         Zero::Ref<Zero::SubTexture2D> m_texture_stair;
         Zero::Ref<Zero::SubTexture2D> m_texture_bush;

@@ -23,6 +23,7 @@ namespace Zero {
         void pushOverlay(Layer* layer);
 
         IWindowSystem& getWindow() { return *m_window; }
+        ImGuiLayer*    getImGuiLayer() { return m_ImGuiLayer; }
 
         static Application& get() { return *s_instance; }
 

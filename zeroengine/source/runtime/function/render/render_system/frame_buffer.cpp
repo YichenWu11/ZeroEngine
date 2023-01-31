@@ -10,7 +10,6 @@ namespace Zero {
     }
 
     FrameBuffer::~FrameBuffer() {
-        m_inner_texture.reset();
     }
 
     void FrameBuffer::onResize(const FrameBufferConfiguration& config) {

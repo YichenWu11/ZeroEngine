@@ -58,9 +58,11 @@ namespace Zero {
     }
 
     void ImGuiLayer::onEvent(Event& e) {
-        ImGuiIO& io = ImGui::GetIO();
-        e.m_handled |= e.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-        e.m_handled |= e.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        if (m_block_events) {
+            ImGuiIO& io = ImGui::GetIO();
+            e.m_handled |= e.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            e.m_handled |= e.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
     }
 
     void ImGuiLayer::begin() {
