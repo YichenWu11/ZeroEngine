@@ -37,13 +37,11 @@ namespace Zero {
         void init(HWND window_handle, int width, int height);
         void swapBuffer();
         void shutdown();
-
         void setVsync(bool vsync) { m_is_vsync_enable = vsync; }
+        void registerRenderPass();
 
         void beginRender();
         void endRender();
-
-        void registerRenderPass();
 
         void submit(
             const Zero::Ref<Chen::CDX12::Mesh>& mesh,
@@ -60,16 +58,14 @@ namespace Zero {
         }
 
         void flush() { flushCommandQueue(); }
-
-        void onResize(int width, int height);
+        void onResize(uint32_t width, uint32_t height);
+        void resizeFrameBuffer(int width, int height);
 
         ID3D12Device*       getGraphicsDevice() { return m_device.Get(); }
         ID3D12CommandQueue* getCommandQueue() { return m_commandQueue.Get(); }
-
-        ImGuiInitInfo getImGuiInitInfo() {
-            return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
+        ImGuiInitInfo       getImGuiInitInfo() {
+                  return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
         }
-
         ImTextureID getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
 
     private:

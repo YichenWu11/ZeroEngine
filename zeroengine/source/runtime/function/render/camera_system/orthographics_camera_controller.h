@@ -21,6 +21,7 @@ namespace Zero {
 
         void onUpdate(TimeStep timestep);
         void onEvent(Event& e);
+        void onResize(float width, float height);
 
         OrthographicsCamera&       getCamera() { return m_camera; }
         const OrthographicsCamera& getCamera() const { return m_camera; }

@@ -247,7 +247,7 @@ namespace Zero {
         }
     }
 
-    void RenderContext::onResize(int width, int height) {
+    void RenderContext::onResize(uint32_t width, uint32_t height) {
         flushCommandQueue();
 
         m_viewport    = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
@@ -317,5 +317,21 @@ namespace Zero {
 
         for (auto& shader_pass : m_render_passes)
             shader_pass->onResize();
+    }
+
+    void RenderContext::resizeFrameBuffer(int width, int height) {
+        flushCommandQueue();
+
+        for (int i = 0; i < s_frame_count; ++i) {
+            FrameBufferConfiguration fb_config{
+                static_cast<uint32_t>(width),
+                static_cast<uint32_t>(height),
+                m_rtvCpuDH.GetCpuHandle(i + 3),
+                m_csuGpuDH.GetCpuHandle(i + 1),
+                s_colorFormat};
+            m_frameBuffers[i]->onResize(fb_config);
+        }
+
+        flushCommandQueue();
     }
 } // namespace Zero

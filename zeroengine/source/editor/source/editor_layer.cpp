@@ -44,6 +44,19 @@ namespace Zero {
 
         {
             ZE_PROFILE_SCOPE("Renderer2D::Render");
+
+            // Zero::Renderer2D::drawCellQuad(
+            //     {0.0f, 1.0f, 0.3f},
+            //     {1.0f, 1.0f},
+            //     0.0f,
+            //     m_texture_stair);
+
+            // Zero::Renderer2D::drawCellQuad(
+            //     {0.0f, -1.0f, 0.2f},
+            //     {2.0f, 1.0f},
+            //     0.0f,
+            //     m_texture_bush);
+
             Zero::Renderer2D::beginScene(m_camera_controller.getCamera());
 
             Zero::Renderer2D::drawQuad(
@@ -66,18 +79,6 @@ namespace Zero {
                 0.0f,
                 {1.0f, 1.0f, 1.0f, 1.0f},
                 GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-
-            // Zero::Renderer2D::drawCellQuad(
-            //     {0.0f, 1.0f, 0.3f},
-            //     {1.0f, 1.0f},
-            //     0.0f,
-            //     m_texture_stair);
-
-            // Zero::Renderer2D::drawCellQuad(
-            //     {0.0f, -1.0f, 0.2f},
-            //     {2.0f, 1.0f},
-            //     0.0f,
-            //     m_texture_bush);
 
             Zero::Renderer2D::drawQuad(
                 {0.0f, 0.0f, 0.2f},
@@ -103,7 +104,7 @@ namespace Zero {
     void EditorLayer::onImGuiRender() {
         ZE_PROFILE_FUNCTION();
 
-        {
+        if (m_dockspace_enable) {
             static auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
 
             static bool               dockspaceOpen             = true;
@@ -129,11 +130,6 @@ namespace Zero {
             if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
                 window_flags |= ImGuiWindowFlags_NoBackground;
 
-            // Important: note that we proceed even if Begin() returns false (aka window is collapsed).
-            // This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
-            // all active windows docked into it will lose their parent and become undocked.
-            // We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
-            // any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
             ImGui::PopStyleVar();
@@ -171,11 +167,21 @@ namespace Zero {
             ImGui::DragFloat2("POSITION", reinterpret_cast<float*>(&position), 0.05f);
             ImGui::End();
 
-            ImGui::Begin("IMAGE");
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+            ImGui::Begin("VIEWER");
+            ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
+
+            if (m_viewport_size != *((Vector2*)&viewport_panel_size)) {
+                Zero::Renderer::resizeFrameBuffer((uint32_t)viewport_panel_size.x, (uint32_t)viewport_panel_size.y);
+                m_viewport_size = Vector2{viewport_panel_size.x, viewport_panel_size.y};
+                m_camera_controller.onResize(viewport_panel_size.x, viewport_panel_size.y);
+            }
+
             ImGui::Image(
                 Zero::Renderer::getOffScreenID(),
-                ImVec2(1280.0f, 720.0f));
+                ImVec2{m_viewport_size.x, m_viewport_size.y});
             ImGui::End();
+            ImGui::PopStyleVar();
 
             ImGui::ShowDemoWindow();
 

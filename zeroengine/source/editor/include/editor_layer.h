@@ -19,6 +19,10 @@ namespace Zero {
     private:
         Zero::OrthographicsCameraController m_camera_controller;
 
+        Vector2 m_viewport_size;
+
+        bool m_dockspace_enable = true;
+
         Zero::Ref<Zero::SubTexture2D> m_texture_stair;
         Zero::Ref<Zero::SubTexture2D> m_texture_bush;
 

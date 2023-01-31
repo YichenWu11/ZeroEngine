@@ -28,6 +28,10 @@ namespace Zero {
         GET_RENDER_CONTEXT().onResize(width, height);
     }
 
+    void Renderer::resizeFrameBuffer(int width, int height) {
+        GET_RENDER_CONTEXT().resizeFrameBuffer(width, height);
+    }
+
     void Renderer::beginScene(const OrthographicsCamera& camera) {
         // takes all the scene settings(camera, lights, environment etc)
         s_scene_data->view_projection_matrix = (camera.getViewProjectionMatrix()).Transpose();

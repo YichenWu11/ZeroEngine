@@ -16,6 +16,7 @@ namespace Zero {
         static void shutdown();
 
         static void onWindowResize(int, int);
+        static void resizeFrameBuffer(int, int);
 
         static void beginScene(const OrthographicsCamera& camera);
         static void endScene();
@@ -23,8 +24,7 @@ namespace Zero {
         static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Matrix& = DirectX::SimpleMath::Matrix::Identity);
 
         static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
-
-        static ImTextureID getOffScreenID();
+        static ImTextureID      getOffScreenID();
 
     private:
         struct SceneData {

@@ -37,6 +37,11 @@ namespace Zero {
         dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(OrthographicsCameraController::onWindowResize));
     }
 
+    void OrthographicsCameraController::onResize(float width, float height) {
+        m_aspect_ratio = width / height;
+        calculateView();
+    }
+
     void OrthographicsCameraController::calculateView() {
         m_bounds = {-m_aspect_ratio * m_zoom_level, m_aspect_ratio * m_zoom_level, -m_zoom_level, m_zoom_level};
         m_camera.setProjection(m_bounds.left, m_bounds.right, m_bounds.bottom, m_bounds.top);
@@ -50,8 +55,7 @@ namespace Zero {
     }
 
     bool OrthographicsCameraController::onWindowResize(WindowResizeEvent& e) {
-        m_aspect_ratio = (float)e.getWidth() / (float)e.getHeight();
-        calculateView();
+        onResize((float)e.getWidth(), (float)e.getHeight());
         return false;
     }
 
