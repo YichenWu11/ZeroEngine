@@ -23,7 +23,13 @@ namespace Zero {
             {2, 3},
             {256.0f, 128.0f});
 
-        m_camera_controller.setZoomLevel(1.0f);
+        m_active_scene = CreateRef<Scene>();
+
+        m_square = m_active_scene->createEntity("square");
+        m_square.addComponent<SpriteRendererComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
+
+        m_camera = m_active_scene->createEntity("camera");
+        m_camera.addComponent<CameraComponent>(Matrix::CreateOrthographic(32.0f, 18.0f, -1.0f, 1.0f));
     }
 
     void EditorLayer::onDetach() {
@@ -46,59 +52,29 @@ namespace Zero {
         {
             ZE_PROFILE_SCOPE("Renderer2D::Render");
 
-            // Renderer2D::drawCellQuad(
-            //     {0.0f, 1.0f, 0.3f},
-            //     {1.0f, 1.0f},
+            // Renderer2D::beginScene(m_camera_controller.getCamera());
+
+            // update scene
+            m_active_scene->onUpdate(timestep);
+
+            // Renderer2D::drawQuad(
+            //     {0.0f, 0.0f, 0.2f},
+            //     {10.0f, 10.0f},
             //     0.0f,
-            //     m_texture_stair);
+            //     {0.8f, 0.8f, 0.8f, 1.0f},
+            //     GET_TEXTURE_TABLE().getTexIndexFromName("asoul"), 5.0f);
 
-            // Renderer2D::drawCellQuad(
-            //     {0.0f, -1.0f, 0.2f},
-            //     {2.0f, 1.0f},
-            //     0.0f,
-            //     m_texture_bush);
+            // for (float y = -5.0f; y < 5.0f; y += 0.5f) {
+            //     for (float x = -5.0f; x < 5.0f; x += 0.5f) {
+            //         Renderer2D::drawQuad(
+            //             {x, y, 0.1f},
+            //             {0.45f, 0.45f},
+            //             0.0f,
+            //             {(x + 5.0f) / 10.0f, (y + 5.0f) / 10.0f, 1.0f, 0.8f});
+            //     }
+            // }
 
-            Renderer2D::beginScene(m_camera_controller.getCamera());
-
-            Renderer2D::drawQuad(
-                {-0.8f, 0.0f},
-                {1.0f, 1.0f},
-                0.0f,
-                {1.0f, 1.0f, 1.0f, 1.0f},
-                GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-
-            Renderer2D::drawQuad(
-                position,
-                {1.0f, 1.0f},
-                0.0f,
-                {1.0f, 1.0f, 1.0f, 1.0f},
-                GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-
-            Renderer2D::drawQuad(
-                {0.8f, 0.0f},
-                {1.0f, 1.0f},
-                0.0f,
-                {1.0f, 1.0f, 1.0f, 1.0f},
-                GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
-
-            Renderer2D::drawQuad(
-                {0.0f, 0.0f, 0.2f},
-                {10.0f, 10.0f},
-                0.0f,
-                {0.8f, 0.8f, 0.8f, 1.0f},
-                GET_TEXTURE_TABLE().getTexIndexFromName("asoul"), 5.0f);
-
-            for (float y = -5.0f; y < 5.0f; y += 0.5f) {
-                for (float x = -5.0f; x < 5.0f; x += 0.5f) {
-                    Renderer2D::drawQuad(
-                        {x, y, 0.1f},
-                        {0.45f, 0.45f},
-                        0.0f,
-                        {(x + 5.0f) / 10.0f, (y + 5.0f) / 10.0f, 1.0f, 0.8f});
-                }
-            }
-
-            Renderer2D::endScene();
+            // Renderer2D::endScene();
         }
     }
 
@@ -160,12 +136,19 @@ namespace Zero {
                 ImGui::EndMenuBar();
             }
 
+            // ************************************************************************************************
+
             ImGui::Begin("ASOUL");
             ImGui::Image(
                 ImTextureID(tex_alloc->GetGpuHandle(2).ptr),
                 ImVec2(190, 190));
             ImGui::SameLine();
-            ImGui::DragFloat2("POSITION", reinterpret_cast<float*>(&position), 0.05f);
+            if (m_square) {
+                ImGui::DragFloat3("POSITION",
+                                  reinterpret_cast<float*>(&(m_square.getComponent<TransformComponent>().translation)),
+                                  0.05f);
+                ImGui::ColorEdit4("COLOR", reinterpret_cast<float*>(&(m_square.getComponent<SpriteRendererComponent>().color)));
+            }
             ImGui::End();
 
             // Viewer
@@ -191,6 +174,8 @@ namespace Zero {
             ImGui::ShowDemoWindow();
 
             ZE_PROFILE_RENDER();
+
+            // ************************************************************************************************
 
             ImGui::End();
         }

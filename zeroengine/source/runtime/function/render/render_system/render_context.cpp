@@ -167,6 +167,10 @@ namespace Zero {
 
         m_frameResourceMngr->CleanUp();
 
+        for (int i = 0; i < s_frame_count; ++i) {
+            m_frameBuffers[i]->onDestroy();
+        }
+
         if (!m_rtvCpuDH.IsNull())
             DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Free(std::move(m_rtvCpuDH));
         if (!m_dsvCpuDH.IsNull())
@@ -186,6 +190,7 @@ namespace Zero {
         LOG_INFO("begin to register render pass: ");
 
         m_render_passes.push_back(Zero::CreateScope<MainCameraPass2D>());
+        m_render_passes.push_back(Zero::CreateScope<UIPass>());
 
         for (auto&& render_pass : m_render_passes)
             render_pass->preLoadResource();
@@ -198,12 +203,15 @@ namespace Zero {
         m_backBufferIndex = (m_backBufferIndex + 1) % s_frame_count;
     }
 
-    void RenderContext::beginRender() {
+    void RenderContext::onRender() {
         m_frameResourceMngr->BeginFrame();
-    }
 
-    void RenderContext::endRender() {
-        drawRenderPasses(*(m_frameResourceMngr->GetCurrentFrameResource()), m_backBufferIndex);
+        {
+            auto cmdListHandle  = m_frameResourceMngr->GetCurrentFrameResource()->Command();
+            m_currframe_cmdlist = GCmdList(cmdListHandle.CmdList());
+            drawRenderPasses(*(m_frameResourceMngr->GetCurrentFrameResource()), m_backBufferIndex);
+        }
+
         m_frameResourceMngr->Execute(m_commandQueue.Get());
 
         ImGuiIO& io = ImGui::GetIO();
@@ -217,16 +225,20 @@ namespace Zero {
 
         ThrowIfFailed(m_swapChain->Present((m_is_vsync_enable) ? 1 : 0, 0));
         m_frameResourceMngr->EndFrame(m_commandQueue.Get());
+
+        // clear draw_list
+        m_draw_2d_list.clear();
     }
 
     // draw call
     void RenderContext::drawRenderPasses(FrameResource& frameRes, uint frameIndex) {
         for (auto&& render_pass : m_render_passes) {
             if (RendererAPI::isMultiIndirectDrawEnable()) {
-                render_pass->drawPassIndirect(frameRes, frameIndex, RendererAPI::isEditorMode());
+                render_pass->drawPass(frameRes, frameIndex, RendererAPI::isEditorMode());
             }
-            else
-                render_pass->drawPass(frameRes, frameIndex);
+            else {
+                render_pass->drawPass(frameRes, frameIndex, RendererAPI::isEditorMode());
+            }
         }
     }
 
@@ -298,16 +310,6 @@ namespace Zero {
             m_device->CreateDepthStencilView(m_depthTargets[n]->GetResource(), nullptr, dsvHandle);
             rtvHandle.Offset(1, m_rtvCpuDH.GetDescriptorSize());
             dsvHandle.Offset(1, m_dsvCpuDH.GetDescriptorSize());
-        }
-
-        for (int i = 0; i < s_frame_count; ++i) {
-            FrameBufferConfiguration fb_config{
-                static_cast<uint32_t>(width),
-                static_cast<uint32_t>(height),
-                m_rtvCpuDH.GetCpuHandle(i + 3),
-                m_csuGpuDH.GetCpuHandle(i + 1),
-                s_colorFormat};
-            m_frameBuffers[i]->onResize(fb_config);
         }
 
         ThrowIfFailed(commandList->Close());

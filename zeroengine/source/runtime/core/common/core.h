@@ -10,7 +10,7 @@
 
 #define BIT(x) (1 << x)
 
-#define ZE_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+#define ZE_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 // https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
 #define ZERO_XSTR(s) ZERO_STR(s)

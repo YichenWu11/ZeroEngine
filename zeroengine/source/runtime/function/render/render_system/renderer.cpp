@@ -57,8 +57,7 @@ namespace Zero {
     }
 
     void Renderer::endScene() {
-        GET_RENDER_CONTEXT().beginRender();
-        GET_RENDER_CONTEXT().endRender();
+        GET_RENDER_CONTEXT().onRender();
     }
 
     void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Matrix& transfrom) {

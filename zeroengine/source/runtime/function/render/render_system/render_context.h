@@ -9,6 +9,7 @@
 
 #include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
+#include "runtime/function/render/render_system/pass/ui_pass.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -27,9 +28,11 @@ namespace Zero {
 
     class RenderContext {
         friend class MainCameraPass2D;
+        friend class UIPass;
 
     public:
-        static RenderContext& getInstance() {
+        static RenderContext&
+        getInstance() {
             static RenderContext instance;
             return instance;
         }
@@ -40,8 +43,7 @@ namespace Zero {
         void setVsync(bool vsync) { m_is_vsync_enable = vsync; }
         void registerRenderPass();
 
-        void beginRender();
-        void endRender();
+        void onRender();
 
         void submit(
             const Zero::Ref<Chen::CDX12::Mesh>& mesh,
@@ -111,6 +113,8 @@ namespace Zero {
         Chen::CDX12::DescriptorHeapAllocation m_csuGpuDH;
 
         Zero::Scope<Chen::CDX12::FrameResourceMngr> m_frameResourceMngr;
+
+        Chen::CDX12::GCmdList m_currframe_cmdlist;
 
         Chen::CDX12::ResourceStateTracker m_stateTracker;
 

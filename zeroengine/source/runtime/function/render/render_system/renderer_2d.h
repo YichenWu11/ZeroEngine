@@ -1,5 +1,6 @@
 #pragma once
 
+#include "runtime/function/render/camera_system/camera.h"
 #include "runtime/function/render/camera_system/orthographics_camera.h"
 #include "runtime/function/render/render_system/subtexture_2d.h"
 
@@ -9,6 +10,7 @@ namespace Zero {
         static void init();
         static void shutdown();
 
+        static void beginScene(const Camera& camera, const DirectX::SimpleMath::Matrix& cam_transform);
         static void beginScene(const OrthographicsCamera& camera);
         static void endScene();
 
@@ -27,6 +29,12 @@ namespace Zero {
             const DirectX::SimpleMath::Color&   color         = {1.0f, 1.0f, 1.0f, 1.0f},
             uint32_t                            tex_index     = 0,
             float                               tiling_factor = 1.0f);
+
+        static void drawQuad(
+            const DirectX::SimpleMath::Matrix& transform,
+            const DirectX::SimpleMath::Color&  color         = {1.0f, 1.0f, 1.0f, 1.0f},
+            uint32_t                           tex_index     = 0,
+            float                              tiling_factor = 1.0f);
 
         static void drawCellQuad(
             const DirectX::SimpleMath::Vector2& position,

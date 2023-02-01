@@ -5,28 +5,31 @@
 using namespace DirectX::SimpleMath;
 
 namespace Zero {
-    class EditorLayer : public Zero::Layer {
+    class EditorLayer : public Layer {
     public:
         EditorLayer();
         ~EditorLayer() = default;
 
         void onAttach() override;
         void onDetach() override;
-        void onUpdate(Zero::TimeStep timestep) override;
+        void onUpdate(TimeStep timestep) override;
         void onImGuiRender() override;
-        void onEvent(Zero::Event& event) override;
+        void onEvent(Event& event) override;
 
     private:
-        Zero::OrthographicsCameraController m_camera_controller;
+        OrthographicsCameraController m_camera_controller;
 
         Vector2 m_viewport_size;
         bool    m_viewport_focused = false;
         bool    m_viewport_hovered = false;
         bool    m_dockspace_enable = true;
 
-        Zero::Ref<Zero::SubTexture2D> m_texture_stair;
-        Zero::Ref<Zero::SubTexture2D> m_texture_bush;
+        Ref<SubTexture2D> m_texture_stair;
+        Ref<SubTexture2D> m_texture_bush;
 
-        Vector2 position{0.0f, 0.0f};
+        Ref<Scene> m_active_scene;
+
+        Entity m_square;
+        Entity m_camera;
     };
 } // namespace Zero

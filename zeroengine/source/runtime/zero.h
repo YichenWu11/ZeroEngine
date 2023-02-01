@@ -19,3 +19,7 @@
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/render_system/subtexture_2d.h"
+
+#include "runtime/function/scene/components.h"
+#include "runtime/function/scene/entity.h"
+#include "runtime/function/scene/scene.h"

@@ -3,8 +3,6 @@
 #include <CDX12/Material/Texture.h>
 
 namespace Zero {
-    class FrameBuffer;
-
     struct FrameBufferConfiguration {
         uint32_t                    width;
         uint32_t                    height;
@@ -24,6 +22,7 @@ namespace Zero {
         Chen::CDX12::Texture*    getInnerTexture() { return m_inner_texture.get(); }
 
         void onResize(const FrameBufferConfiguration& config);
+        void onDestroy();
 
     private:
         FrameBufferConfiguration          m_config;

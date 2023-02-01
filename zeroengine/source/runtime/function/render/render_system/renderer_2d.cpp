@@ -23,6 +23,29 @@ namespace Zero {
     void Renderer2D::shutdown() {
     }
 
+    void Renderer2D::beginScene(const Camera& camera, const DirectX::SimpleMath::Matrix& cam_transform) {
+        // takes all the scene settings(camera, lights, environment etc)
+        BasicShader* shader =
+            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+
+        static Matrix view_proj_matrix;
+        view_proj_matrix = (cam_transform.Invert() * camera.getProjection()).Transpose();
+
+        ShaderParamBindTable::getInstance().bindParam(
+            shader,
+            "_ViewProjMatrix",
+            std::span<const uint8_t>{
+                reinterpret_cast<uint8_t const*>(&view_proj_matrix),
+                sizeof(view_proj_matrix)});
+
+        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
+
+        ShaderParamBindTable::getInstance().bindParam(
+            shader,
+            "TextureMap",
+            std::make_pair(tex_alloc, 0));
+    }
+
     void Renderer2D::beginScene(const OrthographicsCamera& camera) {
         // takes all the scene settings(camera, lights, environment etc)
         BasicShader* shader =
@@ -44,18 +67,10 @@ namespace Zero {
             shader,
             "TextureMap",
             std::make_pair(tex_alloc, 0));
-
-        // NOTE: if editor
-        // Zero::Renderer2D::drawQuad(
-        //     {0.0f, 0.0f, -1.0f},
-        //     {10000.0f, 10000.0f},
-        //     0.0f,
-        //     {0.0f, 0.0f, 0.0f, 0.5f});
     }
 
     void Renderer2D::endScene() {
-        GET_RENDER_CONTEXT().beginRender();
-        GET_RENDER_CONTEXT().endRender();
+        GET_RENDER_CONTEXT().onRender();
     }
 
     void Renderer2D::drawQuad(
@@ -79,6 +94,18 @@ namespace Zero {
                            * Matrix::CreateScale(size.x, size.y, 1.0f)
                            * Matrix::CreateTranslation(position);
 
+        static Zero::Ref<Mesh> mesh = GET_MESH_TABLE().getMesh("square");
+
+        ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
+
+        GET_RENDER_CONTEXT().submit(mesh, transform, color, tex_index, tiling_factor);
+    }
+
+    void Renderer2D::drawQuad(
+        const DirectX::SimpleMath::Matrix& transform,
+        const DirectX::SimpleMath::Color&  color,
+        uint32_t                           tex_index,
+        float                              tiling_factor) {
         static Zero::Ref<Mesh> mesh = GET_MESH_TABLE().getMesh("square");
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");

@@ -129,124 +129,15 @@ namespace Zero {
 
         RenderContext& render_context = GET_RENDER_CONTEXT();
 
-        auto     cmdListHandle = frameRes.Command();
-        GCmdList cmdList(cmdListHandle.CmdList());
-
-        render_context.m_stateTracker.RecordState(
-            render_context.m_frameBuffers[frameIndex]->getInnerTexture(),
-            D3D12_RESOURCE_STATE_RENDER_TARGET);
-        render_context.m_stateTracker.RecordState(
-            render_context.m_depthTargets[frameIndex].get(),
-            D3D12_RESOURCE_STATE_DEPTH_WRITE);
-        render_context.m_stateTracker.RecordState(
-            render_context.m_renderTargets[frameIndex].get(),
-            D3D12_RESOURCE_STATE_RENDER_TARGET);
-        render_context.m_stateTracker.UpdateState(cmdList.Get());
-
-        CD3DX12_CPU_DESCRIPTOR_HANDLE off_rtvHandle(
-            render_context.m_rtvCpuDH.GetCpuHandle(3),
-            frameIndex,
-            render_context.m_rtvCpuDH.GetDescriptorSize());
-
-        CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(
-            render_context.m_dsvCpuDH.GetCpuHandle(0),
-            frameIndex,
-            render_context.m_dsvCpuDH.GetDescriptorSize());
-
-        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(
-            render_context.m_rtvCpuDH.GetCpuHandle(0),
-            frameIndex,
-            render_context.m_rtvCpuDH.GetDescriptorSize());
-
-        frameRes.SetRenderTarget(
-            render_context.m_frameBuffers[frameIndex]->getInnerTexture(),
-            &off_rtvHandle,
-            &dsvHandle);
-        frameRes.ClearRTV(off_rtvHandle);
-        frameRes.ClearDSV(dsvHandle);
-
-        cmdList->SetDescriptorHeaps(
-            1,
-            get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
-
-        BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
-
-        auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
-
-        // draw call
-        for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
-            // bind object-varying constants
-            ShaderParamBindTable::getInstance()
-                .bindParam(
-                    shader,
-                    "_ObjectConstant",
-                    std::span<const uint8_t>{
-                        reinterpret_cast<uint8_t const*>(&obj_constant),
-                        sizeof(obj_constant)});
-
-            render_context.bindProperties.clear();
-
-            // bind the constants which does not differ among different objects
-            for (auto& prop : prop_table) {
-                auto name = prop.first;
-                std::visit(overloaded{
-                               [&](std::span<const uint8_t> data) {
-                    auto buffer = frameRes.AllocateConstBuffer(data);
-                    render_context.bindProperties.emplace_back(name, buffer);
-                               },
-                               [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
-                    render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
-                }},
-                    prop.second);
-            }
-
-            frameRes.DrawMesh(
-                shader,
-                render_context.psoManager.get(),
-                mesh.get(),
-                render_context.s_colorFormat,
-                render_context.s_depthFormat,
-                render_context.bindProperties);
-        }
-
-        // ui_pass
-        frameRes.SetRenderTarget(
-            render_context.m_renderTargets[frameIndex].get(),
-            &rtvHandle,
-            &dsvHandle);
-        frameRes.ClearRTV(rtvHandle);
-        frameRes.ClearDSV(dsvHandle);
-
-        ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
-
-        render_context.m_stateTracker.RestoreState(cmdList.Get());
-
-        // clear mesh
-        render_context.m_draw_2d_list.clear();
-    }
-
-    // NOTE: multi-indirect draw
-    void MainCameraPass2D::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
-        preZSortPass();
-
-        RenderContext& render_context = GET_RENDER_CONTEXT();
-
         if (offscreen) {
-            auto     cmdListHandle = frameRes.Command();
-            GCmdList cmdList(cmdListHandle.CmdList());
-
             render_context.m_stateTracker.RecordState(
                 render_context.m_frameBuffers[frameIndex]->getInnerTexture(),
                 D3D12_RESOURCE_STATE_RENDER_TARGET);
             render_context.m_stateTracker.RecordState(
                 render_context.m_depthTargets[frameIndex].get(),
                 D3D12_RESOURCE_STATE_DEPTH_WRITE);
-            render_context.m_stateTracker.RecordState(
-                render_context.m_renderTargets[frameIndex].get(),
-                D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-            render_context.m_stateTracker.UpdateState(cmdList.Get());
+            render_context.m_stateTracker.UpdateState(render_context.m_currframe_cmdlist.Get());
 
             CD3DX12_CPU_DESCRIPTOR_HANDLE off_rtvHandle(
                 render_context.m_rtvCpuDH.GetCpuHandle(3),
@@ -258,11 +149,6 @@ namespace Zero {
                 frameIndex,
                 render_context.m_dsvCpuDH.GetDescriptorSize());
 
-            CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(
-                render_context.m_rtvCpuDH.GetCpuHandle(0),
-                frameIndex,
-                render_context.m_rtvCpuDH.GetDescriptorSize());
-
             frameRes.SetRenderTarget(
                 render_context.m_frameBuffers[frameIndex]->getInnerTexture(),
                 &off_rtvHandle,
@@ -270,7 +156,7 @@ namespace Zero {
             frameRes.ClearRTV(off_rtvHandle);
             frameRes.ClearDSV(dsvHandle);
 
-            cmdList->SetDescriptorHeaps(
+            render_context.m_currframe_cmdlist->SetDescriptorHeaps(
                 1,
                 get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
 
@@ -279,98 +165,51 @@ namespace Zero {
 
             auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
 
-            render_context.bindProperties.clear();
-
-            // bind the constants which does not differ among different objects
-            for (auto& prop : prop_table) {
-                auto name = prop.first;
-                std::visit(overloaded{
-                               [&](std::span<const uint8_t> data) {
-                    auto buffer = frameRes.AllocateConstBuffer(data);
-                    render_context.bindProperties.emplace_back(name, buffer);
-                               },
-                               [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
-                    render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
-                }},
-                    prop.second);
-            }
-
-            // delete last frame uploadbuffer
-            auto last_frame_index = (frameIndex + render_context.s_frame_count - 1) % render_context.s_frame_count;
-            if (m_indirectDrawBuffer[last_frame_index] != nullptr) {
-                delete m_indirectDrawBuffer[last_frame_index];
-                m_indirectDrawBuffer[last_frame_index] = nullptr;
-            }
-
-            auto mesh_count = render_context.m_draw_2d_list.size();
-
-            m_indirectDrawBuffer[frameIndex] = new UploadBuffer(
-                render_context.getGraphicsDevice(),
-                mesh_count * sizeof(IndirectDrawCommand));
-
-            m_indirectDrawBuffer[frameIndex]->DelayDispose(&frameRes);
-
-            int  cnt                    = 0;
-            auto indirectDrawBufferData = std::vector<IndirectDrawCommand>(mesh_count);
-            auto obj_constant_array     = std::vector<ObjectConstant2D>(mesh_count);
-
             // draw call
             for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
-                obj_constant_array[cnt].transform     = obj_constant.transform;
-                obj_constant_array[cnt].modulate      = obj_constant.modulate;
-                obj_constant_array[cnt].tex_index     = obj_constant.tex_index;
-                obj_constant_array[cnt].tiling_factor = obj_constant.tiling_factor;
+                // bind object-varying constants
+                ShaderParamBindTable::getInstance()
+                    .bindParam(
+                        shader,
+                        "_ObjectConstant",
+                        std::span<const uint8_t>{
+                            reinterpret_cast<uint8_t const*>(&obj_constant),
+                            sizeof(obj_constant)});
 
-                auto obj_cbuffer = frameRes.AllocateConstBuffer(
-                    std::span<const uint8_t>{
-                        reinterpret_cast<uint8_t const*>(&obj_constant_array[cnt]),
-                        sizeof(obj_constant_array[cnt])});
+                render_context.bindProperties.clear();
 
-                // TODO: `cnt + 1`
-                indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh.get(), obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
+                // bind the constants which does not differ among different objects
+                for (auto& prop : prop_table) {
+                    auto name = prop.first;
+                    std::visit(overloaded{
+                                   [&](std::span<const uint8_t> data) {
+                        auto buffer = frameRes.AllocateConstBuffer(data);
+                        render_context.bindProperties.emplace_back(name, buffer);
+                                   },
+                                   [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
+                        render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
+                    }},
+                        prop.second);
+                }
 
-                m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),
-                                                           {reinterpret_cast<vbyte const*>(&(indirectDrawBufferData[cnt])),
-                                                            sizeof(IndirectDrawCommand)});
-
-                cnt++;
+                frameRes.DrawMesh(
+                    shader,
+                    render_context.psoManager.get(),
+                    mesh.get(),
+                    render_context.s_colorFormat,
+                    render_context.s_depthFormat,
+                    render_context.bindProperties);
             }
 
-            // indirect draw call
-            frameRes.DrawMeshIndirect(
-                shader,
-                render_context.psoManager.get(),
-                (std::get<0>(render_context.m_draw_2d_list[0]))->Layout(),
-                render_context.s_colorFormat,
-                render_context.s_depthFormat,
-                render_context.bindProperties,
-                m_indirectDrawBuffer[frameIndex],
-                mesh_count,
-                render_context.m_command_signature.Get());
-
-            // ui_pass
-            frameRes.SetRenderTarget(
-                render_context.m_renderTargets[frameIndex].get(),
-                &rtvHandle,
-                &dsvHandle);
-            frameRes.ClearRTV(rtvHandle);
-            frameRes.ClearDSV(dsvHandle);
-
-            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
-
-            render_context.m_stateTracker.RestoreState(cmdList.Get());
+            render_context.m_stateTracker.RestoreState(render_context.m_currframe_cmdlist.Get());
         }
-        // NOTE: **************************************************************************************************
         else {
-            auto     cmdListHandle = frameRes.Command();
-            GCmdList cmdList(cmdListHandle.CmdList());
-
             render_context.m_stateTracker.RecordState(
                 render_context.m_renderTargets[frameIndex].get(),
                 D3D12_RESOURCE_STATE_RENDER_TARGET);
             render_context.m_stateTracker.RecordState(
                 render_context.m_depthTargets[frameIndex].get(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
-            render_context.m_stateTracker.UpdateState(cmdList.Get());
+            render_context.m_stateTracker.UpdateState(render_context.m_currframe_cmdlist.Get());
 
             CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(
                 render_context.m_dsvCpuDH.GetCpuHandle(0),
@@ -388,7 +227,204 @@ namespace Zero {
             frameRes.ClearRTV(rtvHandle);
             frameRes.ClearDSV(dsvHandle);
 
-            cmdList->SetDescriptorHeaps(
+            render_context.m_currframe_cmdlist->SetDescriptorHeaps(
+                1,
+                get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
+
+            BasicShader* shader =
+                static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+
+            auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
+
+            // draw call
+            for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
+                // bind object-varying constants
+                ShaderParamBindTable::getInstance()
+                    .bindParam(
+                        shader,
+                        "_ObjectConstant",
+                        std::span<const uint8_t>{
+                            reinterpret_cast<uint8_t const*>(&obj_constant),
+                            sizeof(obj_constant)});
+
+                render_context.bindProperties.clear();
+
+                // bind the constants which does not differ among different objects
+                for (auto& prop : prop_table) {
+                    auto name = prop.first;
+                    std::visit(overloaded{
+                                   [&](std::span<const uint8_t> data) {
+                        auto buffer = frameRes.AllocateConstBuffer(data);
+                        render_context.bindProperties.emplace_back(name, buffer);
+                                   },
+                                   [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
+                        render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
+                    }},
+                        prop.second);
+                }
+
+                frameRes.DrawMesh(
+                    shader,
+                    render_context.psoManager.get(),
+                    mesh.get(),
+                    render_context.s_colorFormat,
+                    render_context.s_depthFormat,
+                    render_context.bindProperties);
+            }
+
+            render_context.m_currframe_cmdlist->SetDescriptorHeaps(
+                1,
+                get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
+
+            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), render_context.m_currframe_cmdlist.Get());
+
+            render_context.m_stateTracker.RestoreState(render_context.m_currframe_cmdlist.Get());
+        }
+    }
+
+    // NOTE: multi-indirect draw
+    void MainCameraPass2D::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+        preZSortPass();
+
+        RenderContext& render_context = GET_RENDER_CONTEXT();
+
+        // NOTE: offscreen rendering
+        if (offscreen) {
+            render_context.m_stateTracker.RecordState(
+                render_context.m_frameBuffers[frameIndex]->getInnerTexture(),
+                D3D12_RESOURCE_STATE_RENDER_TARGET);
+            render_context.m_stateTracker.RecordState(
+                render_context.m_depthTargets[frameIndex].get(),
+                D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+            render_context.m_stateTracker.UpdateState(render_context.m_currframe_cmdlist.Get());
+
+            CD3DX12_CPU_DESCRIPTOR_HANDLE off_rtvHandle(
+                render_context.m_rtvCpuDH.GetCpuHandle(3),
+                frameIndex,
+                render_context.m_rtvCpuDH.GetDescriptorSize());
+
+            CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(
+                render_context.m_dsvCpuDH.GetCpuHandle(0),
+                frameIndex,
+                render_context.m_dsvCpuDH.GetDescriptorSize());
+
+            frameRes.SetRenderTarget(
+                render_context.m_frameBuffers[frameIndex]->getInnerTexture(),
+                &off_rtvHandle,
+                &dsvHandle);
+            frameRes.ClearRTV(off_rtvHandle);
+            frameRes.ClearDSV(dsvHandle);
+
+            render_context.m_currframe_cmdlist->SetDescriptorHeaps(
+                1,
+                get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
+
+            BasicShader* shader =
+                static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+
+            auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
+
+            render_context.bindProperties.clear();
+
+            // bind the constants which does not differ among different objects
+            for (auto& prop : prop_table) {
+                auto name = prop.first;
+                std::visit(overloaded{
+                               [&](std::span<const uint8_t> data) {
+                    auto buffer = frameRes.AllocateConstBuffer(data);
+                    render_context.bindProperties.emplace_back(name, buffer);
+                               },
+                               [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
+                    render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
+                }},
+                    prop.second);
+            }
+
+            // delete last frame uploadbuffer
+            auto last_frame_index = (frameIndex + render_context.s_frame_count - 1) % render_context.s_frame_count;
+            if (m_indirectDrawBuffer[last_frame_index] != nullptr) {
+                delete m_indirectDrawBuffer[last_frame_index];
+                m_indirectDrawBuffer[last_frame_index] = nullptr;
+            }
+
+            if (!render_context.m_draw_2d_list.empty()) {
+                auto mesh_count = render_context.m_draw_2d_list.size();
+
+                m_indirectDrawBuffer[frameIndex] = new UploadBuffer(
+                    render_context.getGraphicsDevice(),
+                    mesh_count * sizeof(IndirectDrawCommand));
+
+                m_indirectDrawBuffer[frameIndex]->DelayDispose(&frameRes);
+
+                int  cnt                    = 0;
+                auto indirectDrawBufferData = std::vector<IndirectDrawCommand>(mesh_count);
+                auto obj_constant_array     = std::vector<ObjectConstant2D>(mesh_count);
+
+                // draw call
+                for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
+                    obj_constant_array[cnt].transform     = obj_constant.transform;
+                    obj_constant_array[cnt].modulate      = obj_constant.modulate;
+                    obj_constant_array[cnt].tex_index     = obj_constant.tex_index;
+                    obj_constant_array[cnt].tiling_factor = obj_constant.tiling_factor;
+
+                    auto obj_cbuffer = frameRes.AllocateConstBuffer(
+                        std::span<const uint8_t>{
+                            reinterpret_cast<uint8_t const*>(&obj_constant_array[cnt]),
+                            sizeof(obj_constant_array[cnt])});
+
+                    // TODO: `cnt + 1`
+                    indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh.get(), obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
+
+                    m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),
+                                                               {reinterpret_cast<vbyte const*>(&(indirectDrawBufferData[cnt])),
+                                                                sizeof(IndirectDrawCommand)});
+
+                    cnt++;
+                }
+
+                // indirect draw call
+                frameRes.DrawMeshIndirect(
+                    shader,
+                    render_context.psoManager.get(),
+                    (std::get<0>(render_context.m_draw_2d_list[0]))->Layout(),
+                    render_context.s_colorFormat,
+                    render_context.s_depthFormat,
+                    render_context.bindProperties,
+                    m_indirectDrawBuffer[frameIndex],
+                    mesh_count,
+                    render_context.m_command_signature.Get());
+            }
+
+            render_context.m_stateTracker.RestoreState(render_context.m_currframe_cmdlist.Get());
+        }
+        // NOTE: **************************************************************************************************
+        // NOTE: render to screen directly
+        else {
+            render_context.m_stateTracker.RecordState(
+                render_context.m_renderTargets[frameIndex].get(),
+                D3D12_RESOURCE_STATE_RENDER_TARGET);
+            render_context.m_stateTracker.RecordState(
+                render_context.m_depthTargets[frameIndex].get(), D3D12_RESOURCE_STATE_DEPTH_WRITE);
+            render_context.m_stateTracker.UpdateState(render_context.m_currframe_cmdlist.Get());
+
+            CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(
+                render_context.m_dsvCpuDH.GetCpuHandle(0),
+                frameIndex,
+                render_context.m_dsvCpuDH.GetDescriptorSize());
+            CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(
+                render_context.m_rtvCpuDH.GetCpuHandle(0),
+                frameIndex,
+                render_context.m_rtvCpuDH.GetDescriptorSize());
+
+            frameRes.SetRenderTarget(
+                render_context.m_renderTargets[frameIndex].get(),
+                &rtvHandle,
+                &dsvHandle);
+            frameRes.ClearRTV(rtvHandle);
+            frameRes.ClearDSV(dsvHandle);
+
+            render_context.m_currframe_cmdlist->SetDescriptorHeaps(
                 1,
                 get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
 
@@ -465,16 +501,13 @@ namespace Zero {
                 mesh_count,
                 render_context.m_command_signature.Get());
 
-            cmdList->SetDescriptorHeaps(
+            render_context.m_currframe_cmdlist->SetDescriptorHeaps(
                 1,
                 get_rvalue_ptr(GET_TEXTURE_TABLE().getTexAllocation()->GetDescriptorHeap()));
 
-            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
+            ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), render_context.m_currframe_cmdlist.Get());
 
-            render_context.m_stateTracker.RestoreState(cmdList.Get());
+            render_context.m_stateTracker.RestoreState(render_context.m_currframe_cmdlist.Get());
         }
-
-        // clear mesh
-        render_context.m_draw_2d_list.clear();
     }
 } // namespace Zero

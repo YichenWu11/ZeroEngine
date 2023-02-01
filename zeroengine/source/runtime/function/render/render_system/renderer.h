@@ -1,6 +1,5 @@
 #pragma once
 
-#include <entt/entt.hpp>
 #include <imgui.h>
 
 #include "runtime/function/render/camera_system/orthographics_camera.h"

@@ -1,3 +1,5 @@
+#include <DirectXHelpers.h>
+
 #include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 
@@ -10,6 +12,10 @@ namespace Zero {
     }
 
     FrameBuffer::~FrameBuffer() {
+    }
+
+    void FrameBuffer::onDestroy() {
+        m_inner_texture.reset();
     }
 
     void FrameBuffer::onResize(const FrameBufferConfiguration& config) {
@@ -36,5 +42,7 @@ namespace Zero {
             m_inner_texture->GetResource(),
             &desc,
             config.srv_cpu_handle);
+
+        DirectX::SetDebugObjectName(m_inner_texture->GetResource(), "framebuffer_tex");
     }
 } // namespace Zero
