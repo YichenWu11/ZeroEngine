@@ -1,6 +1,6 @@
 #pragma once
 
-#include "runtime/function/render/camera_system//camera.h"
+#include "runtime/function/scene/scene_camera.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -44,8 +44,9 @@ namespace Zero {
     };
 
     struct CameraComponent {
-        Camera camera;
-        bool   is_current = true;
+        SceneCamera camera;
+        bool        is_current           = true;
+        bool        is_fixed_aspectRatio = false;
 
         CameraComponent()                       = default;
         CameraComponent(const CameraComponent&) = default;

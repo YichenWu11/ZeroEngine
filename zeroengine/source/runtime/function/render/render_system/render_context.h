@@ -59,9 +59,10 @@ namespace Zero {
             m_draw_2d_list.emplace_back(std::make_tuple(mesh, obj_constant));
         }
 
-        void flush() { flushCommandQueue(); }
-        void onResize(uint32_t width, uint32_t height);
-        void resizeFrameBuffer(int width, int height);
+        void                     flush() { flushCommandQueue(); }
+        void                     onResize(uint32_t width, uint32_t height);
+        void                     resizeFrameBuffer(int width, int height);
+        FrameBufferConfiguration getFrameBufferConfig() { return m_frameBuffers[0]->getConfiguration(); }
 
         ID3D12Device*       getGraphicsDevice() { return m_device.Get(); }
         ID3D12CommandQueue* getCommandQueue() { return m_commandQueue.Get(); }
@@ -130,6 +131,7 @@ namespace Zero {
         uint32_t numGpuCSU_static  = 648;
         uint32_t numGpuCSU_dynamic = 648;
 
+        // draw_list
         std::vector<std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D>> m_draw_2d_list;
 
         // RenderPass

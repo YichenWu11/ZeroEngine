@@ -5,7 +5,6 @@
 
 namespace Zero {
     Scene::Scene() {
-        entt::entity entity = m_registry.create();
     }
 
     Scene::~Scene() {
@@ -21,12 +20,12 @@ namespace Zero {
     }
 
     void Scene::onUpdate(TimeStep timestep) {
-        Camera* curr_camera = nullptr;
-        Matrix  camera_transform{Matrix::Identity};
+        SceneCamera* curr_camera = nullptr;
+        Matrix       camera_transform{Matrix::Identity};
         {
-            auto group = m_registry.view<TransformComponent, CameraComponent>();
-            for (auto entity : group) {
-                auto [transform, camera] = group.get<TransformComponent, CameraComponent>(entity);
+            auto view = m_registry.view<TransformComponent, CameraComponent>();
+            for (auto entity : view) {
+                auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
 
                 if (camera.is_current) {
                     curr_camera      = &camera.camera;
@@ -52,6 +51,20 @@ namespace Zero {
         }
 
         Renderer2D::endScene();
+    }
+
+    void Scene::onViewportResize(uint32_t width, uint32_t height) {
+        m_viewport_width  = width;
+        m_viewport_height = height;
+
+        // resize non-fixedAspectRatio cameras
+        auto view = m_registry.view<CameraComponent>();
+        for (auto& entity : view) {
+            auto& camera_component = view.get<CameraComponent>(entity);
+            if (!camera_component.is_fixed_aspectRatio) {
+                camera_component.camera.setViewportSize(width, height);
+            }
+        }
     }
 
 } // namespace Zero

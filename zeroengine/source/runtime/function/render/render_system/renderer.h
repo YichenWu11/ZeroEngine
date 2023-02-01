@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include "runtime/function/render/camera_system/orthographics_camera.h"
+#include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/render_command.h"
 
 namespace Chen::CDX12 {
@@ -23,13 +24,13 @@ namespace Zero {
 
         static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Matrix& = DirectX::SimpleMath::Matrix::Identity);
 
-        static RendererAPI::API getAPI() { return RendererAPI::getAPI(); }
-        static ImTextureID      getOffScreenID();
+        static RendererAPI::API         getAPI() { return RendererAPI::getAPI(); }
+        static ImTextureID              getOffScreenID();
+        static FrameBufferConfiguration getFrameBufferConfig();
 
     private:
         struct SceneData {
             DirectX::SimpleMath::Matrix view_projection_matrix;
-            DirectX::SimpleMath::Matrix model_matrix;
         };
 
     private:

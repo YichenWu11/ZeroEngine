@@ -36,8 +36,6 @@ namespace Zero {
         // takes all the scene settings(camera, lights, environment etc)
         s_scene_data->view_projection_matrix = (camera.getViewProjectionMatrix()).Transpose();
 
-        s_scene_data->model_matrix = (Matrix::CreateTranslation(0.0f, 0.0f, 0.0f)).Transpose();
-
         BasicShader* shader =
             static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
 
@@ -65,5 +63,9 @@ namespace Zero {
 
     ImTextureID Renderer::getOffScreenID() {
         return GET_RENDER_CONTEXT().getOffScreenID();
+    }
+
+    FrameBufferConfiguration Renderer::getFrameBufferConfig() {
+        return GET_RENDER_CONTEXT().getFrameBufferConfig();
     }
 } // namespace Zero

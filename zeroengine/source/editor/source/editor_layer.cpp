@@ -29,13 +29,26 @@ namespace Zero {
         m_square.addComponent<SpriteRendererComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
 
         m_camera = m_active_scene->createEntity("camera");
-        m_camera.addComponent<CameraComponent>(Matrix::CreateOrthographic(32.0f, 18.0f, -1.0f, 1.0f));
+        m_camera.addComponent<CameraComponent>();
     }
 
     void EditorLayer::onDetach() {
     }
 
     void EditorLayer::onUpdate(TimeStep timestep) {
+        // resize
+        {
+            auto config = Renderer::getFrameBufferConfig();
+            if (m_viewport_size.x > 0.0f
+                && m_viewport_size.y > 0.0f
+                && ((config.width != m_viewport_size.x) || (config.height != m_viewport_size.y))) {
+                Renderer::resizeFrameBuffer((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
+                m_camera_controller.onResize(m_viewport_size.x, m_viewport_size.y);
+
+                m_active_scene->onViewportResize((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
+            }
+        }
+
         // update
         {
             ZE_PROFILE_SCOPE("CameraController::onUpdate");
@@ -44,10 +57,10 @@ namespace Zero {
         }
 
         // render
-        // {
-        //     RenderCommand::setClearColor(clear_color);
-        //     RenderCommand::clear();
-        // }
+        {
+            // RenderCommand::setClearColor({0.2f, 0.2f, 0.2f, 1.0f});
+            RenderCommand::clear();
+        }
 
         {
             ZE_PROFILE_SCOPE("Renderer2D::Render");
@@ -148,6 +161,11 @@ namespace Zero {
                                   reinterpret_cast<float*>(&(m_square.getComponent<TransformComponent>().translation)),
                                   0.05f);
                 ImGui::ColorEdit4("COLOR", reinterpret_cast<float*>(&(m_square.getComponent<SpriteRendererComponent>().color)));
+
+                auto& camera     = m_camera.getComponent<CameraComponent>().camera;
+                float ortho_size = camera.getOrthographicSize();
+                if (ImGui::DragFloat("OrthoCameraSize", &ortho_size, 0.05f, 0.1f, 50.0f))
+                    camera.setOrthographicSize(ortho_size);
             }
             ImGui::End();
 
@@ -160,9 +178,7 @@ namespace Zero {
 
             ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
             if (m_viewport_size != *((Vector2*)&viewport_panel_size)) {
-                Renderer::resizeFrameBuffer((uint32_t)viewport_panel_size.x, (uint32_t)viewport_panel_size.y);
                 m_viewport_size = Vector2{viewport_panel_size.x, viewport_panel_size.y};
-                m_camera_controller.onResize(viewport_panel_size.x, viewport_panel_size.y);
             }
 
             ImGui::Image(

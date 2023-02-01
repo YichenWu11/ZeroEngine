@@ -94,11 +94,7 @@ namespace Zero {
                            * Matrix::CreateScale(size.x, size.y, 1.0f)
                            * Matrix::CreateTranslation(position);
 
-        static Zero::Ref<Mesh> mesh = GET_MESH_TABLE().getMesh("square");
-
-        ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
-
-        GET_RENDER_CONTEXT().submit(mesh, transform, color, tex_index, tiling_factor);
+        drawQuad(transform, color, tex_index, tiling_factor);
     }
 
     void Renderer2D::drawQuad(
