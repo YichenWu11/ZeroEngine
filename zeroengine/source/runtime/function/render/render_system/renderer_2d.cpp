@@ -124,7 +124,7 @@ namespace Zero {
         float                               rotation,
         const Zero::Ref<SubTexture2D>&      sub_texture,
         const DirectX::SimpleMath::Color&   color) {
-        if (!GET_MESH_TABLE().isMeshExsit(sub_texture->constructSubTexName())) {
+        if (!GET_MESH_TABLE().isMeshExist(sub_texture->constructSubTexName())) {
             std::vector<VertexData2D> vertices;
             uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
             auto                      tex_coords = sub_texture->getTexCoords();

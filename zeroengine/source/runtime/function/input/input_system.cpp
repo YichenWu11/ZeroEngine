@@ -20,12 +20,10 @@ namespace Zero {
     }
 
     float InputSystem::getMouseX() {
-        auto pos = getMousePosition();
-        return pos.x;
+        return getMousePosition().x;
     }
 
     float InputSystem::getMouseY() {
-        auto pos = getMousePosition();
-        return pos.y;
+        return getMousePosition().y;
     }
 } // namespace Zero

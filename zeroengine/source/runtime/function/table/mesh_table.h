@@ -31,14 +31,12 @@ namespace Zero {
 
         void removeMesh(const std::string&);
 
-        void disposeTempMeshes();
         void delayDisposeMesh(const std::string&, Chen::CDX12::FrameResource* frameres);
 
         Zero::Ref<Chen::CDX12::Mesh> getMesh(const std::string&);
         std::string                  getMeshName(const Zero::Ref<Chen::CDX12::Mesh>&);
-        std::string                  getMeshName(Chen::CDX12::Mesh*);
 
-        bool isMeshExsit(const std::string& name) { return m_mesh_table.contains(name); }
+        bool isMeshExist(const std::string& name) { return m_mesh_table.contains(name); }
 
     private:
         MeshTable()  = default;

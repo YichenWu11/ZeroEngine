@@ -127,14 +127,4 @@ namespace Zero {
         LOG_WARN("this mesh does not exsit in m_mesh_table!");
         return {};
     }
-
-    std::string MeshTable::getMeshName(Chen::CDX12::Mesh* target) {
-        for (auto& [name, mesh] : m_mesh_table) {
-            if (target == mesh.get())
-                return name;
-        }
-        LOG_WARN("this mesh does not exsit in m_mesh_table!");
-        return {};
-    }
-
 } // namespace Zero

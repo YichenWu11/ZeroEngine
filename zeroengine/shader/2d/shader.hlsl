@@ -52,11 +52,5 @@ float4 PSMain(PSInput input) : SV_TARGET {
         TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap, input.tex_coord * u_TilingFactor) *
         u_ModulateColor;
 
-#ifdef EDITOR_MODE
-    // editor
-    if (ret_color.a == 0.0f)
-      return float4(input.tex_coord, 1.0f, 0.5f);
-#endif
-
     return ret_color;
 }

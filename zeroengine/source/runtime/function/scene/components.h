@@ -1,6 +1,8 @@
 #pragma once
 
+#include "runtime/core/util/time_step.h"
 #include "runtime/function/scene/scene_camera.h"
+#include "runtime/function/scene/scriptable_entity.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -26,7 +28,7 @@ namespace Zero {
             translation(_translation) {}
 
         Matrix getTransform() const {
-            return Matrix::CreateRotationZ(DirectX::XMConvertToRadians(-rotation.z))
+            return Matrix::CreateFromYawPitchRoll(rotation)
                    * Matrix::CreateScale(scale)
                    * Matrix::CreateTranslation(translation);
         }
@@ -52,5 +54,18 @@ namespace Zero {
         CameraComponent(const CameraComponent&) = default;
         CameraComponent(const Matrix& _projection) :
             camera(_projection) {}
+    };
+
+    struct NativeScriptComponent {
+        ScriptableEntity* instance = nullptr;
+
+        ScriptableEntity* (*instantiateScript)()      = nullptr;
+        void (*destroyScript)(NativeScriptComponent*) = nullptr;
+
+        template <typename T>
+        void bind() {
+            instantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+            destroyScript     = [](NativeScriptComponent* nsc) { delete nsc->instance; nsc->instance = nullptr; };
+        }
     };
 } // namespace Zero

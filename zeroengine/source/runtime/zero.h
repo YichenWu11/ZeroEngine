@@ -23,3 +23,4 @@
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
 #include "runtime/function/scene/scene.h"
+#include "runtime/function/scene/scriptable_entity.h"

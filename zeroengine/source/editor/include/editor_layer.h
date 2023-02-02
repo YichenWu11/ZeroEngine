@@ -2,6 +2,8 @@
 
 #include "runtime/zero.h"
 
+#include "panels/scene_hierarchy_panel.h"
+
 using namespace DirectX::SimpleMath;
 
 namespace Zero {
@@ -29,7 +31,6 @@ namespace Zero {
 
         Ref<Scene> m_active_scene;
 
-        Entity m_square;
-        Entity m_camera;
+        SceneHierarchyPanel m_scene_hierarchy_panel;
     };
 } // namespace Zero

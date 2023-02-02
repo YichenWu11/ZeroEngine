@@ -99,7 +99,7 @@ namespace Zero {
         transparencyBlendDesc.BlendOp   = D3D12_BLEND_OP_ADD;
 
         transparencyBlendDesc.SrcBlendAlpha  = D3D12_BLEND_ONE;
-        transparencyBlendDesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+        transparencyBlendDesc.DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
         transparencyBlendDesc.BlendOpAlpha   = D3D12_BLEND_OP_ADD;
 
         transparencyBlendDesc.LogicOp               = D3D12_LOGIC_OP_NOOP;
@@ -373,7 +373,7 @@ namespace Zero {
                             reinterpret_cast<uint8_t const*>(&obj_constant_array[cnt]),
                             sizeof(obj_constant_array[cnt])});
 
-                    // TODO: `cnt + 1`
+                    // NOTE: `cnt + 1`
                     indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh.get(), obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
 
                     m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),

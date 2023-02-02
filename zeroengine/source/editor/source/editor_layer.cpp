@@ -5,10 +5,14 @@ namespace Zero {
         Layer("EditorLayer"), m_camera_controller(1280.0f / 720.0f) {}
 
     void EditorLayer::onAttach() {
+        ZE_PROFILE_FUNCTION();
+
         GET_TEXTURE_TABLE().registerTex(
             std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png");
         GET_TEXTURE_TABLE().registerTex(
             std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/asoul.png");
+        GET_TEXTURE_TABLE().registerTex(
+            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/asoul_moon.png");
         GET_TEXTURE_TABLE().registerTex(
             "SpriteSheet",
             std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/game/texture/sprite_sheet.png");
@@ -25,17 +29,55 @@ namespace Zero {
 
         m_active_scene = CreateRef<Scene>();
 
-        m_square = m_active_scene->createEntity("square");
-        m_square.addComponent<SpriteRendererComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
+        auto&& green_square = m_active_scene->createEntity("green_square");
+        green_square.addComponent<SpriteRendererComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
 
-        m_camera = m_active_scene->createEntity("camera");
-        m_camera.addComponent<CameraComponent>();
+        auto&& red_square = m_active_scene->createEntity("red_square");
+        red_square.addComponent<SpriteRendererComponent>(Color{1.0f, 0.0f, 0.0f, 1.0f});
+
+        auto&& camera_a = m_active_scene->createEntity("cameraA");
+        camera_a.addComponent<CameraComponent>();
+
+        class CameraController : public ScriptableEntity {
+        public:
+            void onCreate() override {
+            }
+
+            void onDestroy() override {
+            }
+
+            void onUpdate(TimeStep timestep) override {
+                auto& transform = getComponent<TransformComponent>().translation;
+                float speed     = 5.0f;
+
+                if (InputSystem::isKeyPressed('A'))
+                    transform.x -= speed * timestep;
+                if (InputSystem::isKeyPressed('D'))
+                    transform.x += speed * timestep;
+                if (InputSystem::isKeyPressed('W'))
+                    transform.y += speed * timestep;
+                if (InputSystem::isKeyPressed('S'))
+                    transform.y -= speed * timestep;
+            }
+        };
+
+        camera_a.addComponent<NativeScriptComponent>().bind<CameraController>();
+
+        auto&& camera_b = m_active_scene->createEntity("cameraB");
+        camera_b.addComponent<CameraComponent>();
+        camera_b.getComponent<CameraComponent>().is_current = false;
+
+        m_scene_hierarchy_panel.setContext(m_active_scene);
     }
 
     void EditorLayer::onDetach() {
+        ZE_PROFILE_FUNCTION();
     }
 
-    void EditorLayer::onUpdate(TimeStep timestep) {
+    void
+    EditorLayer::onUpdate(TimeStep timestep) {
+        ZE_PROFILE_FUNCTION();
+
         // resize
         {
             auto config = Renderer::getFrameBufferConfig();
@@ -76,6 +118,20 @@ namespace Zero {
             //     0.0f,
             //     {0.8f, 0.8f, 0.8f, 1.0f},
             //     GET_TEXTURE_TABLE().getTexIndexFromName("asoul"), 5.0f);
+
+            // Zero::Renderer2D::drawQuad(
+            //     {-0.3f, 0.0f},
+            //     {1.0f, 1.0f},
+            //     0.0f,
+            //     {1.0f, 1.0f, 1.0f, 1.0f},
+            //     GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
+
+            // Zero::Renderer2D::drawQuad(
+            //     {0.3f, 0.0f},
+            //     {1.0f, 1.0f},
+            //     0.0f,
+            //     {1.0f, 1.0f, 1.0f, 1.0f},
+            //     GET_TEXTURE_TABLE().getTexIndexFromName("bella"));
 
             // for (float y = -5.0f; y < 5.0f; y += 0.5f) {
             //     for (float x = -5.0f; x < 5.0f; x += 0.5f) {
@@ -128,11 +184,17 @@ namespace Zero {
                 ImGui::PopStyleVar(2);
 
             // DockSpace
-            ImGuiIO& io = ImGui::GetIO();
+            ImGuiIO&    io          = ImGui::GetIO();
+            ImGuiStyle& style       = ImGui::GetStyle();
+            float       minWinSizeX = style.WindowMinSize.x;
+            style.WindowMinSize.x   = 370.0f;
+
             if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
                 ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
                 ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
             }
+
+            style.WindowMinSize.x = minWinSizeX;
 
             if (ImGui::BeginMenuBar()) {
                 if (ImGui::BeginMenu("File")) {
@@ -150,44 +212,36 @@ namespace Zero {
             }
 
             // ************************************************************************************************
+            m_scene_hierarchy_panel.onImGuiRender();
 
-            ImGui::Begin("ASOUL");
-            ImGui::Image(
-                ImTextureID(tex_alloc->GetGpuHandle(2).ptr),
-                ImVec2(190, 190));
-            ImGui::SameLine();
-            if (m_square) {
-                ImGui::DragFloat3("POSITION",
-                                  reinterpret_cast<float*>(&(m_square.getComponent<TransformComponent>().translation)),
-                                  0.05f);
-                ImGui::ColorEdit4("COLOR", reinterpret_cast<float*>(&(m_square.getComponent<SpriteRendererComponent>().color)));
-
-                auto& camera     = m_camera.getComponent<CameraComponent>().camera;
-                float ortho_size = camera.getOrthographicSize();
-                if (ImGui::DragFloat("OrthoCameraSize", &ortho_size, 0.05f, 0.1f, 50.0f))
-                    camera.setOrthographicSize(ortho_size);
-            }
-            ImGui::End();
-
-            // Viewer
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-            ImGui::Begin("VIEWER");
-            m_viewport_focused = ImGui::IsWindowFocused();
-            m_viewport_hovered = ImGui::IsWindowHovered();
-            Application::get().getImGuiLayer()->blockEvents(!m_viewport_focused || !m_viewport_hovered);
-
-            ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
-            if (m_viewport_size != *((Vector2*)&viewport_panel_size)) {
-                m_viewport_size = Vector2{viewport_panel_size.x, viewport_panel_size.y};
+            {
+                ImGui::Begin("ASOUL");
+                ImGui::Image(
+                    ImTextureID(tex_alloc->GetGpuHandle(2).ptr),
+                    ImVec2(200, 200));
+                ImGui::SameLine();
+                ImGui::End();
             }
 
-            ImGui::Image(
-                Renderer::getOffScreenID(),
-                ImVec2{m_viewport_size.x, m_viewport_size.y});
-            ImGui::End();
-            ImGui::PopStyleVar();
+            {
+                // Viewer
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+                ImGui::Begin("VIEWER");
+                m_viewport_focused = ImGui::IsWindowFocused();
+                m_viewport_hovered = ImGui::IsWindowHovered();
+                Application::get().getImGuiLayer()->blockEvents(!m_viewport_focused || !m_viewport_hovered);
 
-            ImGui::ShowDemoWindow();
+                ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
+                if (m_viewport_size != *((Vector2*)&viewport_panel_size)) {
+                    m_viewport_size = Vector2{viewport_panel_size.x, viewport_panel_size.y};
+                }
+
+                ImGui::Image(
+                    Renderer::getOffScreenID(),
+                    ImVec2{m_viewport_size.x, m_viewport_size.y});
+                ImGui::End();
+                ImGui::PopStyleVar();
+            }
 
             ZE_PROFILE_RENDER();
 

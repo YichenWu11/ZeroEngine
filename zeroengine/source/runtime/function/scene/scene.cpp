@@ -19,7 +19,26 @@ namespace Zero {
         return entity;
     }
 
+    void Scene::destroyEntity(Entity entity) {
+        m_registry.destroy(entity);
+    }
+
     void Scene::onUpdate(TimeStep timestep) {
+        // update scripts
+        {
+            m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
+                // TODO: Move to Scene::onScenePlay
+                if (!nsc.instance) {
+                    nsc.instance           = nsc.instantiateScript();
+                    nsc.instance->m_entity = Entity{entity, this};
+                    nsc.instance->onCreate();
+                }
+
+                nsc.instance->onUpdate(timestep);
+            });
+        }
+
+        // render
         SceneCamera* curr_camera = nullptr;
         Matrix       camera_transform{Matrix::Identity};
         {
@@ -65,6 +84,32 @@ namespace Zero {
                 camera_component.camera.setViewportSize(width, height);
             }
         }
+    }
+
+    template <typename T>
+    void Scene::onComponentAdded(Entity entity, T& component) {
+        // static_assert(false);
+    }
+
+    template <>
+    void Scene::onComponentAdded<TransformComponent>(Entity entity, TransformComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentAdded<CameraComponent>(Entity entity, CameraComponent& component) {
+        component.camera.setViewportSize(m_viewport_width, m_viewport_height);
+    }
+
+    template <>
+    void Scene::onComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentAdded<NameComponent>(Entity entity, NameComponent& component) {
+    }
+
+    template <>
+    void Scene::onComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component) {
     }
 
 } // namespace Zero

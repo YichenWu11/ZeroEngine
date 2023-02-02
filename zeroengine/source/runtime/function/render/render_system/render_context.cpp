@@ -234,7 +234,7 @@ namespace Zero {
     void RenderContext::drawRenderPasses(FrameResource& frameRes, uint frameIndex) {
         for (auto&& render_pass : m_render_passes) {
             if (RendererAPI::isMultiIndirectDrawEnable()) {
-                render_pass->drawPass(frameRes, frameIndex, RendererAPI::isEditorMode());
+                render_pass->drawPassIndirect(frameRes, frameIndex, RendererAPI::isEditorMode());
             }
             else {
                 render_pass->drawPass(frameRes, frameIndex, RendererAPI::isEditorMode());
