@@ -4,10 +4,7 @@
 #include "runtime/core/common/layer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
-#include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/window_system/window_system.h"
-#include "runtime/function/table/mesh_table.h"
-#include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;

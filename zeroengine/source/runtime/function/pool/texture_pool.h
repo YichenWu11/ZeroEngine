@@ -3,7 +3,7 @@
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
 #include <CDX12/Material/Texture.h>
 
-#define GET_TEXTURE_TABLE() ::Zero::TextureTable::getInstance()
+#define GET_TEXTURE_POOL() ::Zero::TexturePool::getInstance()
 
 namespace Zero {
     struct TextureBuildInfo {
@@ -19,22 +19,22 @@ namespace Zero {
         D3D12_RESOURCE_STATES              resourceState{D3D12_RESOURCE_STATE_COMMON};
     };
 
-    class TextureTable {
+    class TexturePool {
     public:
         enum class TexFileFormat : uint8_t { WIC = 0,
                                              DDS };
 
     public:
-        static TextureTable& getInstance() {
-            static TextureTable instance;
+        static TexturePool& getInstance() {
+            static TexturePool instance;
             return instance;
         }
 
         void init();
 
-        void registerTex(const std::string&, const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
-        void registerTex(const std::filesystem::path&, TexFileFormat = TexFileFormat::WIC);
-        void registerTex(const TextureBuildInfo&, TexFileFormat = TexFileFormat::WIC);
+        void registerTex(const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
+        void registerTex(const std::string& tex_name, const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
+        void registerTex(const TextureBuildInfo& build_info, TexFileFormat = TexFileFormat::WIC);
 
         Zero::Ref<Chen::CDX12::Texture> getTextureFromName(const std::string&);
         uint32_t                        getTexIndexFromName(const std::string&);
@@ -44,8 +44,8 @@ namespace Zero {
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 
     private:
-        TextureTable() = default;
-        ~TextureTable();
+        TexturePool() = default;
+        ~TexturePool();
 
     private:
         Chen::CDX12::DescriptorHeapAllocation m_tex_alloc;

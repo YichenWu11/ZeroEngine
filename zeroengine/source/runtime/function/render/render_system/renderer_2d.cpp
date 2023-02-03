@@ -1,12 +1,12 @@
 #include <CDX12/Resource/Mesh.h>
 
+#include "runtime/function/pool/mesh_pool.h"
+#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
-#include "runtime/function/table/mesh_table.h"
-#include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX;
@@ -38,7 +38,7 @@ namespace Zero {
                 reinterpret_cast<uint8_t const*>(&view_proj_matrix),
                 sizeof(view_proj_matrix)});
 
-        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
+        auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 
         ShaderParamBindTable::getInstance().bindParam(
             shader,
@@ -61,7 +61,7 @@ namespace Zero {
                 reinterpret_cast<uint8_t const*>(&view_proj_matrix),
                 sizeof(view_proj_matrix)});
 
-        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
+        auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 
         ShaderParamBindTable::getInstance().bindParam(
             shader,
@@ -102,7 +102,7 @@ namespace Zero {
         const DirectX::SimpleMath::Color&  color,
         uint32_t                           tex_index,
         float                              tiling_factor) {
-        static Zero::Ref<Mesh> mesh = GET_MESH_TABLE().getMesh("square");
+        static Zero::Ref<Mesh> mesh = GET_MESH_POOL().getMesh("square");
 
         ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
 
@@ -124,7 +124,7 @@ namespace Zero {
         float                               rotation,
         const Zero::Ref<SubTexture2D>&      sub_texture,
         const DirectX::SimpleMath::Color&   color) {
-        if (!GET_MESH_TABLE().isMeshExist(sub_texture->constructSubTexName())) {
+        if (!GET_MESH_POOL().isMeshExist(sub_texture->constructSubTexName())) {
             std::vector<VertexData2D> vertices;
             uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
             auto                      tex_coords = sub_texture->getTexCoords();
@@ -137,7 +137,7 @@ namespace Zero {
             vertices.push_back(
                 VertexData2D{{-0.5f, 0.5f, 0.0f}, {tex_coords[3].x, 1.0f - tex_coords[3].y}});
 
-            GET_MESH_TABLE().registerMesh(
+            GET_MESH_POOL().registerMesh(
                 sub_texture->constructSubTexName(),
                 vertices.data(),
                 vertices.size(),
@@ -150,10 +150,10 @@ namespace Zero {
                            * Matrix::CreateTranslation(position);
 
         GET_RENDER_CONTEXT().submit(
-            GET_MESH_TABLE().getMesh(sub_texture->constructSubTexName()),
+            GET_MESH_POOL().getMesh(sub_texture->constructSubTexName()),
             transform,
             color,
-            GET_TEXTURE_TABLE().getTexIndex(sub_texture->getTexture()),
+            GET_TEXTURE_POOL().getTexIndex(sub_texture->getTexture()),
             1.0f);
     }
 } // namespace Zero

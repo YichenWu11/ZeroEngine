@@ -4,6 +4,10 @@
 #include "panels/scene_hierarchy_panel.h"
 #include "runtime/function/scene/components.h"
 
+#ifdef _MSVC_LANG
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 namespace Zero {
     static void drawVec3Control(const std::string& label, Vector3& values, float reset_value = 0.0f, float column_width = 100.0f) {
         ImGui::PushID(label.c_str());
@@ -179,6 +183,7 @@ namespace Zero {
             char buffer[256];
             memset(buffer, 0, sizeof(buffer));
             strcpy_s(buffer, sizeof(buffer), name.c_str());
+
             if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
                 name = std::string(buffer);
             }
@@ -191,6 +196,11 @@ namespace Zero {
             ImGui::OpenPopup("AddComponent");
 
         if (ImGui::BeginPopup("AddComponent")) {
+            if (ImGui::MenuItem("Transform")) {
+                m_selected_entity.addComponent<TransformComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+
             if (ImGui::MenuItem("Camera")) {
                 m_selected_entity.addComponent<CameraComponent>();
                 ImGui::CloseCurrentPopup();

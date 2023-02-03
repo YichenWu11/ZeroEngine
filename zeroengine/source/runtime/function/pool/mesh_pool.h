@@ -6,15 +6,15 @@ namespace Chen::CDX12 {
     class FrameResource;
 }
 
-#define GET_MESH_TABLE() ::Zero::MeshTable::getInstance()
+#define GET_MESH_POOL() ::Zero::MeshPool::getInstance()
 
 namespace Zero {
     struct VertexData2D;
 
-    class MeshTable {
+    class MeshPool {
     public:
-        static MeshTable& getInstance() {
-            static MeshTable instance;
+        static MeshPool& getInstance() {
+            static MeshPool instance;
             return instance;
         }
 
@@ -39,8 +39,8 @@ namespace Zero {
         bool isMeshExist(const std::string& name) { return m_mesh_table.contains(name); }
 
     private:
-        MeshTable()  = default;
-        ~MeshTable() = default;
+        MeshPool()  = default;
+        ~MeshPool() = default;
 
     private:
         std::unordered_map<std::string, Zero::Ref<Chen::CDX12::Mesh>> m_mesh_table;

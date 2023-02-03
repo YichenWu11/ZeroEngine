@@ -11,8 +11,8 @@
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/input/input_system.h"
 
-#include "runtime/function/table/mesh_table.h"
-#include "runtime/function/table/texture_table.h"
+#include "runtime/function/pool/mesh_pool.h"
+#include "runtime/function/pool/texture_pool.h"
 
 #include "runtime/function/render/camera_system/orthographics_camera_controller.h"
 #include "runtime/function/render/render_system/render_command.h"

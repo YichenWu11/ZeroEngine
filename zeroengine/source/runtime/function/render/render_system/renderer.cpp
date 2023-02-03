@@ -1,11 +1,11 @@
 #include <CDX12/Resource/Mesh.h>
 
+#include "runtime/function/pool/mesh_pool.h"
+#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
-#include "runtime/function/table/mesh_table.h"
-#include "runtime/function/table/texture_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -14,8 +14,8 @@ namespace Zero {
     Renderer::SceneData* Renderer::s_scene_data = new Renderer::SceneData();
 
     void Renderer::init() {
-        GET_MESH_TABLE().init();
-        GET_TEXTURE_TABLE().init();
+        GET_MESH_POOL().init();
+        GET_TEXTURE_POOL().init();
         Renderer2D::init();
     }
 
@@ -46,7 +46,7 @@ namespace Zero {
                 reinterpret_cast<uint8_t const*>(&s_scene_data->view_projection_matrix),
                 sizeof(s_scene_data->view_projection_matrix)});
 
-        auto tex_alloc = GET_TEXTURE_TABLE().getTexAllocation();
+        auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 
         ShaderParamBindTable::getInstance().bindParam(
             shader,

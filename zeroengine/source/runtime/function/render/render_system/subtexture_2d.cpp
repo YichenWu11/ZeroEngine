@@ -1,5 +1,5 @@
 #include "runtime/function/render/render_system/subtexture_2d.h"
-#include "runtime/function/table/texture_table.h"
+#include "runtime/function/pool/texture_pool.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -15,7 +15,7 @@ namespace Zero {
         m_tex_coords[3] = Vector2{min.x, max.y};
 
         m_sub_name =
-            GET_TEXTURE_TABLE().getTextureName(m_texture) + std::to_string(min.x + min.y + max.x + max.y);
+            GET_TEXTURE_POOL().getTextureName(m_texture) + std::to_string(min.x + min.y + max.x + max.y);
     }
 
     Ref<SubTexture2D> SubTexture2D::createFromCoords(

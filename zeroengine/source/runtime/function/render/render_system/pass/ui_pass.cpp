@@ -53,6 +53,7 @@ namespace Zero {
             render_context.m_stateTracker.RestoreState(render_context.m_currframe_cmdlist.Get());
         }
         else {
+            // do nothing
         }
     }
 

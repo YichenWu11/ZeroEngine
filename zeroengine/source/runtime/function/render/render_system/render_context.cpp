@@ -5,10 +5,11 @@
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
+#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
-#include "runtime/function/table/texture_table.h"
+
 
 using namespace Chen::CDX12;
 using namespace DirectX;

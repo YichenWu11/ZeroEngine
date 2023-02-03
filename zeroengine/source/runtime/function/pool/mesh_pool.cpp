@@ -1,4 +1,4 @@
-#include "runtime/function/table/mesh_table.h"
+#include "runtime/function/pool/mesh_pool.h"
 #include "runtime/function/render/render_system/buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 
@@ -9,7 +9,7 @@ namespace Zero {
     static VertexBufferLayout               layout;
     static std::vector<rtti::Struct const*> structs;
 
-    void MeshTable::buildBasicMesh() {
+    void MeshPool::buildBasicMesh() {
         structs.emplace_back(&layout);
 
         ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
@@ -56,11 +56,11 @@ namespace Zero {
         m_mesh_table["square"] = square_mesh;
     }
 
-    void MeshTable::registerMesh(const std::string& mesh_name,
-                                 VertexData2D*      vertices,
-                                 uint32_t           vertices_count,
-                                 uint32_t*          indices,
-                                 uint32_t           indices_count) {
+    void MeshPool::registerMesh(const std::string& mesh_name,
+                                VertexData2D*      vertices,
+                                uint32_t           vertices_count,
+                                uint32_t*          indices,
+                                uint32_t           indices_count) {
         if (m_mesh_table.contains(mesh_name)) {
             LOG_WARN("mesh with this name ({}) has already exsited!", mesh_name);
             return;
@@ -99,27 +99,27 @@ namespace Zero {
         LOG_INFO("register mesh named {0} success!", mesh_name);
     }
 
-    void MeshTable::removeMesh(const std::string& mesh_name) {
+    void MeshPool::removeMesh(const std::string& mesh_name) {
         if (m_mesh_table.contains(mesh_name))
             m_mesh_table.erase(mesh_name);
         else
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
     }
 
-    void MeshTable::delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres) {
+    void MeshPool::delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres) {
         if (!m_mesh_table.contains(mesh_name))
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         m_mesh_table[mesh_name]->DelayDispose(frameres);
     }
 
-    Zero::Ref<Chen::CDX12::Mesh> MeshTable::getMesh(const std::string& mesh_name) {
+    Zero::Ref<Chen::CDX12::Mesh> MeshPool::getMesh(const std::string& mesh_name) {
         if (m_mesh_table.contains(mesh_name))
             return m_mesh_table[mesh_name];
         LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         return nullptr;
     }
 
-    std::string MeshTable::getMeshName(const Zero::Ref<Chen::CDX12::Mesh>& target) {
+    std::string MeshPool::getMeshName(const Zero::Ref<Chen::CDX12::Mesh>& target) {
         for (auto& [name, mesh] : m_mesh_table) {
             if (target == mesh)
                 return name;
