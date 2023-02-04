@@ -57,9 +57,9 @@ namespace Zero {
                 0,
                 168));
 
-        ShaderParamBindTable::getInstance().registerShader("common", properties);
+        GET_SHADER_BIND_TABLE().registerShader("common", properties);
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("common"));
+            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("common"));
 
         shader->SetVsShader(path.c_str());
         shader->SetPsShader(path.c_str());
@@ -71,9 +71,9 @@ namespace Zero {
         depthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
         depthStencilState.StencilEnable  = false;
 
-        ShaderParamBindTable::getInstance().registerShader("transparent", properties);
+        GET_SHADER_BIND_TABLE().registerShader("transparent", properties);
         BasicShader* trans_shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
         trans_shader->SetVsShader(path.c_str());
 
         if (RendererAPI::isEditorMode()) {
@@ -190,14 +190,14 @@ namespace Zero {
                 get_rvalue_ptr(GET_TEXTURE_POOL().getTexAllocation()->GetDescriptorHeap()));
 
             BasicShader* shader =
-                static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+                static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
 
-            auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
+            auto& prop_table = GET_SHADER_BIND_TABLE().getShaderPropTable(shader);
 
             // draw call
             for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
                 // bind object-varying constants
-                ShaderParamBindTable::getInstance()
+                GET_SHADER_BIND_TABLE()
                     .bindParam(
                         shader,
                         "_ObjectConstant",
@@ -305,9 +305,9 @@ namespace Zero {
             get_rvalue_ptr(GET_TEXTURE_POOL().getTexAllocation()->GetDescriptorHeap()));
 
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
 
-        auto& prop_table = ShaderParamBindTable::getInstance().getShaderPropTable(shader);
+        auto& prop_table = GET_SHADER_BIND_TABLE().getShaderPropTable(shader);
 
         render_context.bindProperties.clear();
 

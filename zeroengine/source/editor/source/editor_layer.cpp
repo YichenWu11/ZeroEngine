@@ -1,3 +1,5 @@
+#include "runtime/function/scene/scene_serializer.h"
+
 #include "editor_layer.h"
 
 namespace Zero {
@@ -29,43 +31,43 @@ namespace Zero {
 
         m_active_scene = CreateRef<Scene>();
 
-        auto&& green_square = m_active_scene->createEntity("green_square");
-        green_square.addComponent<SpriteRendererComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
+        // auto&& green_square = m_active_scene->createEntity("green_square");
+        // green_square.addComponent<SpriteComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
 
-        auto&& red_square = m_active_scene->createEntity("red_square");
-        red_square.addComponent<SpriteRendererComponent>(Color{1.0f, 0.0f, 0.0f, 1.0f});
+        // auto&& red_square = m_active_scene->createEntity("red_square");
+        // red_square.addComponent<SpriteComponent>(Color{1.0f, 0.0f, 0.0f, 1.0f});
 
-        auto&& camera_a = m_active_scene->createEntity("cameraA");
-        camera_a.addComponent<CameraComponent>();
+        // auto&& camera_a = m_active_scene->createEntity("cameraA");
+        // camera_a.addComponent<CameraComponent>();
 
-        class CameraController : public ScriptableEntity {
-        public:
-            void onCreate() override {
-            }
+        // class CameraController : public ScriptableEntity {
+        // public:
+        //     void onCreate() override {
+        //     }
 
-            void onDestroy() override {
-            }
+        //     void onDestroy() override {
+        //     }
 
-            void onUpdate(TimeStep timestep) override {
-                auto& transform = getComponent<TransformComponent>().translation;
-                float speed     = 5.0f;
+        //     void onUpdate(TimeStep timestep) override {
+        //         auto& transform = getComponent<TransformComponent>().translation;
+        //         float speed     = 5.0f;
 
-                if (InputSystem::isKeyPressed('A'))
-                    transform.x -= speed * timestep;
-                if (InputSystem::isKeyPressed('D'))
-                    transform.x += speed * timestep;
-                if (InputSystem::isKeyPressed('W'))
-                    transform.y += speed * timestep;
-                if (InputSystem::isKeyPressed('S'))
-                    transform.y -= speed * timestep;
-            }
-        };
+        //         if (InputSystem::isKeyPressed('A'))
+        //             transform.x -= speed * timestep;
+        //         if (InputSystem::isKeyPressed('D'))
+        //             transform.x += speed * timestep;
+        //         if (InputSystem::isKeyPressed('W'))
+        //             transform.y += speed * timestep;
+        //         if (InputSystem::isKeyPressed('S'))
+        //             transform.y -= speed * timestep;
+        //     }
+        // };
 
-        camera_a.addComponent<NativeScriptComponent>().bind<CameraController>();
+        // camera_a.addComponent<NativeScriptComponent>().bind<CameraController>();
 
-        auto&& camera_b = m_active_scene->createEntity("cameraB");
-        camera_b.addComponent<CameraComponent>();
-        camera_b.getComponent<CameraComponent>().is_current = false;
+        // auto&& camera_b = m_active_scene->createEntity("cameraB");
+        // camera_b.addComponent<CameraComponent>();
+        // camera_b.getComponent<CameraComponent>().is_current = false;
 
         m_scene_hierarchy_panel.setContext(m_active_scene);
     }
@@ -105,45 +107,10 @@ namespace Zero {
         }
 
         {
-            ZE_PROFILE_SCOPE("Renderer2D::Render");
-
-            // Renderer2D::beginScene(m_camera_controller.getCamera());
+            ZE_PROFILE_SCOPE("Renderer2D::RenderScene");
 
             // update scene
             m_active_scene->onUpdate(timestep);
-
-            // Renderer2D::drawQuad(
-            //     {0.0f, 0.0f, 0.2f},
-            //     {10.0f, 10.0f},
-            //     0.0f,
-            //     {0.8f, 0.8f, 0.8f, 1.0f},
-            //     GET_TEXTURE_POOL().getTexIndexFromName("asoul"), 5.0f);
-
-            // Zero::Renderer2D::drawQuad(
-            //     {-0.3f, 0.0f},
-            //     {1.0f, 1.0f},
-            //     0.0f,
-            //     {1.0f, 1.0f, 1.0f, 1.0f},
-            //     GET_TEXTURE_POOL().getTexIndexFromName("bella"));
-
-            // Zero::Renderer2D::drawQuad(
-            //     {0.3f, 0.0f},
-            //     {1.0f, 1.0f},
-            //     0.0f,
-            //     {1.0f, 1.0f, 1.0f, 1.0f},
-            //     GET_TEXTURE_POOL().getTexIndexFromName("bella"));
-
-            // for (float y = -5.0f; y < 5.0f; y += 0.5f) {
-            //     for (float x = -5.0f; x < 5.0f; x += 0.5f) {
-            //         Renderer2D::drawQuad(
-            //             {x, y, 0.1f},
-            //             {0.45f, 0.45f},
-            //             0.0f,
-            //             {(x + 5.0f) / 10.0f, (y + 5.0f) / 10.0f, 1.0f, 0.8f});
-            //     }
-            // }
-
-            // Renderer2D::endScene();
         }
     }
 
@@ -201,6 +168,16 @@ namespace Zero {
                     // Disabling fullscreen would allow the window to be moved to the front of other windows,
                     // which we can't undo at the moment without finer window depth/z control.
                     // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+
+                    if (ImGui::MenuItem("Save")) {
+                        SceneSerializer serializer(m_active_scene);
+                        serializer.serialize(std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/scene/scene.json");
+                    }
+
+                    if (ImGui::MenuItem("Load")) {
+                        SceneSerializer serializer(m_active_scene);
+                        serializer.deserialize(std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/scene/scene.json");
+                    }
 
                     if (ImGui::MenuItem("Exit")) {
                         Application::get().close();

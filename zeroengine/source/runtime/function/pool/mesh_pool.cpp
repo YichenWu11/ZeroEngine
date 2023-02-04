@@ -53,7 +53,7 @@ namespace Zero {
         GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppM_commandLists), ppM_commandLists);
         GET_RENDER_CONTEXT().flush();
 
-        m_mesh_table["square"] = square_mesh;
+        m_mesh_pool["square"] = square_mesh;
     }
 
     void MeshPool::registerMesh(const std::string& mesh_name,
@@ -61,7 +61,7 @@ namespace Zero {
                                 uint32_t           vertices_count,
                                 uint32_t*          indices,
                                 uint32_t           indices_count) {
-        if (m_mesh_table.contains(mesh_name)) {
+        if (m_mesh_pool.contains(mesh_name)) {
             LOG_WARN("mesh with this name ({}) has already exsited!", mesh_name);
             return;
         }
@@ -94,37 +94,37 @@ namespace Zero {
         GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppM_commandLists), ppM_commandLists);
         GET_RENDER_CONTEXT().flush();
 
-        m_mesh_table[mesh_name] = mesh;
+        m_mesh_pool[mesh_name] = mesh;
 
         LOG_INFO("register mesh named {0} success!", mesh_name);
     }
 
     void MeshPool::removeMesh(const std::string& mesh_name) {
-        if (m_mesh_table.contains(mesh_name))
-            m_mesh_table.erase(mesh_name);
+        if (m_mesh_pool.contains(mesh_name))
+            m_mesh_pool.erase(mesh_name);
         else
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
     }
 
     void MeshPool::delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres) {
-        if (!m_mesh_table.contains(mesh_name))
+        if (!m_mesh_pool.contains(mesh_name))
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
-        m_mesh_table[mesh_name]->DelayDispose(frameres);
+        m_mesh_pool[mesh_name]->DelayDispose(frameres);
     }
 
     Zero::Ref<Chen::CDX12::Mesh> MeshPool::getMesh(const std::string& mesh_name) {
-        if (m_mesh_table.contains(mesh_name))
-            return m_mesh_table[mesh_name];
+        if (m_mesh_pool.contains(mesh_name))
+            return m_mesh_pool[mesh_name];
         LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         return nullptr;
     }
 
     std::string MeshPool::getMeshName(const Zero::Ref<Chen::CDX12::Mesh>& target) {
-        for (auto& [name, mesh] : m_mesh_table) {
+        for (auto& [name, mesh] : m_mesh_pool) {
             if (target == mesh)
                 return name;
         }
-        LOG_WARN("this mesh does not exsit in m_mesh_table!");
+        LOG_WARN("this mesh does not exsit in m_mesh_pool!");
         return {};
     }
 } // namespace Zero

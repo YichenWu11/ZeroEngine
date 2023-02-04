@@ -51,7 +51,7 @@ namespace Zero {
         Chen::CDX12::DescriptorHeapAllocation m_tex_alloc;
 
         std::map<std::string, uint32_t>                  m_texname2index;
-        std::map<std::string, Ref<Chen::CDX12::Texture>> m_texture_table;
+        std::map<std::string, Ref<Chen::CDX12::Texture>> m_texture_pool;
 
     private:
         static uint32_t s_invalid_index;

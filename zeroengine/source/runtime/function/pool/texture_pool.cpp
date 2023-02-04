@@ -44,7 +44,7 @@ namespace Zero {
     void TexturePool::registerTex(
         const TextureBuildInfo& info,
         TexFileFormat           file_format) {
-        if (m_texture_table.contains(info.name)) {
+        if (m_texture_pool.contains(info.name)) {
             LOG_WARN("The texture with this name({0}) has exsited!", info.name);
             return;
         }
@@ -88,14 +88,14 @@ namespace Zero {
                 break;
         }
 
-        m_texname2index[info.name] = m_texture_table.size();
-        m_texture_table[info.name] = tex;
+        m_texname2index[info.name] = m_texture_pool.size();
+        m_texture_pool[info.name]  = tex;
 
-        D3D12_SHADER_RESOURCE_VIEW_DESC desc = m_texture_table[info.name]->GetColorSrvDesc(0);
+        D3D12_SHADER_RESOURCE_VIEW_DESC desc = m_texture_pool[info.name]->GetColorSrvDesc(0);
         device->CreateShaderResourceView(
-            m_texture_table[info.name]->GetResource(),
+            m_texture_pool[info.name]->GetResource(),
             &desc,
-            m_tex_alloc.GetCpuHandle(m_texture_table.size() - 1));
+            m_tex_alloc.GetCpuHandle(m_texture_pool.size() - 1));
 
         auto uploadResourcesFinished = resourceUpload.End(GET_RENDER_CONTEXT().getCommandQueue());
         uploadResourcesFinished.wait();
@@ -104,16 +104,16 @@ namespace Zero {
     }
 
     Zero::Ref<Texture> TexturePool::getTextureFromName(const std::string& tex_name) {
-        if (!m_texture_table.contains(tex_name)) {
+        if (!m_texture_pool.contains(tex_name)) {
             LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
             return {};
         }
 
-        return m_texture_table[tex_name];
+        return m_texture_pool[tex_name];
     }
 
     uint32_t TexturePool::getTexIndexFromName(const std::string& tex_name) {
-        if (!m_texture_table.contains(tex_name)) {
+        if (!m_texture_pool.contains(tex_name)) {
             LOG_WARN("The texture with this name({0}) does not exsit!", tex_name);
             return s_invalid_index;
         }
@@ -122,7 +122,7 @@ namespace Zero {
     }
 
     uint32_t TexturePool::getTexIndex(const Ref<Chen::CDX12::Texture>& target) {
-        for (auto& [name, texture] : m_texture_table) {
+        for (auto& [name, texture] : m_texture_pool) {
             if (texture == target)
                 return getTexIndexFromName(name);
         }
@@ -131,7 +131,7 @@ namespace Zero {
     }
 
     std::string TexturePool::getTextureName(const Ref<Chen::CDX12::Texture>& target) {
-        for (auto& [name, texture] : m_texture_table) {
+        for (auto& [name, texture] : m_texture_pool) {
             if (texture == target)
                 return name;
         }

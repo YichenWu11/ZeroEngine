@@ -26,12 +26,12 @@ namespace Zero {
     void Renderer2D::beginScene(const Camera& camera, const DirectX::SimpleMath::Matrix& cam_transform) {
         // takes all the scene settings(camera, lights, environment etc)
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
 
         static Matrix view_proj_matrix;
         view_proj_matrix = (cam_transform.Invert() * camera.getProjection()).Transpose();
 
-        ShaderParamBindTable::getInstance().bindParam(
+        GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "_ViewProjMatrix",
             std::span<const uint8_t>{
@@ -40,7 +40,7 @@ namespace Zero {
 
         auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 
-        ShaderParamBindTable::getInstance().bindParam(
+        GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
             std::make_pair(tex_alloc, 0));
@@ -49,12 +49,12 @@ namespace Zero {
     void Renderer2D::beginScene(const OrthographicsCamera& camera) {
         // takes all the scene settings(camera, lights, environment etc)
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
 
         static Matrix view_proj_matrix;
         view_proj_matrix = camera.getViewProjectionMatrix().Transpose();
 
-        ShaderParamBindTable::getInstance().bindParam(
+        GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "_ViewProjMatrix",
             std::span<const uint8_t>{
@@ -63,7 +63,7 @@ namespace Zero {
 
         auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 
-        ShaderParamBindTable::getInstance().bindParam(
+        GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
             std::make_pair(tex_alloc, 0));

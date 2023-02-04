@@ -11,6 +11,8 @@
 #include <CDX12/Shader/BasicShader.h>
 #include <CDX12/Util/BindProperty.h>
 
+#define GET_SHADER_BIND_TABLE() ::Zero::ShaderParamBindTable::getInstance()
+
 namespace Zero {
     enum class ShaderUsage : uint8_t {
         BASIC = 0,

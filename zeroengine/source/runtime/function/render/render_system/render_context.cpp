@@ -10,7 +10,6 @@
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 
-
 using namespace Chen::CDX12;
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
@@ -138,7 +137,7 @@ namespace Zero {
             D3D12_INDIRECT_ARGUMENT_DESC ind_desc[4];
             ZeroMemory(ind_desc, 4 * sizeof(D3D12_INDIRECT_ARGUMENT_DESC));
             ind_desc[0].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT_BUFFER_VIEW;
-            ind_desc[0].ConstantBufferView.RootParameterIndex = ShaderParamBindTable::getInstance().getShader("transparent")->GetPropRootSigPos("_ObjectConstant");
+            ind_desc[0].ConstantBufferView.RootParameterIndex = GET_SHADER_BIND_TABLE().getShader("transparent")->GetPropRootSigPos("_ObjectConstant");
             ind_desc[1].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_VERTEX_BUFFER_VIEW;
             ind_desc[1].VertexBuffer.Slot                     = 0;
             ind_desc[2].Type                                  = D3D12_INDIRECT_ARGUMENT_TYPE_INDEX_BUFFER_VIEW;
@@ -150,7 +149,7 @@ namespace Zero {
             desc.pArgumentDescs   = ind_desc;
             m_device->CreateCommandSignature(
                 &desc,
-                ShaderParamBindTable::getInstance().getShader("transparent")->RootSig(),
+                GET_SHADER_BIND_TABLE().getShader("transparent")->RootSig(),
                 IID_PPV_ARGS(&m_command_signature));
         }
 

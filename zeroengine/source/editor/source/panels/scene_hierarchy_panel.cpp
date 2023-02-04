@@ -112,7 +112,7 @@ namespace Zero {
 
     void SceneHierarchyPanel::onImGuiRender() {
         {
-            ImGui::Begin("Scene");
+            ImGui::Begin("Hierarchy");
 
             m_context->m_registry.each([&](auto entityHandle) {
                 Entity entity{entityHandle, m_context.get()};
@@ -206,8 +206,8 @@ namespace Zero {
                 ImGui::CloseCurrentPopup();
             }
 
-            if (ImGui::MenuItem("Sprite Renderer")) {
-                m_selected_entity.addComponent<SpriteRendererComponent>();
+            if (ImGui::MenuItem("Sprite")) {
+                m_selected_entity.addComponent<SpriteComponent>();
                 ImGui::CloseCurrentPopup();
             }
 
@@ -285,8 +285,8 @@ namespace Zero {
             }
         });
 
-        // SpriteRendererComponent
-        drawComponent<SpriteRendererComponent>("Sprite", entity, [](auto& component) {
+        // SpriteComponent
+        drawComponent<SpriteComponent>("Sprite", entity, [](auto& component) {
             ImGui::ColorEdit4("Modulate", reinterpret_cast<float*>(&component.color));
             ImGui::DragInt("TexID", reinterpret_cast<int*>(&component.tex_index), 1.0f, 0);
             ImGui::DragFloat("TilingFactor", reinterpret_cast<float*>(&component.tiling_factor), 0.1f, 0.1f);

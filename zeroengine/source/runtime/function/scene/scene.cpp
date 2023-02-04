@@ -57,9 +57,9 @@ namespace Zero {
         if (curr_camera) {
             Renderer2D::beginScene(*curr_camera, camera_transform);
 
-            auto group = m_registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            auto group = m_registry.group<TransformComponent>(entt::get<SpriteComponent>);
             for (auto entity : group) {
-                auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
                 Renderer2D::drawQuad(
                     transform.getTransform(),
@@ -101,7 +101,7 @@ namespace Zero {
     }
 
     template <>
-    void Scene::onComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) {
+    void Scene::onComponentAdded<SpriteComponent>(Entity entity, SpriteComponent& component) {
     }
 
     template <>

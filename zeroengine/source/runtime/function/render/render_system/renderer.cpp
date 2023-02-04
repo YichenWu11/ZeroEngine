@@ -37,9 +37,9 @@ namespace Zero {
         s_scene_data->view_projection_matrix = (camera.getViewProjectionMatrix()).Transpose();
 
         BasicShader* shader =
-            static_cast<BasicShader*>(ShaderParamBindTable::getInstance().getShader("transparent"));
+            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
 
-        ShaderParamBindTable::getInstance().bindParam(
+        GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "_ViewProjMatrix",
             std::span<const uint8_t>{
@@ -48,7 +48,7 @@ namespace Zero {
 
         auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 
-        ShaderParamBindTable::getInstance().bindParam(
+        GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
             std::make_pair(tex_alloc, 0));

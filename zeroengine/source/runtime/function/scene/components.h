@@ -34,14 +34,14 @@ namespace Zero {
         }
     };
 
-    struct SpriteRendererComponent {
+    struct SpriteComponent {
         Color    color{1.0f, 1.0f, 1.0f, 1.0f};
         uint32_t tex_index{0};
         float    tiling_factor{1.0f};
 
-        SpriteRendererComponent()                               = default;
-        SpriteRendererComponent(const SpriteRendererComponent&) = default;
-        SpriteRendererComponent(const Color& _color, uint32_t _tex_index = 0, float _tiling_factor = 1.0f) :
+        SpriteComponent()                       = default;
+        SpriteComponent(const SpriteComponent&) = default;
+        SpriteComponent(const Color& _color, uint32_t _tex_index = 0, float _tiling_factor = 1.0f) :
             color(_color), tex_index(_tex_index), tiling_factor(_tiling_factor) {}
     };
 
