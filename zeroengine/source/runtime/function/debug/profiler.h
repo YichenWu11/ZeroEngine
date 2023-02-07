@@ -21,6 +21,9 @@ namespace Zero {
             return instance;
         }
 
+        Profiler(const Profiler&)            = delete;
+        Profiler& operator=(const Profiler&) = delete;
+
         void render() {
             // ImGuiIO& io = ImGui::GetIO();
             // ImGui::Begin("Profiler", NULL);

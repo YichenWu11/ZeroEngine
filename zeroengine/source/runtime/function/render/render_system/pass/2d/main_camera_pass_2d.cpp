@@ -205,7 +205,7 @@ namespace Zero {
                             reinterpret_cast<uint8_t const*>(&obj_constant),
                             sizeof(obj_constant)});
 
-                render_context.bindProperties.clear();
+                render_context.m_bindProperties.clear();
 
                 // bind the constants which does not differ among different objects
                 for (auto& prop : prop_table) {
@@ -213,21 +213,21 @@ namespace Zero {
                     std::visit(overloaded{
                                    [&](std::span<const uint8_t> data) {
                         auto buffer = frameRes.AllocateConstBuffer(data);
-                        render_context.bindProperties.emplace_back(name, buffer);
+                        render_context.m_bindProperties.emplace_back(name, buffer);
                                    },
                                    [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
-                        render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
+                        render_context.m_bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
                     }},
                         prop.second);
                 }
 
                 frameRes.DrawMesh(
                     shader,
-                    render_context.psoManager.get(),
+                    render_context.m_psoManager.get(),
                     mesh.get(),
                     render_context.s_colorFormat,
                     render_context.s_depthFormat,
-                    render_context.bindProperties);
+                    render_context.m_bindProperties);
             }
 
             if (!offscreen) {
@@ -309,7 +309,7 @@ namespace Zero {
 
         auto& prop_table = GET_SHADER_BIND_TABLE().getShaderPropTable(shader);
 
-        render_context.bindProperties.clear();
+        render_context.m_bindProperties.clear();
 
         // bind the constants which does not differ among different objects
         for (auto& prop : prop_table) {
@@ -317,10 +317,10 @@ namespace Zero {
             std::visit(overloaded{
                            [&](std::span<const uint8_t> data) {
                 auto buffer = frameRes.AllocateConstBuffer(data);
-                render_context.bindProperties.emplace_back(name, buffer);
+                render_context.m_bindProperties.emplace_back(name, buffer);
                            },
                            [&](std::pair<DescriptorHeapAllocation const*, uint32_t> data) {
-                render_context.bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
+                render_context.m_bindProperties.emplace_back(name, DescriptorHeapAllocView(data.first, data.second));
             }},
                 prop.second);
         }
@@ -370,11 +370,11 @@ namespace Zero {
             // indirect draw call
             frameRes.DrawMeshIndirect(
                 shader,
-                render_context.psoManager.get(),
+                render_context.m_psoManager.get(),
                 (std::get<0>(render_context.m_draw_2d_list[0]))->Layout(),
                 render_context.s_colorFormat,
                 render_context.s_depthFormat,
-                render_context.bindProperties,
+                render_context.m_bindProperties,
                 m_indirectDrawBuffer[frameIndex],
                 mesh_count,
                 render_context.m_command_signature.Get());

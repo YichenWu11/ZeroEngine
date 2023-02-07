@@ -66,7 +66,7 @@ namespace Zero {
     }
 
     template <typename T, typename UIFunction>
-    static void drawComponent(const std::string& name, Entity entity, UIFunction ui_function) {
+    static void drawComponent(const std::string& name, Entity entity, UIFunction ui_function, bool remove_enable = true) {
         const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
         if (entity.hasComponent<T>()) {
             auto&  component               = entity.getComponent<T>();
@@ -78,15 +78,16 @@ namespace Zero {
             bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
             ImGui::PopStyleVar();
             ImGui::SameLine(content_RegionAvailable.x - line_height * 0.5f);
+
             if (ImGui::Button("+", ImVec2{line_height, line_height})) {
                 ImGui::OpenPopup("ComponentSettings");
             }
 
             bool remove_component = false;
+
             if (ImGui::BeginPopup("ComponentSettings")) {
                 if (ImGui::MenuItem("Remove Component"))
-                    remove_component = true;
-
+                    remove_component = true & remove_enable;
                 ImGui::EndPopup();
             }
 
@@ -177,19 +178,6 @@ namespace Zero {
     }
 
     void SceneHierarchyPanel::drawComponents(Entity entity) {
-        if (entity.hasComponent<NameComponent>()) {
-            auto& name = entity.getComponent<NameComponent>().name;
-
-            char buffer[256];
-            memset(buffer, 0, sizeof(buffer));
-            strcpy_s(buffer, sizeof(buffer), name.c_str());
-
-            if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
-                name = std::string(buffer);
-            }
-        }
-
-        ImGui::SameLine();
         ImGui::PushItemWidth(-1);
 
         if (ImGui::Button("Add Component"))
@@ -215,6 +203,21 @@ namespace Zero {
         }
 
         ImGui::PopItemWidth();
+
+        // NameComponent
+        drawComponent<NameComponent>(
+            "Name", entity, [](auto& component) {
+                auto& name = component.name;
+
+                char buffer[256];
+                memset(buffer, 0, sizeof(buffer));
+                strcpy_s(buffer, sizeof(buffer), name.c_str());
+
+                if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
+                    name = std::string(buffer);
+                }
+            },
+            false);
 
         // TransformComponent
         drawComponent<TransformComponent>("Transform", entity, [](auto& component) {

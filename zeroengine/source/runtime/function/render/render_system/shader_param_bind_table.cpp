@@ -26,7 +26,7 @@ namespace Zero {
         switch (usage) {
             case ShaderUsage::BASIC: {
                 auto shader                       = Zero::CreateRef<BasicShader>(properties, GET_RENDER_CONTEXT().getGraphicsDevice(), samplers);
-                m_shader_bind_table[shader.get()] = ParamBindTable();
+                m_shader_bind_table[shader.get()] = TParamBindTable();
                 m_shader_table[shader_name]       = std::move(shader);
                 break;
             }
@@ -48,7 +48,7 @@ namespace Zero {
         switch (usage) {
             case ShaderUsage::BASIC: {
                 auto shader                       = Zero::CreateRef<BasicShader>(properties, std::move(rootSig));
-                m_shader_bind_table[shader.get()] = ParamBindTable();
+                m_shader_bind_table[shader.get()] = TParamBindTable();
                 m_shader_table[shader_name]       = std::move(shader);
                 break;
             }
@@ -80,7 +80,7 @@ namespace Zero {
         std::visit([&](auto&& arg) { prop_table[prop_name] = arg; }, data);
     }
 
-    ShaderParamBindTable::ParamBindTable& ShaderParamBindTable::getShaderPropTable(Shader* shader) {
+    ShaderParamBindTable::TParamBindTable& ShaderParamBindTable::getShaderPropTable(Shader* shader) {
         if (!m_shader_bind_table.contains(shader)) {
             LOG_WARN("This shader does not exist in the ShaderBindTable!");
         }

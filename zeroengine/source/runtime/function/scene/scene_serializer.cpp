@@ -31,7 +31,7 @@ namespace Zero {
         Value entity_obj(kObjectType);
         entity_obj.SetObject();
 
-        // TODO: add the entity GUID here
+        // TODO:guid
         Value entity_id(kStringType);
         entity_id.SetString("GUID");
         entity_obj.AddMember("EntityID", entity_id, allocator);
@@ -168,6 +168,7 @@ namespace Zero {
     }
 
     void SceneSerializer::serializerRuntime(const std::filesystem::path& path) {
+        // do nothing
     }
 
     bool SceneSerializer::deserialize(const std::filesystem::path& path) {
@@ -256,6 +257,7 @@ namespace Zero {
     }
 
     bool SceneSerializer::deserializerRuntime(const std::filesystem::path& path) {
+        // do nothing
         return false;
     }
 

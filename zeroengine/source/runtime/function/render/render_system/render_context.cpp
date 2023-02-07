@@ -1,6 +1,5 @@
 #include <CDX12/DescriptorHeapMngr.h>
 #include <CDX12/Resource/DescHeapAllocView.h>
-#include <CDX12/Shader/PSOManager.h>
 #include <backends/imgui_impl_dx12.h>
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
@@ -124,7 +123,7 @@ namespace Zero {
         }
 
         {
-            psoManager = Zero::Scope<PSOManager>(new PSOManager(m_device.Get()));
+            m_psoManager = Zero::Scope<PSOManager>(new PSOManager(m_device.Get()));
         }
 
         {
@@ -163,6 +162,7 @@ namespace Zero {
     }
 
     void RenderContext::shutdown() {
+        // wait for gpu
         flushCommandQueue();
 
         m_frameResourceMngr->CleanUp();
@@ -312,13 +312,13 @@ namespace Zero {
             dsvHandle.Offset(1, m_dsvCpuDH.GetDescriptorSize());
         }
 
+        for (auto& shader_pass : m_render_passes)
+            shader_pass->onResize();
+
         ThrowIfFailed(commandList->Close());
         m_commandQueue.Execute(commandList.Get());
 
         flushCommandQueue();
-
-        for (auto& shader_pass : m_render_passes)
-            shader_pass->onResize();
     }
 
     void RenderContext::resizeFrameBuffer(int width, int height) {
@@ -333,7 +333,5 @@ namespace Zero {
                 s_colorFormat};
             m_frameBuffers[i]->onResize(fb_config);
         }
-
-        flushCommandQueue();
     }
 } // namespace Zero

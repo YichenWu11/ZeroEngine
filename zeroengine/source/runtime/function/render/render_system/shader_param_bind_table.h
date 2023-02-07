@@ -21,9 +21,9 @@ namespace Zero {
 
     class ShaderParamBindTable {
     public:
-        using ParamBindTable  = std::unordered_map<std::string, std::variant<std::pair<Chen::CDX12::DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>>>;
-        using ShaderBindTable = std::unordered_map<Chen::CDX12::Shader*, ParamBindTable>;
-        using ShaderTable     = std::unordered_map<std::string, Zero::Ref<Chen::CDX12::Shader>>;
+        using TParamBindTable  = std::map<std::string, std::variant<std::pair<Chen::CDX12::DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>>>;
+        using TShaderBindTable = std::map<Chen::CDX12::Shader*, TParamBindTable>;
+        using TShaderTable     = std::map<std::string, Zero::Ref<Chen::CDX12::Shader>>;
 
     public:
         static ShaderParamBindTable& getInstance() {
@@ -31,12 +31,14 @@ namespace Zero {
             return instance;
         }
 
+        ShaderParamBindTable(const ShaderParamBindTable&)            = delete;
+        ShaderParamBindTable& operator=(const ShaderParamBindTable&) = delete;
+
         void registerShader(
             const std::string&                                                     shader_name,
             std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
             std::span<D3D12_STATIC_SAMPLER_DESC>                                   samplers = Chen::CDX12::GlobalSamplers::GetSamplers(),
             ShaderUsage                                                            usage    = ShaderUsage::BASIC);
-
         void registerShader(
             const std::string&                                                     shader_name,
             std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
@@ -48,11 +50,14 @@ namespace Zero {
         void bindParam(Chen::CDX12::Shader*, const std::string&, std::variant<std::pair<Chen::CDX12::DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>>);
 
         Chen::CDX12::Shader* getShader(const std::string&);
-
-        ParamBindTable& getShaderPropTable(Chen::CDX12::Shader*);
+        TParamBindTable&     getShaderPropTable(Chen::CDX12::Shader*);
 
     private:
-        ShaderTable     m_shader_table;
-        ShaderBindTable m_shader_bind_table;
+        ShaderParamBindTable()  = default;
+        ~ShaderParamBindTable() = default;
+
+    private:
+        TShaderTable     m_shader_table;
+        TShaderBindTable m_shader_bind_table;
     };
 } // namespace Zero

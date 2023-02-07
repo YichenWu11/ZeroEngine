@@ -30,6 +30,9 @@ namespace Zero {
             return instance;
         }
 
+        TexturePool(const TexturePool&)            = delete;
+        TexturePool& operator=(const TexturePool&) = delete;
+
         void init();
 
         void registerTex(const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);

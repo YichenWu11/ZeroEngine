@@ -115,6 +115,7 @@ namespace Zero {
     Zero::Ref<Chen::CDX12::Mesh> MeshPool::getMesh(const std::string& mesh_name) {
         if (m_mesh_pool.contains(mesh_name))
             return m_mesh_pool[mesh_name];
+
         LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         return nullptr;
     }

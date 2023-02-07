@@ -18,20 +18,21 @@ namespace Zero {
             return instance;
         }
 
+        MeshPool(const MeshPool&)            = delete;
+        MeshPool& operator=(const MeshPool&) = delete;
+
         void init() { buildBasicMesh(); }
 
-        void buildBasicMesh();
-
         void registerMesh(
-            const std::string&,
-            VertexData2D* vertices,
-            uint32_t      vertices_count,
-            uint32_t*     indices,
-            uint32_t      indices_count);
+            const std::string& mesh_name,
+            VertexData2D*      vertices,
+            uint32_t           vertices_count,
+            uint32_t*          indices,
+            uint32_t           indices_count);
 
-        void removeMesh(const std::string&);
+        void removeMesh(const std::string& mesh_name);
 
-        void delayDisposeMesh(const std::string&, Chen::CDX12::FrameResource* frameres);
+        void delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres);
 
         Zero::Ref<Chen::CDX12::Mesh> getMesh(const std::string&);
         std::string                  getMeshName(const Zero::Ref<Chen::CDX12::Mesh>&);
@@ -42,8 +43,10 @@ namespace Zero {
         MeshPool()  = default;
         ~MeshPool() = default;
 
+        void buildBasicMesh();
+
     private:
-        std::unordered_map<std::string, Zero::Ref<Chen::CDX12::Mesh>> m_mesh_pool;
+        std::map<std::string, Zero::Ref<Chen::CDX12::Mesh>> m_mesh_pool;
 
         ComPtr<ID3D12CommandAllocator>    m_cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> m_commandList;
