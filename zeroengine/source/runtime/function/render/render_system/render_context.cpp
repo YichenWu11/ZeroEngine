@@ -161,6 +161,20 @@ namespace Zero {
         LOG_INFO("dx12 render_context init success");
     }
 
+    void RenderContext::registerRenderPass() {
+        LOG_INFO("-------------------------------");
+        LOG_INFO("begin to register render pass: ");
+
+        m_render_passes.push_back(Zero::CreateScope<MainCameraPass2D>());
+        m_render_passes.push_back(Zero::CreateScope<UIPass>());
+
+        for (auto&& render_pass : m_render_passes)
+            render_pass->preLoadResource();
+
+        LOG_INFO("register render pass success!");
+        LOG_INFO("-------------------------------");
+    }
+
     void RenderContext::shutdown() {
         // wait for gpu
         flushCommandQueue();
@@ -175,28 +189,12 @@ namespace Zero {
             DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Free(std::move(m_rtvCpuDH));
         if (!m_dsvCpuDH.IsNull())
             DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Free(std::move(m_dsvCpuDH));
-        if (!m_csuCpuDH.IsNull())
-            DescriptorHeapMngr::GetInstance().GetCSUCpuDH()->Free(std::move(m_csuCpuDH));
         if (!m_csuGpuDH.IsNull())
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
 
 #if defined(DEBUG) || defined(_DEBUG)
             // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
 #endif
-    }
-
-    void RenderContext::registerRenderPass() {
-        LOG_INFO("-------------------------------");
-        LOG_INFO("begin to register render pass: ");
-
-        m_render_passes.push_back(Zero::CreateScope<MainCameraPass2D>());
-        m_render_passes.push_back(Zero::CreateScope<UIPass>());
-
-        for (auto&& render_pass : m_render_passes)
-            render_pass->preLoadResource();
-
-        LOG_INFO("register render pass success!");
-        LOG_INFO("-------------------------------");
     }
 
     void RenderContext::swapBuffer() {

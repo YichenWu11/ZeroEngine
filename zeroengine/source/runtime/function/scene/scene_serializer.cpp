@@ -165,6 +165,8 @@ namespace Zero {
         FileWriteStream         os(fp, writeBuffer, sizeof(writeBuffer));
         Writer<FileWriteStream> write(os);
         doc.Accept(write);
+
+        fclose(fp);
     }
 
     void SceneSerializer::serializerRuntime(const std::filesystem::path& path) {
@@ -172,6 +174,11 @@ namespace Zero {
     }
 
     bool SceneSerializer::deserialize(const std::filesystem::path& path) {
+        if (!std::filesystem::exists(path)) {
+            LOG_WARN("The open_path doesn't exsit!");
+            return false;
+        }
+
         FILE*          fp;
         errno_t        err = fopen_s(&fp, path.string().c_str(), "rb");
         char           readBuffer[65536];
@@ -180,8 +187,18 @@ namespace Zero {
         Document document;
         document.ParseStream(is);
 
-        ZE_ASSERT(document.HasMember("Scene") && "Invalid Scene Json Format!");
-        ZE_ASSERT(document.HasMember("Entities") && "Invalid Scene Json Format!");
+        if (!document.HasMember("Scene")) {
+            LOG_WARN("Invalid Scene Json Format!");
+            return false;
+        }
+
+        if (!document.HasMember("Entities")) {
+            LOG_WARN("Invalid Scene Json Format!");
+            return false;
+        }
+
+        // ZE_ASSERT(document.HasMember("Scene") && "Invalid Scene Json Format!");
+        // ZE_ASSERT(document.HasMember("Entities") && "Invalid Scene Json Format!");
 
         const Value& entities = document["Entities"];
 

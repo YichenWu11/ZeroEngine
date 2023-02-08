@@ -169,19 +169,18 @@ namespace Zero {
                     // which we can't undo at the moment without finer window depth/z control.
                     // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-                    if (ImGui::MenuItem("Save")) {
-                        SceneSerializer serializer(m_active_scene);
-                        serializer.serialize(std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/scene/scene.json");
-                    }
+                    if (ImGui::MenuItem("New", "Ctrl+N"))
+                        newScene();
 
-                    if (ImGui::MenuItem("Load")) {
-                        SceneSerializer serializer(m_active_scene);
-                        serializer.deserialize(std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/scene/scene.json");
-                    }
+                    if (ImGui::MenuItem("Open...", "Ctrl+O"))
+                        openScene();
 
-                    if (ImGui::MenuItem("Exit")) {
+                    if (ImGui::MenuItem("Save As...", "Ctrl+S"))
+                        saveSceneAs();
+
+                    if (ImGui::MenuItem("Exit"))
                         Application::get().close();
-                    }
+
                     ImGui::EndMenu();
                 }
 
@@ -230,6 +229,61 @@ namespace Zero {
 
     void EditorLayer::onEvent(Event& event) {
         m_camera_controller.onEvent(event);
+
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<KeyPressedEvent>(ZE_BIND_EVENT_FN(EditorLayer::onKeyPressed));
+    }
+
+    bool EditorLayer::onKeyPressed(KeyPressedEvent& e) {
+        bool control = InputSystem::isKeyPressed(VK_LCONTROL) || InputSystem::isKeyPressed(VK_RCONTROL);
+        bool shift   = InputSystem::isKeyPressed(VK_LSHIFT) || InputSystem::isKeyPressed(VK_RSHIFT);
+
+        switch (e.getKeyCode()) {
+            case 'N': {
+                if (control) newScene();
+                break;
+            }
+            case 'O': {
+                if (control) openScene();
+                break;
+            }
+            case 'S': {
+                if (control) saveSceneAs();
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    void EditorLayer::newScene() {
+        m_active_scene = CreateRef<Scene>();
+        m_active_scene->onViewportResize((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
+        m_scene_hierarchy_panel.setContext(m_active_scene);
+    }
+
+    void EditorLayer::openScene() {
+        auto open_path = std::filesystem::path(
+            GET_FILE_DIALOG().openFile("Scene (*.json)\0*.json\0"));
+
+        if (!open_path.empty()) {
+            m_active_scene = CreateRef<Scene>();
+            m_active_scene->onViewportResize((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
+            m_scene_hierarchy_panel.setContext(m_active_scene);
+
+            SceneSerializer serializer(m_active_scene);
+            serializer.deserialize(open_path);
+        }
+    }
+
+    void EditorLayer::saveSceneAs() {
+        auto save_path = std::filesystem::path(
+            GET_FILE_DIALOG().saveFile("Scene (*.json)\0*.json\0"));
+
+        if (!save_path.empty()) {
+            SceneSerializer serializer(m_active_scene);
+            serializer.serialize(save_path);
+        }
     }
 
 } // namespace Zero

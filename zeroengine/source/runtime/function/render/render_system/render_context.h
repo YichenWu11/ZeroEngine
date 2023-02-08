@@ -88,13 +88,13 @@ namespace Zero {
         HWND m_window_handle;
         bool m_is_vsync_enable{false};
 
-        Chen::CDX12::Device            m_device;
+        Chen::CDX12::Device                   m_device;
+        Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
+
+        ComPtr<IDXGISwapChain3>        m_swapChain;
         Chen::CDX12::CmdQueue          m_commandQueue;
         ComPtr<ID3D12CommandSignature> m_command_signature;
         Chen::CDX12::GCmdList          m_currframe_cmdlist;
-
-        Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
-        ComPtr<IDXGISwapChain3>               m_swapChain;
 
         CD3DX12_VIEWPORT m_viewport;
         CD3DX12_RECT     m_scissorRect;
@@ -109,13 +109,12 @@ namespace Zero {
         std::vector<Chen::CDX12::BindProperty>      m_bindProperties;
         Chen::CDX12::ResourceStateTracker           m_stateTracker; // stateTracker
 
-        // DescriptorHeap
+        // DescriptorHeapAllocation
         Chen::CDX12::DescriptorHeapAllocation m_rtvCpuDH;
         Chen::CDX12::DescriptorHeapAllocation m_dsvCpuDH;
-        Chen::CDX12::DescriptorHeapAllocation m_csuCpuDH;
         Chen::CDX12::DescriptorHeapAllocation m_csuGpuDH;
 
-        // Synchronization objects.
+        // Synchronization objects
         uint32_t            m_backBufferIndex;
         ComPtr<ID3D12Fence> m_fence;
         uint64_t            m_fenceValue;

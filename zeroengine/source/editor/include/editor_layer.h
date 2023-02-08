@@ -19,6 +19,13 @@ namespace Zero {
         void onEvent(Event& event) override;
 
     private:
+        bool onKeyPressed(KeyPressedEvent& e);
+
+        void newScene();
+        void openScene();
+        void saveSceneAs();
+
+    private:
         OrthographicsCameraController m_camera_controller;
 
         Vector2 m_viewport_size;
