@@ -14,3 +14,5 @@ add_library(imgui STATIC
 
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR_})
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR_}/backends)
+
+# target_link_libraries(${TARGET_NAME} INTERFACE imgui)
