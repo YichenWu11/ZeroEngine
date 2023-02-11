@@ -29,9 +29,9 @@ namespace Zero {
         OrthographicsCameraController m_camera_controller;
 
         Vector2 m_viewport_size;
-        bool    m_viewport_focused = false;
-        bool    m_viewport_hovered = false;
-        bool    m_dockspace_enable = true;
+        bool    m_viewport_focused{false};
+        bool    m_viewport_hovered{false};
+        bool    m_dockspace_enable{true};
 
         Ref<SubTexture2D> m_texture_stair;
         Ref<SubTexture2D> m_texture_bush;
@@ -39,5 +39,7 @@ namespace Zero {
         Ref<Scene> m_active_scene;
 
         SceneHierarchyPanel m_scene_hierarchy_panel;
+
+        int m_GizmoType{-1};
     };
 } // namespace Zero

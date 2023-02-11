@@ -1,3 +1,5 @@
+#include <ImGuizmo.h>
+
 #include "runtime/function/scene/scene_serializer.h"
 
 #include "editor_layer.h"
@@ -205,7 +207,7 @@ namespace Zero {
                 ImGui::Begin("VIEWER");
                 m_viewport_focused = ImGui::IsWindowFocused();
                 m_viewport_hovered = ImGui::IsWindowHovered();
-                Application::get().getImGuiLayer()->blockEvents(!m_viewport_focused || !m_viewport_hovered);
+                Application::get().getImGuiLayer()->blockEvents(!m_viewport_focused && !m_viewport_hovered);
 
                 ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
                 if (m_viewport_size != *((Vector2*)&viewport_panel_size)) {
@@ -215,6 +217,60 @@ namespace Zero {
                 ImGui::Image(
                     Renderer::getOffScreenID(),
                     ImVec2{m_viewport_size.x, m_viewport_size.y});
+
+                // NOTE: Gizmos
+                Entity selected_entity = m_scene_hierarchy_panel.getSelectedEntity();
+                if (selected_entity && m_GizmoType != -1) {
+                    ImGuizmo::SetOrthographic(false);
+                    ImGuizmo::SetDrawlist();
+
+                    float window_width  = (float)ImGui::GetWindowWidth();
+                    float window_height = (float)ImGui::GetWindowHeight();
+                    ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, window_width, window_height);
+
+                    // Camera
+                    auto          camera_entity     = m_active_scene->getPrimaryCameraEntity();
+                    const auto&   camera            = camera_entity.getComponent<CameraComponent>().camera;
+                    const Matrix& camera_projection = camera.getProjection();
+                    Matrix        camera_view       = camera_entity.getComponent<TransformComponent>().getTransform().Invert();
+
+                    // Entity transform
+                    auto&  tc        = selected_entity.getComponent<TransformComponent>();
+                    Matrix transform = tc.getTransform();
+
+                    // Snapping
+                    bool  snap       = InputSystem::isKeyPressed(VK_LCONTROL);
+                    float snap_value = 0.5f; // Snap to 0.5m for translation/scale
+                    // Snap to 45 degrees for rotation
+                    if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+                        snap_value = 45.0f;
+
+                    float snap_values[3] = {snap_value, snap_value, snap_value};
+
+                    ImGuizmo::Manipulate(reinterpret_cast<const float*>(&camera_view),
+                                         reinterpret_cast<const float*>(&camera_projection),
+                                         (ImGuizmo::OPERATION)m_GizmoType,
+                                         ImGuizmo::LOCAL,
+                                         reinterpret_cast<float*>(&transform),
+                                         nullptr,
+                                         snap ? snap_values : nullptr);
+
+                    if (ImGuizmo::IsUsing()) {
+                        Vector3    translation{tc.translation}, scale{tc.scale};
+                        Quaternion q_rotation(Quaternion::CreateFromYawPitchRoll(tc.rotation));
+
+                        transform.Decompose(scale, q_rotation, translation);
+
+                        tc.translation = translation;
+                        tc.rotation    = q_rotation.ToEuler();
+                        if (tc.rotation.x == -0.0f) tc.rotation.x = 0.0f;
+                        if (tc.rotation.y == -0.0f) tc.rotation.x = 0.0f;
+                        if (tc.rotation.z == -0.0f) tc.rotation.x = 0.0f;
+
+                        tc.scale = scale;
+                    }
+                }
+
                 ImGui::End();
                 ImGui::PopStyleVar();
             }
@@ -251,6 +307,20 @@ namespace Zero {
                 if (control) saveSceneAs();
                 break;
             }
+
+            // Gizmos
+            case 'Q':
+                m_GizmoType = -1;
+                break;
+            case 'T':
+                m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                break;
+            case 'R':
+                m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+                break;
+            case 'E':
+                m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                break;
         }
 
         return false;

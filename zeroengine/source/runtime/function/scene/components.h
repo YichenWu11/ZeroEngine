@@ -28,7 +28,7 @@ namespace Zero {
             translation(_translation) {}
 
         Matrix getTransform() const {
-            return Matrix::CreateFromYawPitchRoll(rotation)
+            return Matrix::CreateFromQuaternion(Quaternion::CreateFromYawPitchRoll(rotation))
                    * Matrix::CreateScale(scale)
                    * Matrix::CreateTranslation(translation);
         }
