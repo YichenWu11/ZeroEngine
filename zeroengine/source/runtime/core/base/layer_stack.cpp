@@ -1,5 +1,5 @@
-#include "runtime/core/common/layer_stack.h"
-#include "runtime/core/common/layer.h"
+#include "runtime/core/base/layer_stack.h"
+#include "runtime/core/base/layer.h"
 
 namespace Zero {
     LayerStack::LayerStack() {

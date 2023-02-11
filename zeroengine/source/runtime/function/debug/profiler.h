@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include "runtime/core/util/singleton.h"
+
 namespace Zero {
     struct ProfileTaskResult {
         std::string name;
@@ -12,18 +14,10 @@ namespace Zero {
 
     class StepTimer;
 
-    class Profiler {
+    class Profiler : public Singleton<Profiler> {
         friend class StepTimer;
 
     public:
-        static Profiler& getInstance() {
-            static Profiler instance;
-            return instance;
-        }
-
-        Profiler(const Profiler&)            = delete;
-        Profiler& operator=(const Profiler&) = delete;
-
         void render() {
             ImGui::Begin("Profiler");
             for (auto& ret : m_profile_tasks) {
@@ -33,10 +27,6 @@ namespace Zero {
 
             m_profile_tasks.clear();
         }
-
-    private:
-        Profiler()  = default;
-        ~Profiler() = default;
 
     private:
         std::vector<ProfileTaskResult> m_profile_tasks;

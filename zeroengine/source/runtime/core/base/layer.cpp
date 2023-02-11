@@ -1,4 +1,4 @@
-#include "runtime/core/common/layer.h"
+#include "runtime/core/base/layer.h"
 
 namespace Zero {
     Layer::Layer(const std::string& debugName) :

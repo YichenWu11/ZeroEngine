@@ -1,7 +1,7 @@
 #include <imgui.h>
 
-#include "runtime/core/common/application.h"
-#include "runtime/core/common/layer.h"
+#include "runtime/core/base/application.h"
+#include "runtime/core/base/layer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"

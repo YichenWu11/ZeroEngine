@@ -3,6 +3,8 @@
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
 #include <CDX12/Material/Texture.h>
 
+#include "runtime/core/util/singleton.h"
+
 #define GET_TEXTURE_POOL() ::Zero::TexturePool::getInstance()
 
 namespace Zero {
@@ -19,35 +21,28 @@ namespace Zero {
         D3D12_RESOURCE_STATES              resourceState{D3D12_RESOURCE_STATE_COMMON};
     };
 
-    class TexturePool {
+    class TexturePool : public Singleton<TexturePool> {
+        friend class Singleton<TexturePool>;
+
     public:
         enum class TexFileFormat : uint8_t { WIC = 0,
                                              DDS };
 
     public:
-        static TexturePool& getInstance() {
-            static TexturePool instance;
-            return instance;
-        }
-
-        TexturePool(const TexturePool&)            = delete;
-        TexturePool& operator=(const TexturePool&) = delete;
-
         void init();
 
         void registerTex(const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
-        void registerTex(const std::string& tex_name, const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
+        void registerTex(std::string_view tex_name, const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureBuildInfo& build_info, TexFileFormat = TexFileFormat::WIC);
 
-        Zero::Ref<Chen::CDX12::Texture> getTextureFromName(const std::string&);
-        uint32_t                        getTexIndexFromName(const std::string&);
+        Zero::Ref<Chen::CDX12::Texture> getTextureFromName(std::string_view);
+        uint32_t                        getTexIndexFromName(std::string_view);
         uint32_t                        getTexIndex(const Ref<Chen::CDX12::Texture>&);
         std::string                     getTextureName(const Ref<Chen::CDX12::Texture>&);
 
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 
     private:
-        TexturePool() = default;
         ~TexturePool();
 
     private:

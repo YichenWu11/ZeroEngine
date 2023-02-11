@@ -1,6 +1,6 @@
 #pragma once
 
-#include "runtime/core/common/layer_stack.h"
+#include "runtime/core/base/layer_stack.h"
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/event/application_event.h"
 #include "runtime/function/event/key_event.h"

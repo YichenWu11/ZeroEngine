@@ -42,6 +42,6 @@
 
 #include <SimpleMath.h>
 
-#include "runtime/core/common/core.h"
+#include "runtime/core/base/core.h"
 #include "runtime/core/log/log_system.h"
 #include "runtime/function/debug/profiler.h"

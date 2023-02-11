@@ -1,6 +1,6 @@
 #include <commdlg.h>
 
-#include "runtime/core/common/application.h"
+#include "runtime/core/base/application.h"
 #include "runtime/core/util/file_dialog.h"
 
 namespace Zero {

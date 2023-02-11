@@ -8,6 +8,7 @@
 #include <CDX12/Shader/PSOManager.h>
 #include <CDX12/Util/BindProperty.h>
 
+#include "runtime/core/util/singleton.h"
 #include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/pass/ui_pass.h"
@@ -23,19 +24,11 @@ namespace Zero {
         ID3D12DescriptorHeap*       descriptor_heap;
     };
 
-    class RenderContext {
+    class RenderContext : public Singleton<RenderContext> {
         friend class MainCameraPass2D;
         friend class UIPass;
 
     public:
-        static RenderContext& getInstance() {
-            static RenderContext instance;
-            return instance;
-        }
-
-        RenderContext(const RenderContext&)            = delete;
-        RenderContext& operator=(const RenderContext&) = delete;
-
         void init(HWND window_handle, int width, int height);
         void shutdown();
         void swapBuffer();
@@ -73,9 +66,6 @@ namespace Zero {
         ImTextureID getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
 
     private:
-        RenderContext()  = default;
-        ~RenderContext() = default;
-
         void drawRenderPasses(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
         void flushCommandQueue();
 

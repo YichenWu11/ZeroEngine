@@ -31,13 +31,13 @@ namespace Zero {
         registerTex(tex_path.stem().string(), tex_path, file_format);
     }
 
-    void TexturePool::registerTex(const std::string& name, const std::filesystem::path& tex_path, TexFileFormat file_format) {
+    void TexturePool::registerTex(std::string_view name, const std::filesystem::path& tex_path, TexFileFormat file_format) {
         if (!std::filesystem::exists(tex_path)) {
             LOG_ERROR("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
             return;
         }
 
-        TextureBuildInfo build_info{AnsiToWString(tex_path.string()).c_str(), name};
+        TextureBuildInfo build_info{AnsiToWString(tex_path.string()).c_str(), std::string(name)};
         registerTex(build_info, file_format);
     }
 
@@ -103,22 +103,22 @@ namespace Zero {
         LOG_INFO("register texture named {0} success!", info.name);
     }
 
-    Zero::Ref<Texture> TexturePool::getTextureFromName(const std::string& tex_name) {
-        if (!m_texture_pool.contains(tex_name)) {
+    Zero::Ref<Texture> TexturePool::getTextureFromName(std::string_view tex_name) {
+        if (!m_texture_pool.contains(std::string(tex_name))) {
             LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
             return {};
         }
 
-        return m_texture_pool[tex_name];
+        return m_texture_pool[std::string(tex_name)];
     }
 
-    uint32_t TexturePool::getTexIndexFromName(const std::string& tex_name) {
-        if (!m_texture_pool.contains(tex_name)) {
+    uint32_t TexturePool::getTexIndexFromName(std::string_view tex_name) {
+        if (!m_texture_pool.contains(std::string(tex_name))) {
             LOG_WARN("The texture with this name({0}) does not exsit!", tex_name);
             return s_invalid_index;
         }
 
-        return m_texname2index[tex_name];
+        return m_texname2index[std::string(tex_name)];
     }
 
     uint32_t TexturePool::getTexIndex(const Ref<Chen::CDX12::Texture>& target) {

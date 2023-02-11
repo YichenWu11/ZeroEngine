@@ -3,8 +3,8 @@
 // runtime included
 #include <imgui.h>
 
-#include "runtime/core/common/application.h"
-#include "runtime/core/common/layer.h"
+#include "runtime/core/base/application.h"
+#include "runtime/core/base/layer.h"
 
 #include "runtime/core/util/file_dialog.h"
 #include "runtime/core/util/time_step.h"

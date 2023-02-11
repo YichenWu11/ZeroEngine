@@ -2,6 +2,8 @@
 
 #include <CDX12/Resource/Mesh.h>
 
+#include "runtime/core/util/singleton.h"
+
 namespace Chen::CDX12 {
     class FrameResource;
 }
@@ -11,38 +13,27 @@ namespace Chen::CDX12 {
 namespace Zero {
     struct VertexData2D;
 
-    class MeshPool {
+    class MeshPool : public Singleton<MeshPool> {
     public:
-        static MeshPool& getInstance() {
-            static MeshPool instance;
-            return instance;
-        }
-
-        MeshPool(const MeshPool&)            = delete;
-        MeshPool& operator=(const MeshPool&) = delete;
-
         void init() { buildBasicMesh(); }
 
         void registerMesh(
-            const std::string& mesh_name,
-            VertexData2D*      vertices,
-            uint32_t           vertices_count,
-            uint32_t*          indices,
-            uint32_t           indices_count);
+            std::string_view mesh_name,
+            VertexData2D*    vertices,
+            uint32_t         vertices_count,
+            uint32_t*        indices,
+            uint32_t         indices_count);
 
-        void removeMesh(const std::string& mesh_name);
+        void removeMesh(std::string_view mesh_name);
 
-        void delayDisposeMesh(const std::string& mesh_name, Chen::CDX12::FrameResource* frameres);
+        void delayDisposeMesh(std::string_view mesh_name, Chen::CDX12::FrameResource* frameres);
 
-        Zero::Ref<Chen::CDX12::Mesh> getMesh(const std::string&);
+        Zero::Ref<Chen::CDX12::Mesh> getMesh(std::string_view mesh_name);
         std::string                  getMeshName(const Zero::Ref<Chen::CDX12::Mesh>&);
 
-        bool isMeshExist(const std::string& name) { return m_mesh_pool.contains(name); }
+        bool isMeshExist(std::string_view name) { return m_mesh_pool.contains(std::string(name)); }
 
     private:
-        MeshPool()  = default;
-        ~MeshPool() = default;
-
         void buildBasicMesh();
 
     private:
