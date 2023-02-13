@@ -39,7 +39,8 @@ namespace Zero {
         Ref<Scene> m_active_scene;
 
         SceneHierarchyPanel m_scene_hierarchy_panel;
+        EditorCamera        m_editor_camera;
 
-        int m_GizmoType{-1};
+        int m_GizmoType{7};
     };
 } // namespace Zero

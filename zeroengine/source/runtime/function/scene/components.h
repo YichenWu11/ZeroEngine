@@ -28,8 +28,8 @@ namespace Zero {
             translation(_translation) {}
 
         Matrix getTransform() const {
-            return Matrix::CreateFromQuaternion(Quaternion::CreateFromYawPitchRoll(rotation))
-                   * Matrix::CreateScale(scale)
+            return Matrix::CreateScale(scale)
+                   * Matrix::CreateFromQuaternion(Quaternion::CreateFromYawPitchRoll(rotation))
                    * Matrix::CreateTranslation(translation);
         }
     };
@@ -47,8 +47,8 @@ namespace Zero {
 
     struct CameraComponent {
         SceneCamera camera;
-        bool        is_current           = true;
-        bool        is_fixed_aspectRatio = false;
+        bool        is_current{true};
+        bool        is_fixed_aspectRatio{false};
 
         CameraComponent()                       = default;
         CameraComponent(const CameraComponent&) = default;
@@ -59,8 +59,8 @@ namespace Zero {
     struct NativeScriptComponent {
         ScriptableEntity* instance = nullptr;
 
-        ScriptableEntity* (*instantiateScript)()      = nullptr;
-        void (*destroyScript)(NativeScriptComponent*) = nullptr;
+        ScriptableEntity* (*instantiateScript)(){nullptr};
+        void (*destroyScript)(NativeScriptComponent*){nullptr};
 
         template <typename T>
         void bind() {

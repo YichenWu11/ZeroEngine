@@ -14,9 +14,6 @@ namespace Zero {
         m_handle(handle) {
     }
 
-    ImGuiLayer::~ImGuiLayer() {
-    }
-
     void ImGuiLayer::onAttach() {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();

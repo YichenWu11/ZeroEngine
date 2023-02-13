@@ -3,6 +3,7 @@
 #include <entt/entt.hpp>
 
 #include "runtime/core/util/time_step.h"
+#include "runtime/function/render/camera_system/editor_camera.h"
 
 namespace Zero {
     class Entity;
@@ -21,7 +22,9 @@ namespace Zero {
         Entity createEntity(const std::string& name = std::string{});
         void   destroyEntity(Entity entity);
 
-        void onUpdate(TimeStep timestep);
+        void onUpdateRuntime(TimeStep timestep);
+        void onUpdateEditor(TimeStep timestep, EditorCamera& camera);
+
         void onViewportResize(uint32_t width, uint32_t height);
 
         Entity getPrimaryCameraEntity();

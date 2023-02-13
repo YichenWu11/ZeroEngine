@@ -24,35 +24,24 @@ namespace Zero {
     }
 
     void Renderer2D::beginScene(const Camera& camera, const DirectX::SimpleMath::Matrix& cam_transform) {
-        // takes all the scene settings(camera, lights, environment etc)
-        BasicShader* shader =
-            static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
+        beginScene(cam_transform.Invert() * camera.getProjection());
+    }
 
-        static Matrix view_proj_matrix;
-        view_proj_matrix = (cam_transform.Invert() * camera.getProjection()).Transpose();
-
-        GET_SHADER_BIND_TABLE().bindParam(
-            shader,
-            "_ViewProjMatrix",
-            std::span<const uint8_t>{
-                reinterpret_cast<uint8_t const*>(&view_proj_matrix),
-                sizeof(view_proj_matrix)});
-
-        auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
-
-        GET_SHADER_BIND_TABLE().bindParam(
-            shader,
-            "TextureMap",
-            std::make_pair(tex_alloc, 0));
+    void Renderer2D::beginScene(const EditorCamera& camera) {
+        beginScene(camera.getViewProjection());
     }
 
     void Renderer2D::beginScene(const OrthographicsCamera& camera) {
+        beginScene(camera.getViewProjectionMatrix());
+    }
+
+    void Renderer2D::beginScene(const DirectX::SimpleMath::Matrix& view_proj) {
         // takes all the scene settings(camera, lights, environment etc)
         BasicShader* shader =
             static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
 
         static Matrix view_proj_matrix;
-        view_proj_matrix = camera.getViewProjectionMatrix().Transpose();
+        view_proj_matrix = view_proj.Transpose();
 
         GET_SHADER_BIND_TABLE().bindParam(
             shader,

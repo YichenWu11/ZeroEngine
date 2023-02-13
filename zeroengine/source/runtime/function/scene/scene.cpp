@@ -23,7 +23,7 @@ namespace Zero {
         m_registry.destroy(entity);
     }
 
-    void Scene::onUpdate(TimeStep timestep) {
+    void Scene::onUpdateRuntime(TimeStep timestep) {
         // update scripts
         {
             m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
@@ -67,6 +67,23 @@ namespace Zero {
                     sprite.tex_index,
                     sprite.tiling_factor);
             }
+        }
+
+        Renderer2D::endScene();
+    }
+
+    void Scene::onUpdateEditor(TimeStep timestep, EditorCamera& camera) {
+        Renderer2D::beginScene(camera);
+
+        auto group = m_registry.group<TransformComponent>(entt::get<SpriteComponent>);
+        for (auto entity : group) {
+            auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
+
+            Renderer2D::drawQuad(
+                transform.getTransform(),
+                sprite.color,
+                sprite.tex_index,
+                sprite.tiling_factor);
         }
 
         Renderer2D::endScene();

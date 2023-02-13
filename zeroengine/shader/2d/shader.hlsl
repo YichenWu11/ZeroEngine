@@ -28,9 +28,9 @@ PSInput VSMain(VSInput input) {
 }
 
 float4 PSMain(PSInput input) : SV_TARGET {
-    float dist = 1.0f - distance(input.screen_pos * 0.8f, float2(0.0f, 0.0f));
-    dist = clamp(dist, 0.0f, 1.0f);
-    dist = sqrt(dist);
+    // float dist = 1.0f - distance(input.screen_pos * 0.8f, float2(0.0f, 0.0f));
+    // dist = clamp(dist, 0.0f, 1.0f);
+    // dist = sqrt(dist);
 
     float4 ret_color =
         TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap, input.tex_coord * u_TilingFactor) *

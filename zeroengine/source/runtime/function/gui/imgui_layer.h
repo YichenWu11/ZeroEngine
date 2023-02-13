@@ -12,7 +12,7 @@ namespace Zero {
     class ImGuiLayer : public Layer {
     public:
         ImGuiLayer(HWND);
-        ~ImGuiLayer();
+        ~ImGuiLayer() = default;
 
         void onAttach() override;
         void onDetach() override;

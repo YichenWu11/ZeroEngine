@@ -31,13 +31,8 @@ namespace Zero {
             {2, 3},
             {256.0f, 128.0f});
 
-        m_active_scene = CreateRef<Scene>();
-
-        // auto&& green_square = m_active_scene->createEntity("green_square");
-        // green_square.addComponent<SpriteComponent>(Color{0.0f, 1.0f, 0.0f, 1.0f});
-
-        // auto&& red_square = m_active_scene->createEntity("red_square");
-        // red_square.addComponent<SpriteComponent>(Color{1.0f, 0.0f, 0.0f, 1.0f});
+        m_active_scene  = CreateRef<Scene>();
+        m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
         // auto&& camera_a = m_active_scene->createEntity("cameraA");
         // camera_a.addComponent<CameraComponent>();
@@ -67,10 +62,6 @@ namespace Zero {
 
         // camera_a.addComponent<NativeScriptComponent>().bind<CameraController>();
 
-        // auto&& camera_b = m_active_scene->createEntity("cameraB");
-        // camera_b.addComponent<CameraComponent>();
-        // camera_b.getComponent<CameraComponent>().is_current = false;
-
         m_scene_hierarchy_panel.setContext(m_active_scene);
     }
 
@@ -78,8 +69,7 @@ namespace Zero {
         ZE_PROFILE_FUNCTION();
     }
 
-    void
-    EditorLayer::onUpdate(TimeStep timestep) {
+    void EditorLayer::onUpdate(TimeStep timestep) {
         ZE_PROFILE_FUNCTION();
 
         // resize
@@ -91,6 +81,7 @@ namespace Zero {
                 Renderer::resizeFrameBuffer((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
                 m_camera_controller.onResize(m_viewport_size.x, m_viewport_size.y);
 
+                m_editor_camera.setViewportSize(m_viewport_size.x, m_viewport_size.y);
                 m_active_scene->onViewportResize((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
             }
         }
@@ -100,11 +91,13 @@ namespace Zero {
             ZE_PROFILE_SCOPE("CameraController::onUpdate");
             if (m_viewport_focused)
                 m_camera_controller.onUpdate(timestep);
+
+            m_editor_camera.onUpdate(timestep);
         }
 
         // render
         {
-            // RenderCommand::setClearColor({0.2f, 0.2f, 0.2f, 1.0f});
+            RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1.0f});
             RenderCommand::clear();
         }
 
@@ -112,7 +105,8 @@ namespace Zero {
             ZE_PROFILE_SCOPE("Renderer2D::RenderScene");
 
             // update scene
-            m_active_scene->onUpdate(timestep);
+            m_active_scene->onUpdateEditor(timestep, m_editor_camera);
+            // m_active_scene->onUpdateRuntime(timestep);
         }
     }
 
@@ -229,10 +223,14 @@ namespace Zero {
                     ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, window_width, window_height);
 
                     // Camera
-                    auto          camera_entity     = m_active_scene->getPrimaryCameraEntity();
-                    const auto&   camera            = camera_entity.getComponent<CameraComponent>().camera;
-                    const Matrix& camera_projection = camera.getProjection();
-                    Matrix        camera_view       = camera_entity.getComponent<TransformComponent>().getTransform().Invert();
+                    // auto          camera_entity     = m_active_scene->getPrimaryCameraEntity();
+                    // const auto&   camera            = camera_entity.getComponent<CameraComponent>().camera;
+                    // const Matrix& camera_projection = camera.getProjection();
+                    // Matrix        camera_view       = camera_entity.getComponent<TransformComponent>().getTransform().Invert();
+
+                    // Editor camera
+                    const Matrix& camera_projection = m_editor_camera.getProjection();
+                    Matrix        camera_view       = m_editor_camera.getView();
 
                     // Entity transform
                     auto&  tc        = selected_entity.getComponent<TransformComponent>();
@@ -256,18 +254,21 @@ namespace Zero {
                                          snap ? snap_values : nullptr);
 
                     if (ImGuizmo::IsUsing()) {
-                        Vector3    translation{tc.translation}, scale{tc.scale};
-                        Quaternion q_rotation(Quaternion::CreateFromYawPitchRoll(tc.rotation));
+                        Vector3    translation, scale;
+                        Quaternion q_rotation;
+
+                        auto helper = [](Vector3&& vec3) {
+                            if (vec3.x == -0.0f) vec3.x = 0.0f;
+                            if (vec3.y == -0.0f) vec3.x = 0.0f;
+                            if (vec3.z == -0.0f) vec3.x = 0.0f;
+                            return vec3;
+                        };
 
                         transform.Decompose(scale, q_rotation, translation);
 
                         tc.translation = translation;
-                        tc.rotation    = q_rotation.ToEuler();
-                        if (tc.rotation.x == -0.0f) tc.rotation.x = 0.0f;
-                        if (tc.rotation.y == -0.0f) tc.rotation.x = 0.0f;
-                        if (tc.rotation.z == -0.0f) tc.rotation.x = 0.0f;
-
-                        tc.scale = scale;
+                        tc.rotation    = helper(q_rotation.ToEuler());
+                        tc.scale       = scale;
                     }
                 }
 
@@ -285,6 +286,7 @@ namespace Zero {
 
     void EditorLayer::onEvent(Event& event) {
         m_camera_controller.onEvent(event);
+        m_editor_camera.onEvent(event);
 
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(ZE_BIND_EVENT_FN(EditorLayer::onKeyPressed));
