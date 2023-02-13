@@ -17,73 +17,71 @@ namespace Zero {
         void onEvent(Event& event);
 
         void setViewportSize(float width, float height) {
-            m_ViewportWidth  = width;
-            m_ViewportHeight = height;
+            m_viewportWidth  = width;
+            m_viewportHeight = height;
             updateProjection();
         }
 
-        DirectX::SimpleMath::Matrix getView() const { return mView; }
-        DirectX::SimpleMath::Matrix getViewProjection() const { return mView * m_projection; }
+        void setPosition(const DirectX::XMFLOAT3& v) {
+            m_position  = v;
+            m_viewDirty = true;
+        }
 
-        DirectX::SimpleMath::Vector3 getPosition() const { return mPosition; }
-        void                         setPosition(const DirectX::XMFLOAT3& v);
+        DirectX::SimpleMath::Matrix getView() const { return m_view; }
+        DirectX::SimpleMath::Matrix getViewProjection() const { return m_view * m_projection; }
 
-        DirectX::SimpleMath::Vector3 getRight() const { return mRight; }
-        DirectX::SimpleMath::Vector3 getUp() const { return mUp; }
-        DirectX::SimpleMath::Vector3 getLook() const { return mLook; }
+        DirectX::SimpleMath::Vector3 getPosition() const { return m_position; }
 
-        float getNearZ() const { return mNearZ; }
-        float getFarZ() const { return mFarZ; }
-        float getAspect() const { return mAspect; }
-        float getFovY() const { return mFovY; }
-        float getFovX() const;
+        DirectX::SimpleMath::Vector3 getRight() const { return m_right; }
+        DirectX::SimpleMath::Vector3 getUp() const { return m_up; }
+        DirectX::SimpleMath::Vector3 getLook() const { return m_look; }
 
-        float getNearWindowWidth() const { return mAspect * mNearWindowHeight; }
-        float getNearWindowHeight() const { return mNearWindowHeight; }
-        float getFarWindowWidth() const { return mAspect * mFarWindowHeight; }
-        float getFarWindowHeight() const { return mFarWindowHeight; }
+        float getNearZ() const { return m_nearZ; }
+        float getFarZ() const { return m_farZ; }
+        float getAspect() const { return m_aspect; }
+        float getFovY() const { return m_fovY; }
+        float getFovX() const { return 2.0f * atan(0.5f * getNearWindowWidth() / m_nearZ); }
+
+        float getNearWindowWidth() const { return m_aspect * m_nearWindowHeight; }
+        float getNearWindowHeight() const { return m_nearWindowHeight; }
+        float getFarWindowWidth() const { return m_aspect * m_farWindowHeight; }
+        float getFarWindowHeight() const { return m_farWindowHeight; }
 
     private:
+        void setViewDirty() { m_viewDirty = true; }
+        void setLens(float fovY, float aspect, float zn, float zf);
+
+        void strafe(float d);
+        void walk(float d);
+
+        void pitch(float angle);
+        void rotateY(float angle);
+
         void updateProjection();
         void updateView();
 
         bool onMouseScroll(MouseScrolledEvent& event);
 
-        // Set frustum.
-        void setLens(float fovY, float aspect, float zn, float zf);
-
-        void lookAt(DirectX::FXMVECTOR pos, DirectX::FXMVECTOR target, DirectX::FXMVECTOR worldUp);
-        void lookAt(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& target, const DirectX::XMFLOAT3& up);
-
-        // Strafe/Walk the camera a distance d.
-        void strafe(float d);
-        void walk(float d);
-
-        // Rotate the camera.
-        void pitch(float angle);
-        void rotateY(float angle);
-
     private:
-        // Camera coordinate system with coordinates relative to world space.
-        DirectX::XMFLOAT3 mPosition = {0.0f, 0.0f, -2.0f};
-        DirectX::XMFLOAT3 mRight    = {1.0f, 0.0f, 0.0f};
-        DirectX::XMFLOAT3 mUp       = {0.0f, 1.0f, 0.0f};
-        DirectX::XMFLOAT3 mLook     = {0.0f, 0.0f, 1.0f};
+        DirectX::XMFLOAT3 m_position = {0.0f, 0.0f, 0.0f};
+        DirectX::XMFLOAT3 m_right    = {1.0f, 0.0f, 0.0f};
+        DirectX::XMFLOAT3 m_up       = {0.0f, 1.0f, 0.0f};
+        DirectX::XMFLOAT3 m_look     = {0.0f, 0.0f, 1.0f};
 
-        // Cache frustum properties.
-        float mNearZ            = 0.1f;
-        float mFarZ             = 1000.0f;
-        float mAspect           = 1.778f;
-        float mFovY             = 45.0f;
-        float mNearWindowHeight = 0.0f;
-        float mFarWindowHeight  = 0.0f;
+        float m_nearZ            = 0.1f;
+        float m_farZ             = 1000.0f;
+        float m_aspect           = 1.778f;
+        float m_fovY             = 45.0f;
+        float m_nearWindowHeight = 0.0f;
+        float m_farWindowHeight  = 0.0f;
 
-        bool mViewDirty = true;
+        float m_zoom_level = 1.0f; // for ortho
 
-        // Cache View/Proj matrices.
-        DirectX::XMFLOAT4X4 mView = Chen::CDX12::Math::MathHelper::Identity4x4();
+        bool m_viewDirty = true;
 
-        float                        m_ViewportWidth = 1280, m_ViewportHeight = 720;
-        DirectX::SimpleMath::Vector2 m_InitialMousePosition = {0.0f, 0.0f};
+        DirectX::XMFLOAT4X4 m_view = Chen::CDX12::Math::MathHelper::Identity4x4();
+
+        float                        m_viewportWidth = 1280, m_viewportHeight = 720;
+        DirectX::SimpleMath::Vector2 m_initialMousePosition = {0.0f, 0.0f};
     };
 } // namespace Zero

@@ -2,9 +2,11 @@
 
 #include "runtime/function/input/input_system.h"
 #include "runtime/function/render/camera_system/editor_camera.h"
+#include "runtime/function/render/render_system/renderer_api.h"
 
 using namespace DirectX::SimpleMath;
 using namespace DirectX;
+using namespace Chen::CDX12;
 
 namespace Zero {
     EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip) :
@@ -13,18 +15,138 @@ namespace Zero {
         updateView();
     }
 
+    void EditorCamera::onUpdate(TimeStep ts) {
+        const Vector2& mouse{InputSystem::getMouseX(), InputSystem::getMouseY()};
+        Vector2        delta   = (mouse - m_initialMousePosition) * 0.003f;
+        m_initialMousePosition = mouse;
+
+        if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
+            if (RendererAPI::is2D()) {
+                // 2d
+                if (InputSystem::isKeyPressed('W'))
+                    m_position.y += (5.0f * ts);
+
+                if (InputSystem::isKeyPressed('S'))
+                    m_position.y += (-5.0f * ts);
+
+                if (InputSystem::isKeyPressed('A'))
+                    m_position.x += (-5.0f * ts);
+
+                if (InputSystem::isKeyPressed('D'))
+                    m_position.x += (5.0f * ts);
+
+                setViewDirty();
+            }
+            else {
+                // 3d
+                if (InputSystem::isKeyPressed('W'))
+                    walk(5.0f * ts);
+
+                if (InputSystem::isKeyPressed('S'))
+                    walk(-5.0f * ts);
+
+                if (InputSystem::isKeyPressed('A'))
+                    strafe(-5.0f * ts);
+
+                if (InputSystem::isKeyPressed('D'))
+                    strafe(5.0f * ts);
+
+                if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
+                    pitch(delta.y);
+                    rotateY(delta.x);
+                }
+            }
+        }
+
+        updateView();
+    }
+
+    void EditorCamera::onEvent(Event& e) {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<MouseScrolledEvent>(ZE_BIND_EVENT_FN(EditorCamera::onMouseScroll));
+    }
+
+    bool EditorCamera::onMouseScroll(MouseScrolledEvent& e) {
+        if (RendererAPI::is2D()) {
+            LOG_INFO("{0}", e.getZOffset());
+            m_zoom_level -= e.getZOffset() * 0.001f;
+            m_zoom_level = std::max(m_zoom_level, 0.05f);
+            updateProjection();
+        }
+
+        return false;
+    }
+
+    void EditorCamera::setLens(float fovY, float aspect, float zn, float zf) {
+        // cache properties
+        m_fovY   = fovY;
+        m_aspect = aspect;
+        m_nearZ  = zn;
+        m_farZ   = zf;
+
+        m_nearWindowHeight = 2.0f * m_nearZ * tanf(0.5f * m_fovY);
+        m_farWindowHeight  = 2.0f * m_farZ * tanf(0.5f * m_fovY);
+
+        updateProjection();
+    }
+
+    void EditorCamera::strafe(float d) {
+        // m_position += d*m_right
+        XMVECTOR s = XMVectorReplicate(d);
+        XMVECTOR r = XMLoadFloat3(&m_right);
+        XMVECTOR p = XMLoadFloat3(&m_position);
+        XMStoreFloat3(&m_position, XMVectorMultiplyAdd(s, r, p));
+
+        m_viewDirty = true;
+    }
+
+    void EditorCamera::walk(float d) {
+        // m_position += d*m_look
+        XMVECTOR s = XMVectorReplicate(d);
+        XMVECTOR l = XMLoadFloat3(&m_look);
+        XMVECTOR p = XMLoadFloat3(&m_position);
+        XMStoreFloat3(&m_position, XMVectorMultiplyAdd(s, l, p));
+
+        m_viewDirty = true;
+    }
+
+    void EditorCamera::pitch(float angle) {
+        // Rotate up and look vector about the right vector.
+
+        XMMATRIX R = XMMatrixRotationQuaternion(Math::Quaternion(XMLoadFloat3(&m_right), angle));
+
+        XMStoreFloat3(&m_up, XMVector3TransformNormal(XMLoadFloat3(&m_up), R));
+        XMStoreFloat3(&m_look, XMVector3TransformNormal(XMLoadFloat3(&m_look), R));
+
+        m_viewDirty = true;
+    }
+
+    void EditorCamera::rotateY(float angle) {
+        // Rotate the basis vectors about the world y-axis.
+
+        XMMATRIX R = XMMatrixRotationQuaternion(Math::Quaternion(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), angle));
+
+        XMStoreFloat3(&m_right, XMVector3TransformNormal(XMLoadFloat3(&m_right), R));
+        XMStoreFloat3(&m_up, XMVector3TransformNormal(XMLoadFloat3(&m_up), R));
+        XMStoreFloat3(&m_look, XMVector3TransformNormal(XMLoadFloat3(&m_look), R));
+
+        m_viewDirty = true;
+    }
+
     void EditorCamera::updateProjection() {
-        mAspect      = m_ViewportWidth / m_ViewportHeight;
-        m_projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(mFovY), mAspect, mNearZ, mFarZ);
+        m_aspect = m_viewportWidth / m_viewportHeight;
+        if (RendererAPI::is2D())
+            m_projection = XMMatrixOrthographicLH(2.0f * m_zoom_level * m_aspect, 2.0f * m_zoom_level, -1.0f, 1.0f);
+        else
+            m_projection = XMMatrixPerspectiveFovLH(XMConvertToRadians(m_fovY), m_aspect, m_nearZ, m_farZ);
     }
 
     void EditorCamera::updateView() {
-        // NOTE: Lock the camera's rotation
-        if (mViewDirty) {
-            XMVECTOR R = XMLoadFloat3(&mRight);
-            XMVECTOR U = XMLoadFloat3(&mUp);
-            XMVECTOR L = XMLoadFloat3(&mLook);
-            XMVECTOR P = XMLoadFloat3(&mPosition);
+        if (m_viewDirty) {
+            XMVECTOR R = XMLoadFloat3(&m_right);
+            XMVECTOR U = XMLoadFloat3(&m_up);
+            XMVECTOR L = XMLoadFloat3(&m_look);
+            XMVECTOR P = XMLoadFloat3(&m_position);
 
             // Keep camera's axes orthogonal to each other and of unit length.
             L = XMVector3Normalize(L);
@@ -38,156 +160,31 @@ namespace Zero {
             float y = -XMVectorGetX(XMVector3Dot(P, U));
             float z = -XMVectorGetX(XMVector3Dot(P, L));
 
-            XMStoreFloat3(&mRight, R);
-            XMStoreFloat3(&mUp, U);
-            XMStoreFloat3(&mLook, L);
+            XMStoreFloat3(&m_right, R);
+            XMStoreFloat3(&m_up, U);
+            XMStoreFloat3(&m_look, L);
 
-            mView(0, 0) = mRight.x;
-            mView(1, 0) = mRight.y;
-            mView(2, 0) = mRight.z;
-            mView(3, 0) = x;
+            m_view(0, 0) = m_right.x;
+            m_view(1, 0) = m_right.y;
+            m_view(2, 0) = m_right.z;
+            m_view(3, 0) = x;
 
-            mView(0, 1) = mUp.x;
-            mView(1, 1) = mUp.y;
-            mView(2, 1) = mUp.z;
-            mView(3, 1) = y;
+            m_view(0, 1) = m_up.x;
+            m_view(1, 1) = m_up.y;
+            m_view(2, 1) = m_up.z;
+            m_view(3, 1) = y;
 
-            mView(0, 2) = mLook.x;
-            mView(1, 2) = mLook.y;
-            mView(2, 2) = mLook.z;
-            mView(3, 2) = z;
+            m_view(0, 2) = m_look.x;
+            m_view(1, 2) = m_look.y;
+            m_view(2, 2) = m_look.z;
+            m_view(3, 2) = z;
 
-            mView(0, 3) = 0.0f;
-            mView(1, 3) = 0.0f;
-            mView(2, 3) = 0.0f;
-            mView(3, 3) = 1.0f;
+            m_view(0, 3) = 0.0f;
+            m_view(1, 3) = 0.0f;
+            m_view(2, 3) = 0.0f;
+            m_view(3, 3) = 1.0f;
 
-            mViewDirty = false;
+            m_viewDirty = false;
         }
-    }
-
-    void EditorCamera::onUpdate(TimeStep ts) {
-        const Vector2& mouse{InputSystem::getMouseX(), InputSystem::getMouseY()};
-        Vector2        delta   = (mouse - m_InitialMousePosition) * 0.003f;
-        m_InitialMousePosition = mouse;
-
-        if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
-            if (InputSystem::isKeyPressed('W'))
-                walk(5.0f * ts);
-
-            if (InputSystem::isKeyPressed('S'))
-                walk(-5.0f * ts);
-
-            if (InputSystem::isKeyPressed('A'))
-                strafe(-5.0f * ts);
-
-            if (InputSystem::isKeyPressed('D'))
-                strafe(5.0f * ts);
-
-            if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
-                pitch(delta.y);
-                rotateY(delta.x);
-            }
-        }
-
-        updateView();
-    }
-
-    void EditorCamera::onEvent(Event& e) {
-        EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<MouseScrolledEvent>(ZE_BIND_EVENT_FN(EditorCamera::onMouseScroll));
-    }
-
-    bool EditorCamera::onMouseScroll(MouseScrolledEvent& e) {
-        return false;
-    }
-
-    void EditorCamera::setPosition(const XMFLOAT3& v) {
-        mPosition  = v;
-        mViewDirty = true;
-    }
-
-    float EditorCamera::getFovX() const {
-        float halfWidth = 0.5f * getNearWindowWidth();
-        return 2.0f * atan(halfWidth / mNearZ);
-    }
-
-    void EditorCamera::setLens(float fovY, float aspect, float zn, float zf) {
-        // cache properties
-        mFovY   = fovY;
-        mAspect = aspect;
-        mNearZ  = zn;
-        mFarZ   = zf;
-
-        mNearWindowHeight = 2.0f * mNearZ * tanf(0.5f * mFovY);
-        mFarWindowHeight  = 2.0f * mFarZ * tanf(0.5f * mFovY);
-
-        updateProjection();
-    }
-
-    void EditorCamera::lookAt(FXMVECTOR pos, FXMVECTOR target, FXMVECTOR worldUp) {
-        XMVECTOR L = XMVector3Normalize(XMVectorSubtract(target, pos));
-        XMVECTOR R = XMVector3Normalize(XMVector3Cross(worldUp, L));
-        XMVECTOR U = XMVector3Cross(L, R);
-
-        XMStoreFloat3(&mPosition, pos);
-        XMStoreFloat3(&mLook, L);
-        XMStoreFloat3(&mRight, R);
-        XMStoreFloat3(&mUp, U);
-
-        mViewDirty = true;
-    }
-
-    void EditorCamera::lookAt(const XMFLOAT3& pos, const XMFLOAT3& target, const XMFLOAT3& up) {
-        XMVECTOR P = XMLoadFloat3(&pos);
-        XMVECTOR T = XMLoadFloat3(&target);
-        XMVECTOR U = XMLoadFloat3(&up);
-
-        lookAt(P, T, U);
-
-        mViewDirty = true;
-    }
-
-    void EditorCamera::strafe(float d) {
-        // mPosition += d*mRight
-        XMVECTOR s = XMVectorReplicate(d);
-        XMVECTOR r = XMLoadFloat3(&mRight);
-        XMVECTOR p = XMLoadFloat3(&mPosition);
-        XMStoreFloat3(&mPosition, XMVectorMultiplyAdd(s, r, p));
-
-        mViewDirty = true;
-    }
-
-    void EditorCamera::walk(float d) {
-        // mPosition += d*mLook
-        XMVECTOR s = XMVectorReplicate(d);
-        XMVECTOR l = XMLoadFloat3(&mLook);
-        XMVECTOR p = XMLoadFloat3(&mPosition);
-        XMStoreFloat3(&mPosition, XMVectorMultiplyAdd(s, l, p));
-
-        mViewDirty = true;
-    }
-
-    void EditorCamera::pitch(float angle) {
-        // Rotate up and look vector about the right vector.
-
-        XMMATRIX R = XMMatrixRotationQuaternion(Chen::CDX12::Math::Quaternion(XMLoadFloat3(&mRight), angle));
-
-        XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
-        XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
-
-        mViewDirty = true;
-    }
-
-    void EditorCamera::rotateY(float angle) {
-        // Rotate the basis vectors about the world y-axis.
-
-        XMMATRIX R = XMMatrixRotationQuaternion(Chen::CDX12::Math::Quaternion(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), angle));
-
-        XMStoreFloat3(&mRight, XMVector3TransformNormal(XMLoadFloat3(&mRight), R));
-        XMStoreFloat3(&mUp, XMVector3TransformNormal(XMLoadFloat3(&mUp), R));
-        XMStoreFloat3(&mLook, XMVector3TransformNormal(XMLoadFloat3(&mLook), R));
-
-        mViewDirty = true;
     }
 } // namespace Zero
