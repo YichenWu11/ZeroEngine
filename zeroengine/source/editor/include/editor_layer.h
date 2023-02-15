@@ -26,8 +26,6 @@ namespace Zero {
         void saveSceneAs();
 
     private:
-        OrthographicsCameraController m_camera_controller;
-
         Vector2 m_viewport_size;
         bool    m_viewport_focused{false};
         bool    m_viewport_hovered{false};

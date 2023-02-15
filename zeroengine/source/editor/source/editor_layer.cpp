@@ -6,7 +6,7 @@
 
 namespace Zero {
     EditorLayer::EditorLayer() :
-        Layer("EditorLayer"), m_camera_controller(1280.0f / 720.0f) {}
+        Layer("EditorLayer") {}
 
     void EditorLayer::onAttach() {
         ZE_PROFILE_FUNCTION();
@@ -79,7 +79,6 @@ namespace Zero {
                 && m_viewport_size.y > 0.0f
                 && ((config.width != m_viewport_size.x) || (config.height != m_viewport_size.y))) {
                 Renderer::resizeFrameBuffer((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
-                m_camera_controller.onResize(m_viewport_size.x, m_viewport_size.y);
 
                 m_editor_camera.setViewportSize(m_viewport_size.x, m_viewport_size.y);
                 m_active_scene->onViewportResize((uint32_t)m_viewport_size.x, (uint32_t)m_viewport_size.y);
@@ -88,16 +87,15 @@ namespace Zero {
 
         // update
         {
-            ZE_PROFILE_SCOPE("CameraController::onUpdate");
-            if (m_viewport_focused)
-                m_camera_controller.onUpdate(timestep);
+            ZE_PROFILE_SCOPE("EditorCamera::onUpdate");
 
-            m_editor_camera.onUpdate(timestep);
+            if (m_viewport_hovered)
+                m_editor_camera.onUpdate(timestep);
         }
 
         // render
         {
-            RenderCommand::setClearColor({0.1f, 0.1f, 0.1f, 1.0f});
+            RenderCommand::setClearColor({0.2f, 0.2f, 0.2f, 1.0f});
             RenderCommand::clear();
         }
 
@@ -285,7 +283,6 @@ namespace Zero {
     }
 
     void EditorLayer::onEvent(Event& event) {
-        m_camera_controller.onEvent(event);
         m_editor_camera.onEvent(event);
 
         EventDispatcher dispatcher(event);

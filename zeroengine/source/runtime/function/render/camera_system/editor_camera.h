@@ -1,7 +1,5 @@
 #pragma once
 
-#include <CDX12/Math/MathHelper.h>
-
 #include "runtime/core/util/time_step.h"
 #include "runtime/function/event/event.h"
 #include "runtime/function/event/mouse_event.h"
@@ -79,7 +77,7 @@ namespace Zero {
 
         bool m_viewDirty = true;
 
-        DirectX::XMFLOAT4X4 m_view = Chen::CDX12::Math::MathHelper::Identity4x4();
+        DirectX::XMFLOAT4X4 m_view{DirectX::SimpleMath::Matrix::Identity};
 
         float                        m_viewportWidth = 1280, m_viewportHeight = 720;
         DirectX::SimpleMath::Vector2 m_initialMousePosition = {0.0f, 0.0f};

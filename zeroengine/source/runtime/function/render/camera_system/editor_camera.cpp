@@ -20,25 +20,18 @@ namespace Zero {
         Vector2        delta   = (mouse - m_initialMousePosition) * 0.003f;
         m_initialMousePosition = mouse;
 
-        if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
-            if (RendererAPI::is2D()) {
-                // 2d
-                if (InputSystem::isKeyPressed('W'))
-                    m_position.y += (5.0f * ts);
-
-                if (InputSystem::isKeyPressed('S'))
-                    m_position.y += (-5.0f * ts);
-
-                if (InputSystem::isKeyPressed('A'))
-                    m_position.x += (-5.0f * ts);
-
-                if (InputSystem::isKeyPressed('D'))
-                    m_position.x += (5.0f * ts);
-
-                setViewDirty();
+        if (RendererAPI::is2D()) {
+            // 2d
+            if (InputSystem::isMouseButtonPressed(VK_MBUTTON)) {
+                m_position.x += m_zoom_level * -delta.x;
+                m_position.y += m_zoom_level * delta.y;
             }
-            else {
-                // 3d
+
+            setViewDirty();
+        }
+        else {
+            // 3d
+            if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
                 if (InputSystem::isKeyPressed('W'))
                     walk(5.0f * ts);
 
@@ -51,10 +44,8 @@ namespace Zero {
                 if (InputSystem::isKeyPressed('D'))
                     strafe(5.0f * ts);
 
-                if (InputSystem::isMouseButtonPressed(VK_RBUTTON)) {
-                    pitch(delta.y);
-                    rotateY(delta.x);
-                }
+                pitch(delta.y);
+                rotateY(delta.x);
             }
         }
 
@@ -68,7 +59,6 @@ namespace Zero {
 
     bool EditorCamera::onMouseScroll(MouseScrolledEvent& e) {
         if (RendererAPI::is2D()) {
-            LOG_INFO("{0}", e.getZOffset());
             m_zoom_level -= e.getZOffset() * 0.001f;
             m_zoom_level = std::max(m_zoom_level, 0.05f);
             updateProjection();
