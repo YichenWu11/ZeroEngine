@@ -148,7 +148,7 @@ namespace Zero {
             ImGuiIO&    io          = ImGui::GetIO();
             ImGuiStyle& style       = ImGui::GetStyle();
             float       minWinSizeX = style.WindowMinSize.x;
-            style.WindowMinSize.x   = 370.0f;
+            style.WindowMinSize.x   = 300.0f;
 
             if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
                 ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -158,11 +158,7 @@ namespace Zero {
             style.WindowMinSize.x = minWinSizeX;
 
             if (ImGui::BeginMenuBar()) {
-                if (ImGui::BeginMenu("File")) {
-                    // Disabling fullscreen would allow the window to be moved to the front of other windows,
-                    // which we can't undo at the moment without finer window depth/z control.
-                    // ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-
+                if (ImGui::BeginMenu("Menu")) {
                     if (ImGui::MenuItem("New", "Ctrl+N"))
                         newScene();
 
@@ -188,7 +184,7 @@ namespace Zero {
                 ImGui::Begin("ASOUL");
                 ImGui::Image(
                     ImTextureID(tex_alloc->GetGpuHandle(2).ptr),
-                    ImVec2(200, 200));
+                    ImVec2(120, 120));
                 ImGui::SameLine();
                 ImGui::End();
             }
@@ -196,7 +192,63 @@ namespace Zero {
             {
                 // Viewer
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-                ImGui::Begin("VIEWER");
+                ImGui::Begin("VIEWER", NULL, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar);
+
+                if (ImGui::BeginMenuBar()) {
+                    ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
+
+                    {
+                        ImGui::Indent(10.f);
+
+                        if (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE) {
+                            ImGui::PushStyleColor(ImGuiCol_Button,
+                                                  ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
+                            ImGui::Button("Trans");
+                            ImGui::PopStyleColor(3);
+                        }
+                        else {
+                            if (ImGui::Button("Trans")) m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                        }
+                        ImGui::Unindent();
+                    }
+
+                    ImGui::SameLine();
+
+                    {
+                        if (m_GizmoType == ImGuizmo::OPERATION::ROTATE) {
+                            ImGui::PushStyleColor(ImGuiCol_Button,
+                                                  ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
+                            ImGui::Button("Rotate");
+                            ImGui::PopStyleColor(3);
+                        }
+                        else {
+                            if (ImGui::Button("Rotate")) m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+                        }
+                    }
+
+                    ImGui::SameLine();
+
+                    {
+                        if (m_GizmoType == ImGuizmo::OPERATION::SCALE) {
+                            ImGui::PushStyleColor(ImGuiCol_Button,
+                                                  ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
+                            ImGui::Button("Scale");
+                            ImGui::PopStyleColor(3);
+                        }
+                        else {
+                            if (ImGui::Button("Scale")) m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                        }
+                    }
+
+                    ImGui::EndMenuBar();
+                }
+
                 m_viewport_focused = ImGui::IsWindowFocused();
                 m_viewport_hovered = ImGui::IsWindowHovered();
                 Application::get().getImGuiLayer()->blockEvents(!m_viewport_focused && !m_viewport_hovered);
@@ -309,16 +361,16 @@ namespace Zero {
 
             // Gizmos
             case 'Q':
-                m_GizmoType = -1;
+                if (!ImGuizmo::IsUsing()) m_GizmoType = -1;
                 break;
             case 'T':
-                m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                if (!ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
                 break;
             case 'R':
-                m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+                if (!ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::ROTATE;
                 break;
             case 'E':
-                m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                if (!ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::SCALE;
                 break;
         }
 

@@ -5,7 +5,8 @@ namespace Chen::CDX12 {
 } // namespace Chen::CDX12
 
 namespace Zero {
-    class RenderContext;
+    struct RenderPassConfiguration {
+    };
 
     class RenderPass {
     public:

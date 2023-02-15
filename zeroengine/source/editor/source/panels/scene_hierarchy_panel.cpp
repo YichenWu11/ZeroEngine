@@ -113,7 +113,7 @@ namespace Zero {
 
     void SceneHierarchyPanel::onImGuiRender() {
         {
-            ImGui::Begin("Hierarchy");
+            ImGui::Begin("Scene");
 
             m_context->m_registry.each([&](auto entityHandle) {
                 Entity entity{entityHandle, m_context.get()};
@@ -150,9 +150,11 @@ namespace Zero {
         ImGuiTreeNodeFlags flags = ((m_selected_entity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
         flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 
-        bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", name.c_str());
-        if (ImGui::IsItemClicked())
+        ImGuiIO& io = ImGui::GetIO();
+
+        if (ImGui::Selectable(name.c_str(), m_selected_entity == entity)) {
             m_selected_entity = entity;
+        }
 
         bool entity_deleted = false;
         if (ImGui::BeginPopupContextItem()) {
@@ -160,14 +162,6 @@ namespace Zero {
                 entity_deleted = true;
 
             ImGui::EndPopup();
-        }
-
-        if (opened) {
-            // ImGuiTreeNodeFlags flags  = ImGuiTreeNodeFlags_OpenOnArrow;
-            // bool               opened = ImGui::TreeNodeEx((void*)9817239, flags, "%s", name.c_str());
-            // if (opened)
-            //     ImGui::TreePop();
-            ImGui::TreePop();
         }
 
         if (entity_deleted) {

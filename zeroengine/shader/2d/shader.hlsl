@@ -36,6 +36,7 @@ float4 PSMain(PSInput input) : SV_TARGET {
         TextureMap[u_TexIndex].Sample(u_samAnisotropicWrap, input.tex_coord * u_TilingFactor) *
         u_ModulateColor;
 
+    // return EdgeDetect(input.tex_coord * u_TilingFactor, u_TexIndex) * u_ModulateColor;
     // return Blur(input.tex_coord * u_TilingFactor, u_TexIndex) * u_ModulateColor;
     return ret_color;
 }
