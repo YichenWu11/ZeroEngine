@@ -3,12 +3,13 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "runtime/core/log/log_system.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 namespace Zero {
     std::shared_ptr<spdlog::logger> LogSystem::s_logger;
 
     void LogSystem::init() {
-        auto log_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "log/zeroengine.log";
+        auto log_path = GET_CONFIG_MNGR().getRootFolder() / "log/zeroengine.log";
 
         std::vector<spdlog::sink_ptr> logSinks;
         logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());

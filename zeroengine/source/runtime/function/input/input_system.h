@@ -9,8 +9,5 @@ namespace Zero {
         static DirectX::SimpleMath::Vector2 getMousePosition();
         static float                        getMouseX();
         static float                        getMouseY();
-
-    private:
-        static Zero::Scope<InputSystem> s_instance;
     };
 } // namespace Zero

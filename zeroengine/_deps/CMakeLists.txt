@@ -17,3 +17,11 @@ endif()
 if(NOT TARGET imgui)
     include(imgui.cmake)
 endif()
+
+if(NOT TARGET entt)
+    include(entt.cmake)
+endif()
+
+if(NOT TARGET ImGuizmo)
+    include(ImGuizmo.cmake)
+endif()

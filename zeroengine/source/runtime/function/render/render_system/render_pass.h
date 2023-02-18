@@ -5,7 +5,8 @@ namespace Chen::CDX12 {
 } // namespace Chen::CDX12
 
 namespace Zero {
-    class RenderContext;
+    struct RenderPassConfiguration {
+    };
 
     class RenderPass {
     public:
@@ -18,7 +19,9 @@ namespace Zero {
         virtual void preLoadResource()                                 = 0;
         virtual void delayDisposeResource(Chen::CDX12::FrameResource&) = 0;
 
-        virtual void drawPass(Chen::CDX12::FrameResource&, uint32_t frameIndex)                  = 0;
-        virtual void drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) = 0;
+        virtual void onResize() {}
+
+        virtual void drawPass(Chen::CDX12::FrameResource&, uint32_t frameIndex, bool offscreen = true)                  = 0;
+        virtual void drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen = true) = 0;
     };
 } // namespace Zero

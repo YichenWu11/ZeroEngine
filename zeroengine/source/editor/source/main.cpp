@@ -1,5 +1,9 @@
-#include <iostream>
+#include "editor.h"
 
-int main() {
-    std::cout << "hello editor" << std::endl;
+int main(int /*argc*/, char** /*argv*/) {
+    auto editor_app = Zero::createApplication();
+
+    editor_app->run();
+
+    delete editor_app;
 }

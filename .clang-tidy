@@ -1,3 +1,6 @@
+Checks: '-readability-identifier-naming'
+InheritParentConfig: true
+
 <!-- Checks: '-*,
     misc-throw-by-value-catch-by-reference,
     misc-misplaced-const,

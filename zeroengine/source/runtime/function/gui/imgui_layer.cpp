@@ -1,19 +1,18 @@
 #include <CDX12/DescriptorHeapMngr.h>
+#include <ImGuizmo.h>
 #include <backends/imgui_impl_dx12.h>
 #include <backends/imgui_impl_win32.h>
 
-#include "runtime/core/common/application.h"
+#include "runtime/core/base/application.h"
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/input/input_system.h"
 #include "runtime/function/render/render_system/render_context.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 namespace Zero {
     ImGuiLayer::ImGuiLayer(HWND handle) :
         Layer("ImGuiLayer"),
         m_handle(handle) {
-    }
-
-    ImGuiLayer::~ImGuiLayer() {
     }
 
     void ImGuiLayer::onAttach() {
@@ -23,7 +22,7 @@ namespace Zero {
         ImGuiIO& io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
         ImGuiStyle& style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -31,13 +30,10 @@ namespace Zero {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        // ImGui::StyleColorsDark();
-        // ImGui::StyleColorsClassic();
-        // ImGui::StyleColorsLight();
         setZeroImGuiStyle();
 
-        auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/ZeroEngineFont.ttf";
-        io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 20.0f);
+        auto font_path = GET_CONFIG_MNGR().getAssetFolder() / "font/JetBrainsMono-Light.ttf";
+        io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 22.0f);
 
         ImGuiInitInfo init_info = GET_RENDER_CONTEXT().getImGuiInitInfo();
 
@@ -58,15 +54,18 @@ namespace Zero {
     }
 
     void ImGuiLayer::onEvent(Event& e) {
-        ImGuiIO& io = ImGui::GetIO();
-        e.m_handled |= e.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-        e.m_handled |= e.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        if (m_block_events) {
+            ImGuiIO& io = ImGui::GetIO();
+            e.m_handled |= e.isInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            e.m_handled |= e.isInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
     }
 
     void ImGuiLayer::begin() {
         ImGui_ImplDX12_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
     }
 
     void ImGuiLayer::end() {
@@ -79,7 +78,7 @@ namespace Zero {
 
     void ImGuiLayer::setZeroImGuiStyle() {
         auto& colors              = ImGui::GetStyle().Colors;
-        colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.105f, 0.11f, 1.0f};
+        colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.1f, 0.1f, 1.0f};
 
         // Headers
         colors[ImGuiCol_Header]        = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
@@ -99,13 +98,13 @@ namespace Zero {
         // Tabs
         colors[ImGuiCol_Tab]                = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
         colors[ImGuiCol_TabHovered]         = ImVec4{0.38f, 0.3805f, 0.381f, 1.0f};
-        colors[ImGuiCol_TabActive]          = ImVec4{0.28f, 0.2805f, 0.281f, 1.0f};
+        colors[ImGuiCol_TabActive]          = ImVec4{0.7f, 0.2805f, 0.281f, 1.0f};
         colors[ImGuiCol_TabUnfocused]       = ImVec4{0.15f, 0.1505f, 0.151f, 1.0f};
         colors[ImGuiCol_TabUnfocusedActive] = ImVec4{0.2f, 0.205f, 0.21f, 1.0f};
 
         // Title
-        colors[ImGuiCol_TitleBg]          = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
-        colors[ImGuiCol_TitleBgActive]    = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
-        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.15f, 0.156f, 0.25f, 1.0f};
+        colors[ImGuiCol_TitleBg]          = ImVec4{0.3f, 0.3f, 0.3f, 1.0f};
+        colors[ImGuiCol_TitleBgActive]    = ImVec4{0.3f, 0.3f, 0.3f, 1.0f};
+        colors[ImGuiCol_TitleBgCollapsed] = ImVec4{0.3f, 0.3f, 0.3f, 1.0f};
     }
 } // namespace Zero

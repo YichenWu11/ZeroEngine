@@ -1,13 +1,9 @@
 #include "sandbox/sandbox.h"
 
 int main(int /*argc*/, char** /*argv*/) {
-    Zero::LogSystem::init();
+    auto sandbox_app = createApplication();
 
-    LOG_INFO("zeroengine start");
+    sandbox_app->run();
 
-    auto editor_app = createApplication();
-
-    editor_app->run();
-
-    delete editor_app;
+    delete sandbox_app;
 }

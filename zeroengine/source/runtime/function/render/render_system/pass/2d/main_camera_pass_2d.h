@@ -17,10 +17,10 @@ namespace Zero {
     struct ObjectConstant2D {
         DirectX::SimpleMath::Matrix transform;
         DirectX::SimpleMath::Color  modulate;
-        UINT                        tex_index{0};
-        UINT                        pad0{0};
-        UINT                        pad1{0};
-        UINT                        pad2{0};
+        uint32_t                    tex_index{0};
+        int32_t                     entity_id{-1};
+        uint32_t                    pad0{0};
+        uint32_t                    pad1{0};
         float                       tiling_factor{1.0f};
     };
 
@@ -31,8 +31,8 @@ namespace Zero {
 
         void preLoadResource() override;
         void delayDisposeResource(Chen::CDX12::FrameResource&) override;
-        void drawPass(Chen::CDX12::FrameResource&, uint32_t frameIndex) override;
-        void drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex) override;
+        void drawPass(Chen::CDX12::FrameResource&, uint32_t frameIndex, bool offscreen = true) override;
+        void drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen = true) override;
 
     private:
         void preZSortPass();

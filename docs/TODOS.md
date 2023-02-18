@@ -1,6 +1,7 @@
 # TODOS
 
-- [ ] replace all the raw pointer with Ref/Scope
+- [x] render_pass abstraction
+- [x] offScreen rendering
+- [ ] mouse picking
 - [ ] profiler_visualizer
-- [ ] render_pass abstraction
 - [ ] particle system (2d)

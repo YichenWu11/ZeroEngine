@@ -17,5 +17,6 @@ public:
 };
 
 Zero::Application* createApplication() {
+    Zero::RendererAPI::setEditorModeEnabled(false);
     return new Sandbox();
 }

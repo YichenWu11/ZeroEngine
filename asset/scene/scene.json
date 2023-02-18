@@ -1,0 +1,139 @@
+{
+    "Scene": "Untitled",
+    "Entities": [
+        {
+            "EntityID": "GUID",
+            "NameComponent": {
+                "name": "cameraB"
+            },
+            "TransformComponent": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "CameraComponent": {
+                "projectionType": 1,
+                "perspectiveFOV": 0.7853981852531433,
+                "perspectiveNear": 0.009999999776482582,
+                "perspectiveFar": 1000.0,
+                "orthographicSize": 10.0,
+                "orthographicNear": -1.0,
+                "orthographicFar": 1.0,
+                "is_current": false,
+                "is_fixed_aspectRatio": false
+            }
+        },
+        {
+            "EntityID": "GUID",
+            "NameComponent": {
+                "name": "cameraA"
+            },
+            "TransformComponent": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "CameraComponent": {
+                "projectionType": 1,
+                "perspectiveFOV": 0.7853981852531433,
+                "perspectiveNear": 0.009999999776482582,
+                "perspectiveFar": 1000.0,
+                "orthographicSize": 10.0,
+                "orthographicNear": -1.0,
+                "orthographicFar": 1.0,
+                "is_current": true,
+                "is_fixed_aspectRatio": false
+            }
+        },
+        {
+            "EntityID": "GUID",
+            "NameComponent": {
+                "name": "red_square"
+            },
+            "TransformComponent": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "SpriteComponent": {
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "tex_index": 0,
+                "tiling_factor": 1.0
+            }
+        },
+        {
+            "EntityID": "GUID",
+            "NameComponent": {
+                "name": "green_square"
+            },
+            "TransformComponent": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "SpriteComponent": {
+                "color": [
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0
+                ],
+                "tex_index": 0,
+                "tiling_factor": 1.0
+            }
+        }
+    ]
+}

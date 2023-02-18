@@ -25,3 +25,4 @@
 * DirectXMath (use DirectXTK12/SimpleMath as warpper)
 * spdlog
 * rapidjson
+* entt

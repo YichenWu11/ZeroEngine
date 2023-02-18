@@ -1,8 +1,6 @@
 #include "runtime/function/input/input_system.h"
 
 namespace Zero {
-    Zero::Scope<InputSystem> InputSystem::s_instance = Zero::CreateScope<InputSystem>();
-
     bool InputSystem::isKeyPressed(int keycode) {
         return GetAsyncKeyState(keycode) & 0x8000;
     }
@@ -14,18 +12,16 @@ namespace Zero {
     DirectX::SimpleMath::Vector2 InputSystem::getMousePosition() {
         POINT pos;
         bool  success = GetCursorPos(&pos);
-        ZE_ASSERT(success && "GetCursorPos failed!");
+        ZE_ASSERT(success, "GetCursorPos failed!");
         ScreenToClient(FindWindow(L"MainWnd", NULL), &pos);
         return {(float)pos.x, (float)pos.y};
     }
 
     float InputSystem::getMouseX() {
-        auto pos = getMousePosition();
-        return pos.x;
+        return getMousePosition().x;
     }
 
     float InputSystem::getMouseY() {
-        auto pos = getMousePosition();
-        return pos.y;
+        return getMousePosition().y;
     }
 } // namespace Zero
