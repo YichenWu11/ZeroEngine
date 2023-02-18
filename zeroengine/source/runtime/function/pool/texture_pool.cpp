@@ -5,6 +5,7 @@
 
 #include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/render_context.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
 
@@ -19,11 +20,11 @@ namespace Zero {
     void TexturePool::init() {
         m_tex_alloc = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
         registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png"); // default texture
+            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/white.png"); // default texture
         registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/icon/DirectoryIcon.png"); // default icon
+            GET_CONFIG_MNGR().getAssetFolder() / "icon/DirectoryIcon.png"); // default icon
         registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/icon/FileIcon.png"); // default icon
+            GET_CONFIG_MNGR().getAssetFolder() / "icon/FileIcon.png"); // default icon
     }
 
     void TexturePool::registerTex(

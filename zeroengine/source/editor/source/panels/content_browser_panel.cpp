@@ -1,24 +1,22 @@
 #include <imgui.h>
 
 #include "runtime/function/pool/texture_pool.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 #include "panels/content_browser_panel.h"
 
 namespace Zero {
-    static const std::filesystem::path s_asset_path =
-        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset";
-
     static const int s_dir_icon  = 1;
     static const int s_file_icon = 2;
 
     ContentBrowserPanel::ContentBrowserPanel() :
-        m_current_directory(s_asset_path) {
+        m_current_directory(GET_CONFIG_MNGR().getAssetFolder()) {
     }
 
     void ContentBrowserPanel::onImGuiRender() {
         ImGui::Begin("Browser");
 
-        if (m_current_directory != std::filesystem::path(s_asset_path)) {
+        if (m_current_directory != std::filesystem::path(GET_CONFIG_MNGR().getAssetFolder())) {
             if (ImGui::Button("<-")) {
                 m_current_directory = m_current_directory.parent_path();
             }
@@ -37,7 +35,7 @@ namespace Zero {
 
         for (auto& directoryEntry : std::filesystem::directory_iterator(m_current_directory)) {
             const auto& path           = directoryEntry.path();
-            auto        relativePath   = std::filesystem::relative(path, s_asset_path);
+            auto        relativePath   = std::filesystem::relative(path, GET_CONFIG_MNGR().getAssetFolder());
             std::string filenameString = relativePath.filename().string();
 
             ImGui::PushID(filenameString.c_str());

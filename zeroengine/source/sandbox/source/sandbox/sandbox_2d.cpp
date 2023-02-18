@@ -1,3 +1,5 @@
+#include "runtime/resource/config_manager/config_manager.h"
+
 #include "sandbox/sandbox_2d.h"
 
 Sandbox2D::Sandbox2D() :
@@ -5,14 +7,14 @@ Sandbox2D::Sandbox2D() :
 
 void Sandbox2D::onAttach() {
     GET_TEXTURE_POOL().registerTex(
-        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png");
+        GET_CONFIG_MNGR().getAssetFolder() / "texture/common/bella.png");
     GET_TEXTURE_POOL().registerTex(
-        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/asoul.png");
+        GET_CONFIG_MNGR().getAssetFolder() / "texture/common/asoul.png");
     GET_TEXTURE_POOL().registerTex(
         "SpriteSheet",
-        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/game/texture/sprite_sheet.png");
+        GET_CONFIG_MNGR().getAssetFolder() / "game/texture/sprite_sheet.png");
     GET_TEXTURE_POOL().registerTex(
-        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/icon.png");
+        GET_CONFIG_MNGR().getAssetFolder() / "texture/common/icon.png");
 
     m_texture_stair = Zero::SubTexture2D::createFromCoords(
         GET_TEXTURE_POOL().getTextureFromName("SpriteSheet"),

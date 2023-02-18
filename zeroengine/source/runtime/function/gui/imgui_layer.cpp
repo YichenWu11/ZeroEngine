@@ -7,6 +7,7 @@
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/input/input_system.h"
 #include "runtime/function/render/render_system/render_context.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 namespace Zero {
     ImGuiLayer::ImGuiLayer(HWND handle) :
@@ -29,12 +30,9 @@ namespace Zero {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        // ImGui::StyleColorsDark();
-        // ImGui::StyleColorsClassic();
-        // ImGui::StyleColorsLight();
         setZeroImGuiStyle();
 
-        auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/JetBrainsMono-Light.ttf";
+        auto font_path = GET_CONFIG_MNGR().getAssetFolder() / "font/JetBrainsMono-Light.ttf";
         io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 22.0f);
 
         ImGuiInitInfo init_info = GET_RENDER_CONTEXT().getImGuiInitInfo();

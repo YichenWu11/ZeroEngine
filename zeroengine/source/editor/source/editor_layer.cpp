@@ -1,7 +1,8 @@
 #include <ImGuizmo.h>
 
-#include "runtime/function/render/render_system//render_context.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/scene/scene_serializer.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 #include "editor_layer.h"
 
@@ -13,14 +14,14 @@ namespace Zero {
         ZE_PROFILE_FUNCTION();
 
         GET_TEXTURE_POOL().registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/bella.png");
+            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/bella.png");
         GET_TEXTURE_POOL().registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/asoul.png");
+            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/asoul.png");
         GET_TEXTURE_POOL().registerTex(
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/asoul_moon.png");
+            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/asoul_moon.png");
         GET_TEXTURE_POOL().registerTex(
             "SpriteSheet",
-            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/game/texture/sprite_sheet.png");
+            GET_CONFIG_MNGR().getAssetFolder() / "game/texture/sprite_sheet.png");
 
         m_texture_stair = SubTexture2D::createFromCoords(
             GET_TEXTURE_POOL().getTextureFromName("SpriteSheet"),

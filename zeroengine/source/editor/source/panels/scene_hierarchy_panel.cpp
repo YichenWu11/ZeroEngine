@@ -3,6 +3,7 @@
 
 #include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/scene/components.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 #include "panels/scene_hierarchy_panel.h"
 
@@ -300,7 +301,7 @@ namespace Zero {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     const wchar_t* path = (const wchar_t*)payload->Data;
                     auto           tex_path =
-                        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset" / std::filesystem::path(path);
+                        GET_CONFIG_MNGR().getAssetFolder() / std::filesystem::path(path);
                     LOG_INFO("{0}", tex_path.string());
                     // TODO: Register Texture
                 }

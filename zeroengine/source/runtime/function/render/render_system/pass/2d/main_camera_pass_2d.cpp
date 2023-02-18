@@ -12,6 +12,7 @@
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
 
@@ -31,7 +32,7 @@ namespace Zero {
     }
 
     void MainCameraPass2D::preLoadResource() {
-        auto         shader_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "zeroengine/shader/2d/shader.hlsl";
+        auto         shader_path = GET_CONFIG_MNGR().getRootFolder() / "zeroengine/shader/2d/shader.hlsl";
         std::wstring path        = AnsiToWString(shader_path.string());
 
         std::vector<std::pair<std::string, Shader::Property>> properties;
