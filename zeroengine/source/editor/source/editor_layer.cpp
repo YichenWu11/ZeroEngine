@@ -1,5 +1,6 @@
 #include <ImGuizmo.h>
 
+#include "runtime/function/render/render_system//render_context.h"
 #include "runtime/function/scene/scene_serializer.h"
 
 #include "editor_layer.h"
@@ -105,6 +106,19 @@ namespace Zero {
             // update scene
             m_active_scene->onUpdateEditor(timestep, m_editor_camera);
             // m_active_scene->onUpdateRuntime(timestep);
+
+            auto [mx, my] = ImGui::GetMousePos();
+            mx -= m_viewport_bounds[0].x;
+            my -= m_viewport_bounds[0].y;
+            Vector2 viewport_size = m_viewport_bounds[1] - m_viewport_bounds[0];
+            my                    = viewport_size.y - my;
+            int mouse_x           = (int)mx;
+            int mouse_y           = (int)my;
+
+            if (mouse_x >= 0 && mouse_y >= 0 && mouse_x < (int)viewport_size.x && mouse_y < (int)viewport_size.y) {
+                // int pixelData    = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+                // m_hovered_entity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
+            }
         }
     }
 
@@ -112,8 +126,6 @@ namespace Zero {
         ZE_PROFILE_FUNCTION();
 
         if (m_dockspace_enable) {
-            static auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
-
             static bool               dockspaceOpen             = true;
             static bool               opt_fullscreen_persistant = true;
             bool                      opt_fullscreen            = opt_fullscreen_persistant;
@@ -148,7 +160,7 @@ namespace Zero {
             ImGuiIO&    io          = ImGui::GetIO();
             ImGuiStyle& style       = ImGui::GetStyle();
             float       minWinSizeX = style.WindowMinSize.x;
-            style.WindowMinSize.x   = 300.0f;
+            style.WindowMinSize.x   = 370.0f;
 
             if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
                 ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -179,20 +191,14 @@ namespace Zero {
 
             // ************************************************************************************************
             m_scene_hierarchy_panel.onImGuiRender();
-
-            {
-                ImGui::Begin("ASOUL");
-                ImGui::Image(
-                    ImTextureID(tex_alloc->GetGpuHandle(2).ptr),
-                    ImVec2(120, 120));
-                ImGui::SameLine();
-                ImGui::End();
-            }
+            m_content_browser_panel.onImGuiRender();
 
             {
                 // Viewer
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
                 ImGui::Begin("VIEWER", NULL, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar);
+
+                auto viewport_offset = ImGui::GetCursorPos(); // Includes tab bar
 
                 if (ImGui::BeginMenuBar()) {
                     ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
@@ -209,7 +215,7 @@ namespace Zero {
                             ImGui::PopStyleColor(3);
                         }
                         else {
-                            if (ImGui::Button("Trans")) m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                            if (ImGui::Button("Trans") && !ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
                         }
                         ImGui::Unindent();
                     }
@@ -226,7 +232,7 @@ namespace Zero {
                             ImGui::PopStyleColor(3);
                         }
                         else {
-                            if (ImGui::Button("Rotate")) m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+                            if (ImGui::Button("Rotate") && !ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::ROTATE;
                         }
                     }
 
@@ -242,7 +248,7 @@ namespace Zero {
                             ImGui::PopStyleColor(3);
                         }
                         else {
-                            if (ImGui::Button("Scale")) m_GizmoType = ImGuizmo::OPERATION::SCALE;
+                            if (ImGui::Button("Scale") && !ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::SCALE;
                         }
                     }
 
@@ -261,6 +267,15 @@ namespace Zero {
                 ImGui::Image(
                     Renderer::getOffScreenID(),
                     ImVec2{m_viewport_size.x, m_viewport_size.y});
+
+                auto   window_size = ImGui::GetWindowSize();
+                ImVec2 min_bound   = ImGui::GetWindowPos();
+                min_bound.x += viewport_offset.x;
+                min_bound.y += viewport_offset.y;
+
+                ImVec2 max_bound     = {min_bound.x + window_size.x, min_bound.y + window_size.y};
+                m_viewport_bounds[0] = Vector2{min_bound.x, min_bound.y};
+                m_viewport_bounds[1] = Vector2{max_bound.x, max_bound.y};
 
                 // NOTE: Gizmos
                 Entity selected_entity = m_scene_hierarchy_panel.getSelectedEntity();
@@ -358,20 +373,6 @@ namespace Zero {
                 if (control) saveSceneAs();
                 break;
             }
-
-            // Gizmos
-            case 'Q':
-                if (!ImGuizmo::IsUsing()) m_GizmoType = -1;
-                break;
-            case 'T':
-                if (!ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-                break;
-            case 'R':
-                if (!ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-                break;
-            case 'E':
-                if (!ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::SCALE;
-                break;
         }
 
         return false;

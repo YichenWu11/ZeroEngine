@@ -34,7 +34,7 @@ namespace Zero {
         // ImGui::StyleColorsLight();
         setZeroImGuiStyle();
 
-        auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/JetBrainsMono.ttf";
+        auto font_path = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/font/JetBrainsMono-Light.ttf";
         io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 22.0f);
 
         ImGuiInitInfo init_info = GET_RENDER_CONTEXT().getImGuiInitInfo();

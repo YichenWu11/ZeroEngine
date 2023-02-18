@@ -1,15 +1,15 @@
 #ifndef COMMON
 #define COMMON
 
-cbuffer _ViewProjMatrix : register(b0) { float4x4 u_CameraWorldToViewMatrix; };
+cbuffer _PassConstant : register(b0) { float4x4 u_CameraWorldToViewMatrix; };
 
 cbuffer _ObjectConstant : register(b1) {
     float4x4 u_LocalToWorldMatrix;
     float4 u_ModulateColor;
     uint u_TexIndex;
+    int  u_entity_id;
     uint pad0;
     uint pad1;
-    uint pad2;
     float u_TilingFactor;
 }
 

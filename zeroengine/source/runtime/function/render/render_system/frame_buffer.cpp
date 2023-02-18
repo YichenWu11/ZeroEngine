@@ -32,7 +32,7 @@ namespace Zero {
             TextureDimension::Tex2D,
             1,
             1,
-            Texture::TextureUsage::RenderTarget,
+            Texture::TextureUsage::GenericColor,
             D3D12_RESOURCE_STATE_COMMON);
 
         device->CreateRenderTargetView(m_inner_texture->GetResource(), nullptr, config.rtv_cpu_handle);
@@ -42,6 +42,13 @@ namespace Zero {
             m_inner_texture->GetResource(),
             &desc,
             config.srv_cpu_handle);
+
+        // D3D12_UNORDERED_ACCESS_VIEW_DESC uav_desc = m_inner_texture->GetColorUavDesc(0);
+        // device->CreateUnorderedAccessView(
+        //     m_inner_texture->GetResource(),
+        //     nullptr,
+        //     &uav_desc,
+        //     config.srv_cpu_handle);
 
         DirectX::SetDebugObjectName(m_inner_texture->GetResource(), "framebuffer_tex");
     }

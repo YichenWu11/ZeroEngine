@@ -30,13 +30,13 @@ namespace Zero {
 
         template <typename T>
         T& getComponent() {
-            ZE_ASSERT(hasComponent<T>() && "Entity dose not have this component!");
+            ZE_ASSERT(hasComponent<T>(), "Entity dose not have this component!");
             return m_parent_scene->m_registry.get<T>(m_entity_handle);
         }
 
         template <typename T>
         void removeComponent() {
-            ZE_ASSERT(hasComponent<T>() && "Entity does not have this component!");
+            ZE_ASSERT(hasComponent<T>(), "Entity does not have this component!");
             m_parent_scene->m_registry.remove<T>(m_entity_handle);
         }
 

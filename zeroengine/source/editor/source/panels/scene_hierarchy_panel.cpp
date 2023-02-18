@@ -1,8 +1,10 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "panels/scene_hierarchy_panel.h"
+#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/scene/components.h"
+
+#include "panels/scene_hierarchy_panel.h"
 
 #ifdef _MSVC_LANG
 #define _CRT_SECURE_NO_WARNINGS
@@ -208,6 +210,7 @@ namespace Zero {
                 strcpy_s(buffer, sizeof(buffer), name.c_str());
 
                 if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
+                    if (!buffer[0]) buffer[0] = ' ';
                     name = std::string(buffer);
                 }
             },
@@ -285,8 +288,26 @@ namespace Zero {
         // SpriteComponent
         drawComponent<SpriteComponent>("Sprite", entity, [](auto& component) {
             ImGui::ColorEdit4("Modulate", reinterpret_cast<float*>(&component.color));
+
             ImGui::DragInt("TexID", reinterpret_cast<int*>(&component.tex_index), 1.0f, 0);
-            ImGui::DragFloat("TilingFactor", reinterpret_cast<float*>(&component.tiling_factor), 0.1f, 0.1f);
+            {
+                ImGui::Image(
+                    GET_TEXTURE_POOL().getImTextureID(component.tex_index),
+                    ImVec2(50, 50));
+            }
+
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
+                    const wchar_t* path = (const wchar_t*)payload->Data;
+                    auto           tex_path =
+                        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset" / std::filesystem::path(path);
+                    LOG_INFO("{0}", tex_path.string());
+                    // TODO: Register Texture
+                }
+                ImGui::EndDragDropTarget();
+            }
+
+            ImGui::DragFloat("Tiling", reinterpret_cast<float*>(&component.tiling_factor), 0.1f, 0.1f);
         });
     }
 } // namespace Zero

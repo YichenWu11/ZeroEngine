@@ -42,12 +42,14 @@ namespace Zero {
             const DirectX::SimpleMath::Matrix&  trans,
             const DirectX::SimpleMath::Color&   color,
             uint32_t                            tex_index,
-            float                               tiling_factor) {
+            float                               tiling_factor,
+            int                                 entity_id) {
             ObjectConstant2D obj_constant;
             obj_constant.transform     = trans.Transpose();
             obj_constant.modulate      = color;
             obj_constant.tex_index     = tex_index;
             obj_constant.tiling_factor = tiling_factor;
+            obj_constant.entity_id     = entity_id;
             m_draw_2d_list.emplace_back(std::make_tuple(mesh, obj_constant));
         }
 
@@ -57,11 +59,12 @@ namespace Zero {
 
         void setVsync(bool vsync) { m_is_vsync_enable = vsync; }
 
-        FrameBufferConfiguration getFrameBufferConfig() { return m_frameBuffers[0]->getConfiguration(); }
-        ID3D12Device*            getGraphicsDevice() { return m_device.Get(); }
-        ID3D12CommandQueue*      getCommandQueue() { return m_commandQueue.Get(); }
-        ImGuiInitInfo            getImGuiInitInfo() {
-                       return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
+        Chen::CDX12::FrameResource& getCurrFrameResource() { return *m_frameResourceMngr->GetCurrentFrameResource(); }
+        FrameBufferConfiguration    getFrameBufferConfig() { return m_frameBuffers[0]->getConfiguration(); }
+        ID3D12Device*               getGraphicsDevice() { return m_device.Get(); }
+        ID3D12CommandQueue*         getCommandQueue() { return m_commandQueue.Get(); }
+        ImGuiInitInfo               getImGuiInitInfo() {
+                          return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
         }
         ImTextureID getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
 

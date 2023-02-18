@@ -11,6 +11,8 @@ void Sandbox2D::onAttach() {
     GET_TEXTURE_POOL().registerTex(
         "SpriteSheet",
         std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/game/texture/sprite_sheet.png");
+    GET_TEXTURE_POOL().registerTex(
+        std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/icon.png");
 
     m_texture_stair = Zero::SubTexture2D::createFromCoords(
         GET_TEXTURE_POOL().getTextureFromName("SpriteSheet"),
@@ -101,8 +103,6 @@ void Sandbox2D::onUpdate(Zero::TimeStep timestep) {
 
 void Sandbox2D::onImGuiRender() {
     ZE_PROFILE_FUNCTION();
-
-    static auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
 }
 
 void Sandbox2D::onEvent(Zero::Event& event) {

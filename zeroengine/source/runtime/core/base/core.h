@@ -3,9 +3,13 @@
 #include <memory>
 
 #ifdef NDEBUG
-#define ZE_ASSERT(statement)
+#define ZE_ASSERT(statement, msg)
 #else
-#define ZE_ASSERT(statement) assert(statement)
+#define ZE_ASSERT(statement, msg) \
+    if (!statement) { \
+        LOG_ERROR("{0}", msg); \
+        __debugbreak(); \
+    }
 #endif
 
 #define BIT(x) (1 << x)

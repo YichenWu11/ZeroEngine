@@ -20,9 +20,15 @@ namespace Zero {
         m_tex_alloc = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
         registerTex(
             std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/texture/common/white.png"); // default texture
+        registerTex(
+            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/icon/DirectoryIcon.png"); // default icon
+        registerTex(
+            std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR)) / "asset/icon/FileIcon.png"); // default icon
     }
 
-    void TexturePool::registerTex(const std::filesystem::path& tex_path, TexFileFormat file_format) {
+    void TexturePool::registerTex(
+        const std::filesystem::path& tex_path,
+        TexFileFormat                file_format) {
         if (!std::filesystem::exists(tex_path)) {
             LOG_ERROR("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
             return;
@@ -31,7 +37,10 @@ namespace Zero {
         registerTex(tex_path.stem().string(), tex_path, file_format);
     }
 
-    void TexturePool::registerTex(std::string_view name, const std::filesystem::path& tex_path, TexFileFormat file_format) {
+    void TexturePool::registerTex(
+        std::string_view             name,
+        const std::filesystem::path& tex_path,
+        TexFileFormat                file_format) {
         if (!std::filesystem::exists(tex_path)) {
             LOG_ERROR("The file with this path ({0}) does not exsit!(in registerTex)", tex_path.string());
             return;
@@ -88,13 +97,12 @@ namespace Zero {
                 break;
         }
 
-        m_texname2index[info.name] = m_texture_pool.size();
-        m_texture_pool[info.name]  = tex;
-
-        D3D12_SHADER_RESOURCE_VIEW_DESC desc = m_texture_pool[info.name]->GetColorSrvDesc(0);
+        m_texname2index[info.name]               = m_texture_pool.size();
+        m_texture_pool[info.name]                = tex;
+        D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = tex->GetColorSrvDesc(0);
         device->CreateShaderResourceView(
             m_texture_pool[info.name]->GetResource(),
-            &desc,
+            &srv_desc,
             m_tex_alloc.GetCpuHandle(m_texture_pool.size() - 1));
 
         auto uploadResourcesFinished = resourceUpload.End(GET_RENDER_CONTEXT().getCommandQueue());

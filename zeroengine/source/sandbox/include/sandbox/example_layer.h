@@ -36,8 +36,7 @@ public:
 
         {
             ImGui::Begin("IMAGE");
-            static auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
-            ImGui::Image(ImTextureID(tex_alloc->GetGpuHandle(0).ptr), ImVec2(190, 190));
+            ImGui::Image(GET_TEXTURE_POOL().getImTextureID(0), ImVec2(190, 190));
             ImGui::End();
         }
     }

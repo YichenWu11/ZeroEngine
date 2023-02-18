@@ -41,17 +41,15 @@ namespace Zero {
 
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
-            "_ViewProjMatrix",
+            "_PassConstant",
             std::span<const uint8_t>{
                 reinterpret_cast<uint8_t const*>(&s_scene_data->view_projection_matrix),
                 sizeof(s_scene_data->view_projection_matrix)});
 
-        auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
-
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
-            std::make_pair(tex_alloc, 0));
+            std::make_pair(GET_TEXTURE_POOL().getTexAllocation(), 0));
     }
 
     void Renderer::endScene() {

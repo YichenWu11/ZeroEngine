@@ -36,7 +36,7 @@ namespace Zero {
 
         std::vector<std::pair<std::string, Shader::Property>> properties;
         properties.emplace_back(
-            "_ViewProjMatrix",
+            "_PassConstant",
             Shader::Property(
                 ShaderVariableType::ConstantBuffer,
                 0,
@@ -347,17 +347,19 @@ namespace Zero {
 
             // draw call
             for (auto& [mesh, obj_constant] : render_context.m_draw_2d_list) {
+                // NOTE: assign
                 obj_constant_array[cnt].transform     = obj_constant.transform;
                 obj_constant_array[cnt].modulate      = obj_constant.modulate;
                 obj_constant_array[cnt].tex_index     = obj_constant.tex_index;
                 obj_constant_array[cnt].tiling_factor = obj_constant.tiling_factor;
+                obj_constant_array[cnt].entity_id     = obj_constant.entity_id;
 
                 auto obj_cbuffer = frameRes.AllocateConstBuffer(
                     std::span<const uint8_t>{
                         reinterpret_cast<uint8_t const*>(&obj_constant_array[cnt]),
                         sizeof(obj_constant_array[cnt])});
 
-                // NOTE: `cnt + 1`
+                // NOTE: cnt + 1
                 indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh.get(), obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
 
                 m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),

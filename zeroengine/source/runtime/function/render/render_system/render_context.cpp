@@ -18,7 +18,7 @@ namespace Zero {
     DXGI_FORMAT RenderContext::s_depthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
     void RenderContext::init(HWND window_handle, int width, int height) {
-        ZE_ASSERT(window_handle && "window handle passed to dx12_context is NULL!");
+        ZE_ASSERT(window_handle, "window handle passed to dx12_context is NULL!");
 
         m_window_handle = window_handle;
         m_viewport      = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));

@@ -61,11 +61,7 @@ namespace Zero {
             for (auto entity : group) {
                 auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
-                Renderer2D::drawQuad(
-                    transform.getTransform(),
-                    sprite.color,
-                    sprite.tex_index,
-                    sprite.tiling_factor);
+                Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
             }
         }
 
@@ -79,11 +75,7 @@ namespace Zero {
         for (auto entity : group) {
             auto [transform, sprite] = group.get<TransformComponent, SpriteComponent>(entity);
 
-            Renderer2D::drawQuad(
-                transform.getTransform(),
-                sprite.color,
-                sprite.tex_index,
-                sprite.tiling_factor);
+            Renderer2D::drawSprite(transform.getTransform(), sprite, (int)entity);
         }
 
         Renderer2D::endScene();

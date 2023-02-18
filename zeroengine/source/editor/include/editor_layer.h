@@ -2,6 +2,7 @@
 
 #include "runtime/zero.h"
 
+#include "panels/content_browser_panel.h"
 #include "panels/scene_hierarchy_panel.h"
 
 using namespace DirectX::SimpleMath;
@@ -27,9 +28,11 @@ namespace Zero {
 
     private:
         Vector2 m_viewport_size;
-        bool    m_viewport_focused{false};
-        bool    m_viewport_hovered{false};
-        bool    m_dockspace_enable{true};
+        Vector2 m_viewport_bounds[2];
+
+        bool m_viewport_focused{false};
+        bool m_viewport_hovered{false};
+        bool m_dockspace_enable{true};
 
         Ref<SubTexture2D> m_texture_stair;
         Ref<SubTexture2D> m_texture_bush;
@@ -37,7 +40,11 @@ namespace Zero {
         Ref<Scene> m_active_scene;
 
         SceneHierarchyPanel m_scene_hierarchy_panel;
-        EditorCamera        m_editor_camera;
+        ContentBrowserPanel m_content_browser_panel;
+
+        EditorCamera m_editor_camera;
+
+        Entity m_hovered_entity;
 
         int m_GizmoType{7};
     };

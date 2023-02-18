@@ -56,12 +56,12 @@ namespace Zero {
     Zero::Ref<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t byte_size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
-                ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");
+                ZE_ASSERT(false, "RendererAPI::NONE is not currently supported!");
             case RendererAPI::API::DX12:
                 return Zero::CreateRef<VertexBuffer>(vertices, byte_size);
         }
 
-        ZE_ASSERT(false && "Unknown RendererAPI");
+        ZE_ASSERT(false, "Unknown RendererAPI");
         return nullptr;
     }
 
@@ -96,12 +96,12 @@ namespace Zero {
     Zero::Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t byte_size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
-                ZE_ASSERT(false && "RendererAPI::NONE is not currently supported!");
+                ZE_ASSERT(false, "RendererAPI::NONE is not currently supported!");
             case RendererAPI::API::DX12:
                 return Zero::CreateRef<IndexBuffer>(indices, byte_size);
         }
 
-        ZE_ASSERT(false && "Unknown RendererAPI");
+        ZE_ASSERT(false, "Unknown RendererAPI");
         return nullptr;
     }
 } // namespace Zero

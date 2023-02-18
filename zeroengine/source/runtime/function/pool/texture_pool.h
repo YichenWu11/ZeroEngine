@@ -28,8 +28,14 @@ namespace Zero {
         enum class TexFileFormat : uint8_t { WIC = 0,
                                              DDS };
 
+        enum class TexType : uint8_t {
+            COMMON = 0,
+            ICON   = 1
+        };
+
     public:
-        void init();
+        void
+        init();
 
         void registerTex(const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
         void registerTex(std::string_view tex_name, const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
@@ -41,6 +47,8 @@ namespace Zero {
         std::string                     getTextureName(const Ref<Chen::CDX12::Texture>&);
 
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
+
+        ImTextureID getImTextureID(uint32_t tex_idx) { return ImTextureID(m_tex_alloc.GetGpuHandle(tex_idx).ptr); }
 
     private:
         ~TexturePool();

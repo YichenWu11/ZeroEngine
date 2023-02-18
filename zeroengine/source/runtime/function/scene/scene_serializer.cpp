@@ -197,8 +197,8 @@ namespace Zero {
             return false;
         }
 
-        // ZE_ASSERT(document.HasMember("Scene") && "Invalid Scene Json Format!");
-        // ZE_ASSERT(document.HasMember("Entities") && "Invalid Scene Json Format!");
+        // ZE_ASSERT(document.HasMember("Scene"), "Invalid Scene Json Format!");
+        // ZE_ASSERT(document.HasMember("Entities"), "Invalid Scene Json Format!");
 
         const Value& entities = document["Entities"];
 

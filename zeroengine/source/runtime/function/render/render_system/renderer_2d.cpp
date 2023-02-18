@@ -45,17 +45,15 @@ namespace Zero {
 
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
-            "_ViewProjMatrix",
+            "_PassConstant",
             std::span<const uint8_t>{
                 reinterpret_cast<uint8_t const*>(&view_proj_matrix),
                 sizeof(view_proj_matrix)});
 
-        auto tex_alloc = GET_TEXTURE_POOL().getTexAllocation();
-
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
-            std::make_pair(tex_alloc, 0));
+            std::make_pair(GET_TEXTURE_POOL().getTexAllocation(), 0));
     }
 
     void Renderer2D::endScene() {
@@ -90,12 +88,13 @@ namespace Zero {
         const DirectX::SimpleMath::Matrix& transform,
         const DirectX::SimpleMath::Color&  color,
         uint32_t                           tex_index,
-        float                              tiling_factor) {
+        float                              tiling_factor,
+        int                                entity_id) {
         static Zero::Ref<Mesh> mesh = GET_MESH_POOL().getMesh("square");
 
-        ZE_ASSERT(mesh && "the square mesh retrieve failure for unknown error(drawQuad)!");
+        ZE_ASSERT(mesh, "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        GET_RENDER_CONTEXT().submit(mesh, transform, color, tex_index, tiling_factor);
+        GET_RENDER_CONTEXT().submit(mesh, transform, color, tex_index, tiling_factor, entity_id);
     }
 
     void Renderer2D::drawCellQuad(
@@ -138,11 +137,19 @@ namespace Zero {
                            * Matrix::CreateScale(size.x, size.y, 1.0f)
                            * Matrix::CreateTranslation(position);
 
+        // trick here : -1
         GET_RENDER_CONTEXT().submit(
             GET_MESH_POOL().getMesh(sub_texture->constructSubTexName()),
             transform,
             color,
             GET_TEXTURE_POOL().getTexIndex(sub_texture->getTexture()),
-            1.0f);
+            1.0f, -1);
+    }
+
+    void Renderer2D::drawSprite(
+        const DirectX::SimpleMath::Matrix& transform,
+        const SpriteComponent&             src,
+        int                                entity_id) {
+        drawQuad(transform, src.color, src.tex_index, src.tiling_factor, entity_id);
     }
 } // namespace Zero

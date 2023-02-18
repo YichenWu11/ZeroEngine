@@ -13,7 +13,7 @@ namespace Zero {
     Application* Application::s_instance = nullptr;
 
     Application::Application() {
-        ZE_ASSERT(!s_instance && "Application already exists!");
+        ZE_ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
         m_window = IWindowSystem::create();
@@ -55,6 +55,17 @@ namespace Zero {
             float    time     = ImGui::GetTime();
             TimeStep timestep = time - m_lastframe_time;
             m_lastframe_time  = time;
+
+            static float elapse_time = 0.0f;
+            elapse_time += timestep;
+
+            // frame_rate
+            if (elapse_time > 1.0f) {
+                std::wstring window_text =
+                    L"Zero Engine - " + std::to_wstring((int)ImGui::GetIO().Framerate) + L" fps";
+                SetWindowText(FindWindow(L"MainWnd", NULL), window_text.c_str());
+                elapse_time -= 1.0f;
+            }
 
             if (!m_minimized) {
                 m_ImGuiLayer->begin();
