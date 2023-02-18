@@ -5,6 +5,7 @@
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
+#include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX::SimpleMath;
@@ -15,6 +16,11 @@ namespace Zero {
     Application::Application() {
         ZE_ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
+
+        Zero::ConfigManager::getInstance().init();
+        Zero::LogSystem::init();
+
+        LOG_INFO("zeroengine start");
 
         m_window = IWindowSystem::create();
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));

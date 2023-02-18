@@ -1,8 +1,6 @@
 #include "runtime/function/input/input_system.h"
 
 namespace Zero {
-    Zero::Scope<InputSystem> InputSystem::s_instance = Zero::CreateScope<InputSystem>();
-
     bool InputSystem::isKeyPressed(int keycode) {
         return GetAsyncKeyState(keycode) & 0x8000;
     }

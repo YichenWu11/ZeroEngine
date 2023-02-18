@@ -34,8 +34,7 @@ namespace Zero {
         };
 
     public:
-        void
-        init();
+        void init();
 
         void registerTex(const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
         void registerTex(std::string_view tex_name, const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
