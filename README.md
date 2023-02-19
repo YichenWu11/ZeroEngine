@@ -1,4 +1,4 @@
-# ZeroEngine
+# ZeroEngine (WIP)
 
 ***toy game engine.***
 
@@ -10,6 +10,8 @@
            /_______ \\___  >|__|    \____//_______  /|___|  /\___  / |__||___|  / \___  >
                    \/    \/                       \/      \//_____/           \/      \/
 ```
+
+![00](docs/images/00.png)
 
 ## Environment
 
