@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
-#include <CDX12/Material/Texture.h>
+#include <CDX12/Resource/Texture.h>
 
 #include "runtime/core/util/singleton.h"
 

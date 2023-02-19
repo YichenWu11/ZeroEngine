@@ -1,4 +1,4 @@
-#include <CDX12/Material/Texture.h>
+#include <CDX12/Resource/Texture.h>
 
 #include "runtime/function/render/render_system/renderer_api.h"
 
@@ -7,11 +7,4 @@ namespace Zero {
     RendererAPI::Dimension RendererAPI::s_dimension                   = RendererAPI::Dimension::TWO_D;
     bool                   RendererAPI::s_multi_indirect_draw_enabled = true;
     bool                   RendererAPI::s_is_editor_mode              = false;
-
-    void RendererAPI::clear() {
-    }
-
-    void RendererAPI::setClearColor(const DirectX::SimpleMath::Vector4& color) {
-        Chen::CDX12::Texture::setClearColor(color);
-    }
 } // namespace Zero

@@ -87,14 +87,6 @@ namespace Zero {
             }
         }
 
-        // update
-        {
-            ZE_PROFILE_SCOPE("EditorCamera::onUpdate");
-
-            if (m_viewport_hovered)
-                m_editor_camera.onUpdate(timestep);
-        }
-
         // render
         {
             RenderCommand::setClearColor({0.2f, 0.2f, 0.2f, 1.0f});
@@ -105,8 +97,20 @@ namespace Zero {
             ZE_PROFILE_SCOPE("Renderer2D::RenderScene");
 
             // update scene
-            m_active_scene->onUpdateEditor(timestep, m_editor_camera);
-            // m_active_scene->onUpdateRuntime(timestep);
+
+            switch (m_sceneMode) {
+                case SceneMode::Editor: {
+                    if (m_viewport_hovered)
+                        m_editor_camera.onUpdate(timestep);
+
+                    m_active_scene->onUpdateEditor(timestep, m_editor_camera);
+                    break;
+                }
+                case SceneMode::Game: {
+                    m_active_scene->onUpdateRuntime(timestep);
+                    break;
+                }
+            }
 
             auto [mx, my] = ImGui::GetMousePos();
             mx -= m_viewport_bounds[0].x;
@@ -202,18 +206,23 @@ namespace Zero {
                 auto viewport_offset = ImGui::GetCursorPos(); // Includes tab bar
 
                 if (ImGui::BeginMenuBar()) {
-                    ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
+                    // ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
+                    ImVec4 check_button_color = ImVec4{0.365f, 0.04f, 0.26f, 1.0f};
 
                     {
                         ImGui::Indent(10.f);
 
                         if (m_GizmoType == ImGuizmo::OPERATION::TRANSLATE) {
+                            ImGui::PushID("Trans");
                             ImGui::PushStyleColor(ImGuiCol_Button,
                                                   ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
                             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
                             ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
+
                             ImGui::Button("Trans");
+
                             ImGui::PopStyleColor(3);
+                            ImGui::PopID();
                         }
                         else {
                             if (ImGui::Button("Trans") && !ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
@@ -225,12 +234,16 @@ namespace Zero {
 
                     {
                         if (m_GizmoType == ImGuizmo::OPERATION::ROTATE) {
+                            ImGui::PushID("Rotate");
                             ImGui::PushStyleColor(ImGuiCol_Button,
                                                   ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
                             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
                             ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
+
                             ImGui::Button("Rotate");
+
                             ImGui::PopStyleColor(3);
+                            ImGui::PopID();
                         }
                         else {
                             if (ImGui::Button("Rotate") && !ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::ROTATE;
@@ -241,16 +254,45 @@ namespace Zero {
 
                     {
                         if (m_GizmoType == ImGuizmo::OPERATION::SCALE) {
+                            ImGui::PushID("Scale");
                             ImGui::PushStyleColor(ImGuiCol_Button,
                                                   ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
                             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
                             ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
+
                             ImGui::Button("Scale");
+
                             ImGui::PopStyleColor(3);
+                            ImGui::PopID();
                         }
                         else {
                             if (ImGui::Button("Scale") && !ImGuizmo::IsUsing()) m_GizmoType = ImGuizmo::OPERATION::SCALE;
                         }
+                    }
+
+                    ImGui::SameLine();
+
+                    float indent_scale = Application::get().getWindow().getWidth() / 1280.f;
+
+                    {
+                        ImGui::Indent(ImGui::GetWindowSize().x - 110.0f);
+
+                        if (m_sceneMode == SceneMode::Editor) {
+                            ImGui::PushID("Editor Mode");
+                            if (ImGui::Button("Editor Mode")) {
+                                onScenePlay();
+                            }
+                            ImGui::PopID();
+                        }
+                        else if (m_sceneMode == SceneMode::Game) {
+                            ImGui::PushID("Game Mode");
+                            if (ImGui::Button("Game Mode")) {
+                                onSceneStop();
+                            }
+                            ImGui::PopID();
+                        }
+
+                        ImGui::Unindent();
                     }
 
                     ImGui::EndMenuBar();
@@ -280,19 +322,13 @@ namespace Zero {
 
                 // NOTE: Gizmos
                 Entity selected_entity = m_scene_hierarchy_panel.getSelectedEntity();
-                if (selected_entity && m_GizmoType != -1) {
+                if (selected_entity && m_GizmoType != -1 && m_sceneMode == SceneMode::Editor) {
                     ImGuizmo::SetOrthographic(false);
                     ImGuizmo::SetDrawlist();
 
                     float window_width  = (float)ImGui::GetWindowWidth();
                     float window_height = (float)ImGui::GetWindowHeight();
                     ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, window_width, window_height);
-
-                    // Camera
-                    // auto          camera_entity     = m_active_scene->getPrimaryCameraEntity();
-                    // const auto&   camera            = camera_entity.getComponent<CameraComponent>().camera;
-                    // const Matrix& camera_projection = camera.getProjection();
-                    // Matrix        camera_view       = camera_entity.getComponent<TransformComponent>().getTransform().Invert();
 
                     // Editor camera
                     const Matrix& camera_projection = m_editor_camera.getProjection();
@@ -351,7 +387,9 @@ namespace Zero {
     }
 
     void EditorLayer::onEvent(Event& event) {
-        m_editor_camera.onEvent(event);
+        if (m_sceneMode == SceneMode::Editor) {
+            m_editor_camera.onEvent(event);
+        }
 
         EventDispatcher dispatcher(event);
         dispatcher.Dispatch<KeyPressedEvent>(ZE_BIND_EVENT_FN(EditorLayer::onKeyPressed));
@@ -408,5 +446,8 @@ namespace Zero {
             serializer.serialize(save_path);
         }
     }
+
+    void EditorLayer::onScenePlay() { m_sceneMode = SceneMode::Game; }
+    void EditorLayer::onSceneStop() { m_sceneMode = SceneMode::Editor; }
 
 } // namespace Zero

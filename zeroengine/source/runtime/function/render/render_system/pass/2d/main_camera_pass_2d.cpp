@@ -89,6 +89,7 @@ namespace Zero {
         }
         trans_shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
         trans_shader->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+        // trans_shader->rasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
         trans_shader->blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
         D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;

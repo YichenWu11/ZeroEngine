@@ -5,6 +5,7 @@
 #include "runtime/function/render/camera_system/orthographics_camera.h"
 #include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/render_command.h"
+#include "runtime/function/render/render_system/renderer_api.h"
 
 namespace Chen::CDX12 {
     class Mesh;

@@ -26,6 +26,9 @@ namespace Zero {
         void openScene();
         void saveSceneAs();
 
+        void onScenePlay();
+        void onSceneStop();
+
     private:
         Vector2 m_viewport_size;
         Vector2 m_viewport_bounds[2];
@@ -47,5 +50,12 @@ namespace Zero {
         Entity m_hovered_entity;
 
         int m_GizmoType{7};
+
+        enum class SceneMode {
+            Editor = 0,
+            Game   = 1
+        };
+
+        SceneMode m_sceneMode = SceneMode::Editor;
     };
 } // namespace Zero

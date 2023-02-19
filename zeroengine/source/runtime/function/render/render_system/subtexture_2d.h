@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CDX12/Material/Texture.h>
+#include <CDX12/Resource/Texture.h>
 
 namespace Zero {
     class SubTexture2D {
