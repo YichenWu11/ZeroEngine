@@ -4,9 +4,6 @@
 #include "runtime/function/scene/entity.h"
 
 namespace Zero {
-    Scene::Scene() {
-    }
-
     Scene::~Scene() {
     }
 
@@ -27,7 +24,7 @@ namespace Zero {
         // update scripts
         {
             m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
-                // TODO: Move to Scene::onScenePlay
+                // TODO: Move to onScenePlay
                 if (!nsc.instance) {
                     nsc.instance           = nsc.instantiateScript();
                     nsc.instance->m_entity = Entity{entity, this};

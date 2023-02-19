@@ -16,7 +16,7 @@ namespace Zero {
         friend class SceneSerializer;
 
     public:
-        Scene();
+        Scene() = default;
         ~Scene();
 
         Entity createEntity(const std::string& name = std::string{});
