@@ -68,4 +68,21 @@ namespace Zero {
             destroyScript     = [](NativeScriptComponent* nsc) { delete nsc->instance; nsc->instance = nullptr; };
         }
     };
+
+    // physics
+    struct Rigidbody2DComponent {
+        enum class BodyType { Static = 0,
+                              Dynamic,
+                              Kinematic };
+
+        BodyType type{BodyType::Static};
+        bool     is_fixed_rotation{false};
+
+        // Storage for runtime
+        void* runtime_body{nullptr};
+
+        Rigidbody2DComponent()                            = default;
+        Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
+    };
+
 } // namespace Zero

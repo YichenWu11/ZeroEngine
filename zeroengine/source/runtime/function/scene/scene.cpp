@@ -1,7 +1,13 @@
-#include "runtime/function/scene/scene.h"
+// Box2D
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
+#include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_world.h>
+
 #include "runtime/function/render/render_system/renderer_2d.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
+#include "runtime/function/scene/scene.h"
 
 namespace Zero {
     Scene::~Scene() {
@@ -18,6 +24,15 @@ namespace Zero {
 
     void Scene::destroyEntity(Entity entity) {
         m_registry.destroy(entity);
+    }
+
+    void Scene::onRuntimeStart() {
+        m_physics_world = new b2World({0.0f, -9.8f});
+    }
+
+    void Scene::onRuntimeStop() {
+        delete m_physics_world;
+        m_physics_world = nullptr;
     }
 
     void Scene::onUpdateRuntime(TimeStep timestep) {

@@ -447,7 +447,13 @@ namespace Zero {
         }
     }
 
-    void EditorLayer::onScenePlay() { m_sceneMode = SceneMode::Game; }
-    void EditorLayer::onSceneStop() { m_sceneMode = SceneMode::Editor; }
+    void EditorLayer::onScenePlay() {
+        m_active_scene->onRuntimeStart();
+        m_sceneMode = SceneMode::Game;
+    }
+    void EditorLayer::onSceneStop() {
+        m_active_scene->onRuntimeStop();
+        m_sceneMode = SceneMode::Editor;
+    }
 
 } // namespace Zero

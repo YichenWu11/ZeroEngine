@@ -76,7 +76,7 @@ namespace Zero {
             ImVec2 content_RegionAvailable = ImGui::GetContentRegionAvail();
 
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
-            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4{0.365f, 0.04f, 0.26f, 1.0f});
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4{0.2f, 0.024f, 0.08f, 1.0f});
             float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
             ImGui::Separator();
             bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());

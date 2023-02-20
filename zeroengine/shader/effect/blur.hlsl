@@ -36,12 +36,10 @@ static const float2 offsets[] = {
     float2(-0.03375f, -0.05625f),
 };
 
-float4 Blur(float2 uv, uint tex_index)
-{
+float4 Blur(float2 uv, uint tex_index) {
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    for (int i = 0; i < 15; i++)
-    {
+    for (int i = 0; i < 15; i++) {
         color += TextureMap[tex_index].Sample(u_samAnisotropicWrap, uv + offsets[i]) * weights[i];
     }
 
