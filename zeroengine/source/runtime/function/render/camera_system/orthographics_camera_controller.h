@@ -49,8 +49,8 @@ namespace Zero {
         OrthographicsCamera       m_camera;
         bool                      m_rotation_enabled;
 
-        DirectX::SimpleMath::Vector3 m_camera_position{0.0f, 0.0f, 0.0f};
-        float                        m_camera_rotation = 0.0f;
+        Vector3 m_camera_position{0.0f, 0.0f, 0.0f};
+        float   m_camera_rotation = 0.0f;
 
         // per second
         float m_camera_move_speed   = 5.0f;

@@ -23,7 +23,7 @@ namespace Zero {
         static void beginScene(const OrthographicsCamera& camera);
         static void endScene();
 
-        static void submit(Chen::CDX12::Mesh*, const DirectX::SimpleMath::Matrix& = DirectX::SimpleMath::Matrix::Identity);
+        static void submit(Chen::CDX12::Mesh*, const Matrix& = Matrix::Identity);
 
         static RendererAPI::API         getAPI() { return RendererAPI::getAPI(); }
         static ImTextureID              getOffScreenID();
@@ -31,7 +31,7 @@ namespace Zero {
 
     private:
         struct SceneData {
-            DirectX::SimpleMath::Matrix view_projection_matrix;
+            Matrix view_projection_matrix;
         };
 
     private:

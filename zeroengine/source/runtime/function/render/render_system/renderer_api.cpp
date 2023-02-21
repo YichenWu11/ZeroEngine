@@ -1,5 +1,3 @@
-#include <CDX12/Resource/Texture.h>
-
 #include "runtime/function/render/render_system/renderer_api.h"
 
 namespace Zero {

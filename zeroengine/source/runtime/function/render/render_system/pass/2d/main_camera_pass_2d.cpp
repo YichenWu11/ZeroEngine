@@ -112,7 +112,7 @@ namespace Zero {
         trans_shader->depthStencilState.StencilEnable = true;
     }
 
-    void MainCameraPass2D::delayDisposeResource(Chen::CDX12::FrameResource&) {
+    void MainCameraPass2D::delayDisposeResource(FrameResource&) {
         // do nothing
     }
 
@@ -121,7 +121,7 @@ namespace Zero {
 
         // NOTE: trick here, get the z-index from the _34 of the transform matrix
         std::sort(render_context.m_draw_2d_list.begin(), render_context.m_draw_2d_list.end(),
-                  [](std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D> a, std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D> b) {
+                  [](std::tuple<Zero::Ref<Mesh>, ObjectConstant2D> a, std::tuple<Zero::Ref<Mesh>, ObjectConstant2D> b) {
             return std::get<1>(a).transform._34 > std::get<1>(b).transform._34;
         });
     }
@@ -133,7 +133,7 @@ namespace Zero {
             - if `offscreen`, render to m_framebuffer; else render to m_renderTarget
             - and render imgui_data together
     */
-    void MainCameraPass2D::drawPass(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+    void MainCameraPass2D::drawPass(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         preZSortPass();
 
         RenderContext& render_context = GET_RENDER_CONTEXT();
@@ -249,7 +249,7 @@ namespace Zero {
             - if `offscreen`, render to m_framebuffer; else render to m_renderTarget
             - and render imgui_data together
     */
-    void MainCameraPass2D::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+    void MainCameraPass2D::drawPassIndirect(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         preZSortPass();
 
         RenderContext& render_context = GET_RENDER_CONTEXT();

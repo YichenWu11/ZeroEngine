@@ -59,8 +59,8 @@ namespace Zero {
             return;
         }
 
-        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
-        auto          tex    = Zero::CreateRef<Texture>(
+        DXRawDevicePtr device = GET_RENDER_CONTEXT().getGraphicsDevice();
+        auto           tex    = Zero::CreateRef<Texture>(
             device,
             info.width,
             info.height,
@@ -130,7 +130,7 @@ namespace Zero {
         return m_texname2index[std::string(tex_name)];
     }
 
-    uint32_t TexturePool::getTexIndex(const Ref<Chen::CDX12::Texture>& target) {
+    uint32_t TexturePool::getTexIndex(const Ref<Texture>& target) {
         for (auto& [name, texture] : m_texture_pool) {
             if (texture == target)
                 return getTexIndexFromName(name);
@@ -139,7 +139,7 @@ namespace Zero {
         return s_invalid_index;
     }
 
-    std::string TexturePool::getTextureName(const Ref<Chen::CDX12::Texture>& target) {
+    std::string TexturePool::getTextureName(const Ref<Texture>& target) {
         for (auto& [name, texture] : m_texture_pool) {
             if (texture == target)
                 return name;

@@ -1,7 +1,5 @@
 #include "runtime/function/scene/scene_camera.h"
 
-using namespace DirectX::SimpleMath;
-
 namespace Zero {
     SceneCamera::SceneCamera(const Matrix& _projection) :
         Camera(_projection) {

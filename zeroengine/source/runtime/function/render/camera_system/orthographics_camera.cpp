@@ -1,7 +1,6 @@
 #include "runtime/function/render/camera_system/orthographics_camera.h"
 
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     OrthographicsCamera::OrthographicsCamera(float left, float right, float bottom, float top) :

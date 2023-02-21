@@ -2,12 +2,11 @@
 #include "runtime/function/pool/texture_pool.h"
 
 using namespace Chen::CDX12;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
-    SubTexture2D::SubTexture2D(const Ref<Chen::CDX12::Texture>&    texture,
-                               const DirectX::SimpleMath::Vector2& min,
-                               const DirectX::SimpleMath::Vector2& max) :
+    SubTexture2D::SubTexture2D(const Ref<Chen::CDX12::Texture>& texture,
+                               const Vector2&                   min,
+                               const Vector2&                   max) :
         m_texture(texture) {
         m_tex_coords[0] = Vector2{min.x, min.y};
         m_tex_coords[1] = Vector2{max.x, min.y};
@@ -19,10 +18,10 @@ namespace Zero {
     }
 
     Ref<SubTexture2D> SubTexture2D::createFromCoords(
-        const Ref<Chen::CDX12::Texture>&    texture,
-        const DirectX::SimpleMath::Vector2& coords,
-        const DirectX::SimpleMath::Vector2& cell_size,
-        const DirectX::SimpleMath::Vector2& sprite_size) {
+        const Ref<Texture>& texture,
+        const Vector2&      coords,
+        const Vector2&      cell_size,
+        const Vector2&      sprite_size) {
         Vector2 min = {
             (coords.x * cell_size.x) / texture->GetWidth(),
             (coords.y * cell_size.y) / texture->GetHeight()};

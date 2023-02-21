@@ -8,7 +8,6 @@
 #include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     Application* Application::s_instance = nullptr;

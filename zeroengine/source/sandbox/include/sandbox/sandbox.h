@@ -3,8 +3,6 @@
 #include "sandbox/example_layer.h"
 #include "sandbox/sandbox_2d.h"
 
-using namespace DirectX::SimpleMath;
-
 class Sandbox : public Zero::Application {
 public:
     Sandbox() {

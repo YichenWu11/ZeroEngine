@@ -4,8 +4,6 @@
 #include "runtime/function/scene/scene_camera.h"
 #include "runtime/function/scene/scriptable_entity.h"
 
-using namespace DirectX::SimpleMath;
-
 namespace Zero {
     struct NameComponent {
         std::string name;

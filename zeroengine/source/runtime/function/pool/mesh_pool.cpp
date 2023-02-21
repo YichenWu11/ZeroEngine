@@ -3,7 +3,6 @@
 #include "runtime/function/render/render_system/render_context.h"
 
 using namespace Chen::CDX12;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     static VertexBufferLayout               layout;
@@ -12,7 +11,7 @@ namespace Zero {
     void MeshPool::buildBasicMesh() {
         structs.emplace_back(&layout);
 
-        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
+        DXRawDevicePtr device = GET_RENDER_CONTEXT().getGraphicsDevice();
 
         VertexData2D vertices_square[] = {
             {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
@@ -66,7 +65,7 @@ namespace Zero {
             return;
         }
 
-        ID3D12Device* device = GET_RENDER_CONTEXT().getGraphicsDevice();
+        DXRawDevicePtr device = GET_RENDER_CONTEXT().getGraphicsDevice();
 
         ThrowIfFailed(m_cmdAllocator->Reset());
         ThrowIfFailed(m_commandList->Reset(m_cmdAllocator.Get(), nullptr));
@@ -106,13 +105,13 @@ namespace Zero {
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
     }
 
-    void MeshPool::delayDisposeMesh(std::string_view mesh_name, Chen::CDX12::FrameResource* frameres) {
+    void MeshPool::delayDisposeMesh(std::string_view mesh_name, FrameResource* frameres) {
         if (!m_mesh_pool.contains(std::string(mesh_name)))
             LOG_WARN("mesh with this name ({}) does not exsit!", mesh_name);
         m_mesh_pool[std::string(mesh_name)]->DelayDispose(frameres);
     }
 
-    Zero::Ref<Chen::CDX12::Mesh> MeshPool::getMesh(std::string_view mesh_name) {
+    Zero::Ref<Mesh> MeshPool::getMesh(std::string_view mesh_name) {
         if (m_mesh_pool.contains(std::string(mesh_name)))
             return m_mesh_pool[std::string(mesh_name)];
 
@@ -120,7 +119,7 @@ namespace Zero {
         return nullptr;
     }
 
-    std::string MeshPool::getMeshName(const Zero::Ref<Chen::CDX12::Mesh>& target) {
+    std::string MeshPool::getMeshName(const Zero::Ref<Mesh>& target) {
         for (auto& [name, mesh] : m_mesh_pool) {
             if (target == mesh)
                 return name;

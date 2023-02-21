@@ -15,13 +15,13 @@ using Microsoft::WRL::ComPtr;
 namespace Zero {
     // TODO: ObjectConstant Here
     struct ObjectConstant2D {
-        DirectX::SimpleMath::Matrix transform;
-        DirectX::SimpleMath::Color  modulate;
-        uint32_t                    tex_index{0};
-        int32_t                     entity_id{-1};
-        uint32_t                    pad0{0};
-        uint32_t                    pad1{0};
-        float                       tiling_factor{1.0f};
+        Matrix   transform;
+        Color    modulate;
+        uint32_t tex_index{0};
+        int32_t  entity_id{-1};
+        uint32_t pad0{0};
+        uint32_t pad1{0};
+        float    tiling_factor{1.0f};
     };
 
     class MainCameraPass2D final : public RenderPass {

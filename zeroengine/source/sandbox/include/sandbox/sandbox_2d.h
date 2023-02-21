@@ -2,8 +2,6 @@
 
 #include "runtime/zero.h"
 
-using namespace DirectX::SimpleMath;
-
 class Sandbox2D : public Zero::Layer {
 public:
     Sandbox2D();

@@ -10,7 +10,6 @@
 
 using namespace Chen::CDX12;
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     struct Renderer2DData {};
@@ -23,7 +22,7 @@ namespace Zero {
     void Renderer2D::shutdown() {
     }
 
-    void Renderer2D::beginScene(const Camera& camera, const DirectX::SimpleMath::Matrix& cam_transform) {
+    void Renderer2D::beginScene(const Camera& camera, const Matrix& cam_transform) {
         beginScene(cam_transform.Invert() * camera.getProjection());
     }
 
@@ -35,7 +34,7 @@ namespace Zero {
         beginScene(camera.getViewProjectionMatrix());
     }
 
-    void Renderer2D::beginScene(const DirectX::SimpleMath::Matrix& view_proj) {
+    void Renderer2D::beginScene(const Matrix& view_proj) {
         // takes all the scene settings(camera, lights, environment etc)
         BasicShader* shader =
             static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
@@ -61,22 +60,22 @@ namespace Zero {
     }
 
     void Renderer2D::drawQuad(
-        const DirectX::SimpleMath::Vector2& position,
-        const DirectX::SimpleMath::Vector2& size,
-        float                               rotation,
-        const DirectX::SimpleMath::Color&   color,
-        uint32_t                            tex_index,
-        float                               tiling_factor) {
+        const Vector2& position,
+        const Vector2& size,
+        float          rotation,
+        const Color&   color,
+        uint32_t       tex_index,
+        float          tiling_factor) {
         drawQuad({position.x, position.y, 0.0f}, size, rotation, color, tex_index);
     }
 
     void Renderer2D::drawQuad(
-        const DirectX::SimpleMath::Vector3& position,
-        const DirectX::SimpleMath::Vector2& size,
-        float                               rotation,
-        const DirectX::SimpleMath::Color&   color,
-        uint32_t                            tex_index,
-        float                               tiling_factor) {
+        const Vector3& position,
+        const Vector2& size,
+        float          rotation,
+        const Color&   color,
+        uint32_t       tex_index,
+        float          tiling_factor) {
         Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
                            * Matrix::CreateScale(size.x, size.y, 1.0f)
                            * Matrix::CreateTranslation(position);
@@ -85,11 +84,11 @@ namespace Zero {
     }
 
     void Renderer2D::drawQuad(
-        const DirectX::SimpleMath::Matrix& transform,
-        const DirectX::SimpleMath::Color&  color,
-        uint32_t                           tex_index,
-        float                              tiling_factor,
-        int                                entity_id) {
+        const Matrix& transform,
+        const Color&  color,
+        uint32_t      tex_index,
+        float         tiling_factor,
+        int           entity_id) {
         static Zero::Ref<Mesh> mesh = GET_MESH_POOL().getMesh("square");
 
         ZE_ASSERT(mesh, "the square mesh retrieve failure for unknown error(drawQuad)!");
@@ -98,20 +97,20 @@ namespace Zero {
     }
 
     void Renderer2D::drawCellQuad(
-        const DirectX::SimpleMath::Vector2& position,
-        const DirectX::SimpleMath::Vector2& size,
-        float                               rotation,
-        const Zero::Ref<SubTexture2D>&      sub_texture,
-        const DirectX::SimpleMath::Color&   color) {
+        const Vector2&                 position,
+        const Vector2&                 size,
+        float                          rotation,
+        const Zero::Ref<SubTexture2D>& sub_texture,
+        const Color&                   color) {
         drawCellQuad({position.x, position.y, 0.0f}, size, rotation, sub_texture, color);
     }
 
     void Renderer2D::drawCellQuad(
-        const DirectX::SimpleMath::Vector3& position,
-        const DirectX::SimpleMath::Vector2& size,
-        float                               rotation,
-        const Zero::Ref<SubTexture2D>&      sub_texture,
-        const DirectX::SimpleMath::Color&   color) {
+        const Vector3&                 position,
+        const Vector2&                 size,
+        float                          rotation,
+        const Zero::Ref<SubTexture2D>& sub_texture,
+        const Color&                   color) {
         if (!GET_MESH_POOL().isMeshExist(sub_texture->constructSubTexName())) {
             std::vector<VertexData2D> vertices;
             uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
@@ -147,9 +146,9 @@ namespace Zero {
     }
 
     void Renderer2D::drawSprite(
-        const DirectX::SimpleMath::Matrix& transform,
-        const SpriteComponent&             src,
-        int                                entity_id) {
+        const Matrix&          transform,
+        const SpriteComponent& src,
+        int                    entity_id) {
         drawQuad(transform, src.color, src.tex_index, src.tiling_factor, entity_id);
     }
 } // namespace Zero

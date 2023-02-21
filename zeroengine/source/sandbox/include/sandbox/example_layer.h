@@ -2,8 +2,6 @@
 
 #include "runtime/zero.h"
 
-using namespace DirectX::SimpleMath;
-
 class ExampleLayer : public Zero::Layer {
 public:
     ExampleLayer() :

@@ -12,10 +12,10 @@ namespace Zero {
     }
 
     void ShaderParamBindTable::registerShader(
-        std::string_view                                                       shader_name,
-        std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
-        std::span<D3D12_STATIC_SAMPLER_DESC>                                   samplers,
-        ShaderUsage                                                            usage) {
+        std::string_view                                          shader_name,
+        std::span<std::pair<std::string, Shader::Property> const> properties,
+        std::span<D3D12_STATIC_SAMPLER_DESC>                      samplers,
+        ShaderUsage                                               usage) {
         if (m_shader_table.contains(std::string(shader_name))) {
             LOG_WARN("The shader with this name ({}) has existed!", shader_name);
             return;
@@ -36,10 +36,10 @@ namespace Zero {
     }
 
     void ShaderParamBindTable::registerShader(
-        std::string_view                                                       shader_name,
-        std::span<std::pair<std::string, Chen::CDX12::Shader::Property> const> properties,
-        ComPtr<ID3D12RootSignature>&&                                          rootSig,
-        ShaderUsage                                                            usage) {
+        std::string_view                                          shader_name,
+        std::span<std::pair<std::string, Shader::Property> const> properties,
+        ComPtr<ID3D12RootSignature>&&                             rootSig,
+        ShaderUsage                                               usage) {
         if (m_shader_table.contains(std::string(shader_name))) {
             LOG_WARN("The shader with this name ({}) has existed!", shader_name);
             return;

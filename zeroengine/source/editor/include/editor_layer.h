@@ -5,8 +5,6 @@
 #include "panels/content_browser_panel.h"
 #include "panels/scene_hierarchy_panel.h"
 
-using namespace DirectX::SimpleMath;
-
 namespace Zero {
     class EditorLayer : public Layer {
     public:

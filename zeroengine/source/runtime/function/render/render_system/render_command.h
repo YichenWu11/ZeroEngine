@@ -8,7 +8,7 @@ namespace Zero {
         static void clear() {
         }
 
-        static void setClearColor(const DirectX::SimpleMath::Color& color) {
+        static void setClearColor(const Color& color) {
             Chen::CDX12::Texture::setClearColor(color);
         }
     };

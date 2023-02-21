@@ -8,7 +8,6 @@
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 
 using namespace Chen::CDX12;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     Renderer::SceneData* Renderer::s_scene_data = new Renderer::SceneData();
@@ -56,7 +55,7 @@ namespace Zero {
         GET_RENDER_CONTEXT().onRender();
     }
 
-    void Renderer::submit(Mesh* mesh, const DirectX::SimpleMath::Matrix& transfrom) {
+    void Renderer::submit(Mesh* mesh, const Matrix& transfrom) {
     }
 
     ImTextureID Renderer::getOffScreenID() {

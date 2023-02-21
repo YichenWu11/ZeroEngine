@@ -9,7 +9,7 @@ namespace Zero {
         return GetAsyncKeyState(button) & 0x8000;
     }
 
-    DirectX::SimpleMath::Vector2 InputSystem::getMousePosition() {
+    Vector2 InputSystem::getMousePosition() {
         POINT pos;
         bool  success = GetCursorPos(&pos);
         ZE_ASSERT(success, "GetCursorPos failed!");
