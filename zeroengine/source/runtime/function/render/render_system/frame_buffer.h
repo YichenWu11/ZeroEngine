@@ -25,7 +25,7 @@ namespace Zero {
         void onDestroy();
 
     private:
-        FrameBufferConfiguration          m_config;
-        Zero::Scope<Chen::CDX12::Texture> m_inner_texture;
+        FrameBufferConfiguration    m_config;
+        Scope<Chen::CDX12::Texture> m_inner_texture;
     };
 } // namespace Zero

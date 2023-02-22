@@ -91,8 +91,8 @@ namespace Zero {
 
             // Create a RTV for each frame.
             for (uint32_t n = 0; n < s_frame_count; ++n) {
-                m_renderTargets[n] = Zero::Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
-                m_depthTargets[n]  = Zero::Scope<Texture>(
+                m_renderTargets[n] = Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+                m_depthTargets[n]  = Scope<Texture>(
                     new Texture(
                          m_device.Get(),
                          m_scissorRect.right,
@@ -122,7 +122,7 @@ namespace Zero {
         }
 
         {
-            m_psoManager = Zero::Scope<DXPSOMngr>(new DXPSOMngr(m_device.Get()));
+            m_psoManager = Scope<DXPSOMngr>(new DXPSOMngr(m_device.Get()));
         }
 
         {
@@ -290,8 +290,8 @@ namespace Zero {
         CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvCpuDH.GetCpuHandle());
 
         for (uint32_t n = 0; n < s_frame_count; ++n) {
-            m_renderTargets[n] = Zero::Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
-            m_depthTargets[n]  = Zero::Scope<Texture>(
+            m_renderTargets[n] = Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+            m_depthTargets[n]  = Scope<Texture>(
                 new Texture(
                      m_device.Get(),
                      m_scissorRect.right,

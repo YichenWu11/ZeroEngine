@@ -40,14 +40,14 @@ namespace Zero {
         void registerTex(std::string_view tex_name, const std::filesystem::path& path, TexFileFormat = TexFileFormat::WIC);
         void registerTex(const TextureBuildInfo& build_info, TexFileFormat = TexFileFormat::WIC);
 
-        Zero::Ref<Chen::CDX12::Texture> getTextureFromName(std::string_view);
-        uint32_t                        getTexIndexFromName(std::string_view);
-        uint32_t                        getTexIndex(const Ref<Chen::CDX12::Texture>&);
-        std::string                     getTextureName(const Ref<Chen::CDX12::Texture>&);
+        Ref<Chen::CDX12::Texture> getTextureFromName(std::string_view);
+        uint32_t                  getTexIndexFromName(std::string_view);
+        uint32_t                  getTexIndex(const Ref<Chen::CDX12::Texture>&);
+        std::string               getTextureName(const Ref<Chen::CDX12::Texture>&);
 
         Chen::CDX12::DescriptorHeapAllocation* getTexAllocation() { return &m_tex_alloc; }
 
-        ImTextureID getImTextureID(uint32_t tex_idx) { return ImTextureID(m_tex_alloc.GetGpuHandle(tex_idx).ptr); }
+        ImTextureID getImTextureID(uint32_t tex_idx) const { return ImTextureID(m_tex_alloc.GetGpuHandle(tex_idx).ptr); }
 
     private:
         ~TexturePool();

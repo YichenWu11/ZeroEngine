@@ -39,7 +39,6 @@ namespace Zero {
         // update scripts
         {
             m_registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
-                // TODO: Move to onScenePlay
                 if (!nsc.instance) {
                     nsc.instance           = nsc.instantiateScript();
                     nsc.instance->m_entity = Entity{entity, this};

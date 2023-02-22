@@ -6,8 +6,8 @@
 class Sandbox : public Zero::Application {
 public:
     Sandbox() {
-        // pushLayer(new ExampleLayer());
-        pushLayer(new Sandbox2D());
+        pushLayer(new ExampleLayer());
+        // pushLayer(new Sandbox2D());
     }
 
     ~Sandbox() {
@@ -15,6 +15,5 @@ public:
 };
 
 Zero::Application* createApplication() {
-    Zero::RendererAPI::setEditorModeEnabled(false);
     return new Sandbox();
 }

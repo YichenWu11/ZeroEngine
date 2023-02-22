@@ -28,7 +28,7 @@ namespace Zero {
         virtual void setVSync(bool enabled)                            = 0;
         virtual bool isVSync() const                                   = 0;
 
-        static Zero::Scope<IWindowSystem> create(const WindowCreateInfo& create_info = WindowCreateInfo());
+        static Scope<IWindowSystem> create(const WindowCreateInfo& create_info = WindowCreateInfo());
     };
 
 } // namespace Zero

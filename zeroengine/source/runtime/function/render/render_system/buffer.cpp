@@ -53,7 +53,7 @@ namespace Zero {
     void VertexBuffer::unbind() const {
     }
 
-    Zero::Ref<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t byte_size) {
+    Ref<VertexBuffer> VertexBuffer::create(float* vertices, uint32_t byte_size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false, "RendererAPI::NONE is not currently supported!");
@@ -93,7 +93,7 @@ namespace Zero {
     void IndexBuffer::unbind() const {
     }
 
-    Zero::Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t byte_size) {
+    Ref<IndexBuffer> IndexBuffer::create(uint32_t* indices, uint32_t byte_size) {
         switch (Renderer::getAPI()) {
             case RendererAPI::API::NONE:
                 ZE_ASSERT(false, "RendererAPI::NONE is not currently supported!");

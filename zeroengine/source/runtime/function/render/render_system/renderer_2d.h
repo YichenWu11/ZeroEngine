@@ -41,18 +41,18 @@ namespace Zero {
             int           entity_id     = -1);
 
         static void drawCellQuad(
-            const Vector2&                 position,
-            const Vector2&                 size,
-            float                          rotation,
-            const Zero::Ref<SubTexture2D>& sub_texture,
-            const Color&                   color = {1.0f, 1.0f, 1.0f, 1.0f});
+            const Vector2&           position,
+            const Vector2&           size,
+            float                    rotation,
+            const Ref<SubTexture2D>& sub_texture,
+            const Color&             color = {1.0f, 1.0f, 1.0f, 1.0f});
 
         static void drawCellQuad(
-            const Vector3&                 position,
-            const Vector2&                 size,
-            float                          rotation,
-            const Zero::Ref<SubTexture2D>& sub_texture,
-            const Color&                   color = {1.0f, 1.0f, 1.0f, 1.0f});
+            const Vector3&           position,
+            const Vector2&           size,
+            float                    rotation,
+            const Ref<SubTexture2D>& sub_texture,
+            const Color&             color = {1.0f, 1.0f, 1.0f, 1.0f});
 
         static void drawSprite(
             const Matrix&          transform,

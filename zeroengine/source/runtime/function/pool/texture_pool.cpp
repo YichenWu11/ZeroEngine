@@ -112,7 +112,7 @@ namespace Zero {
         LOG_INFO("register texture named {0} success!", info.name);
     }
 
-    Zero::Ref<Texture> TexturePool::getTextureFromName(std::string_view tex_name) {
+    Ref<Texture> TexturePool::getTextureFromName(std::string_view tex_name) {
         if (!m_texture_pool.contains(std::string(tex_name))) {
             LOG_WARN("The texture with this name({0}) dose not exsit!", tex_name);
             return {};

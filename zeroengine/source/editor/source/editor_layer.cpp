@@ -36,34 +36,6 @@ namespace Zero {
         m_active_scene  = CreateRef<Scene>();
         m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
-        // auto&& camera_a = m_active_scene->createEntity("cameraA");
-        // camera_a.addComponent<CameraComponent>();
-
-        // class CameraController : public ScriptableEntity {
-        // public:
-        //     void onCreate() override {
-        //     }
-
-        //     void onDestroy() override {
-        //     }
-
-        //     void onUpdate(TimeStep timestep) override {
-        //         auto& transform = getComponent<TransformComponent>().translation;
-        //         float speed     = 5.0f;
-
-        //         if (InputSystem::isKeyPressed('A'))
-        //             transform.x -= speed * timestep;
-        //         if (InputSystem::isKeyPressed('D'))
-        //             transform.x += speed * timestep;
-        //         if (InputSystem::isKeyPressed('W'))
-        //             transform.y += speed * timestep;
-        //         if (InputSystem::isKeyPressed('S'))
-        //             transform.y -= speed * timestep;
-        //     }
-        // };
-
-        // camera_a.addComponent<NativeScriptComponent>().bind<CameraController>();
-
         m_scene_hierarchy_panel.setContext(m_active_scene);
     }
 

@@ -25,7 +25,7 @@ namespace Zero {
     public:
         using TParamBindTable  = std::map<std::string, std::variant<std::pair<Chen::CDX12::DescriptorHeapAllocation const*, uint32_t>, std::span<const uint8_t>>>;
         using TShaderBindTable = std::map<Chen::CDX12::Shader*, TParamBindTable>;
-        using TShaderTable     = std::map<std::string, Zero::Ref<Chen::CDX12::Shader>>;
+        using TShaderTable     = std::map<std::string, Ref<Chen::CDX12::Shader>>;
 
     public:
         void registerShader(

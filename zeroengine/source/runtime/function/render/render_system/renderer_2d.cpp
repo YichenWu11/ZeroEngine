@@ -89,7 +89,7 @@ namespace Zero {
         uint32_t      tex_index,
         float         tiling_factor,
         int           entity_id) {
-        static Zero::Ref<Mesh> mesh = GET_MESH_POOL().getMesh("square");
+        static Ref<Mesh> mesh = GET_MESH_POOL().getMesh("square");
 
         ZE_ASSERT(mesh, "the square mesh retrieve failure for unknown error(drawQuad)!");
 
@@ -97,20 +97,20 @@ namespace Zero {
     }
 
     void Renderer2D::drawCellQuad(
-        const Vector2&                 position,
-        const Vector2&                 size,
-        float                          rotation,
-        const Zero::Ref<SubTexture2D>& sub_texture,
-        const Color&                   color) {
+        const Vector2&           position,
+        const Vector2&           size,
+        float                    rotation,
+        const Ref<SubTexture2D>& sub_texture,
+        const Color&             color) {
         drawCellQuad({position.x, position.y, 0.0f}, size, rotation, sub_texture, color);
     }
 
     void Renderer2D::drawCellQuad(
-        const Vector3&                 position,
-        const Vector2&                 size,
-        float                          rotation,
-        const Zero::Ref<SubTexture2D>& sub_texture,
-        const Color&                   color) {
+        const Vector3&           position,
+        const Vector2&           size,
+        float                    rotation,
+        const Ref<SubTexture2D>& sub_texture,
+        const Color&             color) {
         if (!GET_MESH_POOL().isMeshExist(sub_texture->constructSubTexName())) {
             std::vector<VertexData2D> vertices;
             uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};

@@ -34,12 +34,12 @@ namespace Zero {
         void onRender();
 
         void submit(
-            const Zero::Ref<Mesh>& mesh,
-            const Matrix&          trans,
-            const Color&           color,
-            uint32_t               tex_index,
-            float                  tiling_factor,
-            int                    entity_id) {
+            const Ref<Mesh>& mesh,
+            const Matrix&    trans,
+            const Color&     color,
+            uint32_t         tex_index,
+            float            tiling_factor,
+            int              entity_id) {
             ObjectConstant2D obj_constant;
             obj_constant.transform     = trans.Transpose();
             obj_constant.modulate      = color;
@@ -89,12 +89,12 @@ namespace Zero {
         DXRect     m_scissorRect;
 
         // render_target, depth_target, frame_buffer
-        Zero::Scope<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
-        Zero::Scope<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
-        Zero::Scope<FrameBuffer>          m_frameBuffers[s_frame_count];
+        Scope<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
+        Scope<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
+        Scope<FrameBuffer>          m_frameBuffers[s_frame_count];
 
-        Zero::Scope<DXPSOMngr>      m_psoManager;
-        Zero::Scope<DXFrameResMngr> m_frameResourceMngr; // frameResourceMngr
+        Scope<DXPSOMngr>            m_psoManager;
+        Scope<DXFrameResMngr>       m_frameResourceMngr; // frameResourceMngr
         std::vector<DXBindProperty> m_bindProperties;
         DXResStateTracker           m_stateTracker; // stateTracker
 
@@ -119,9 +119,9 @@ namespace Zero {
         DXDebugDevice debug_device;
 
         // draw_list
-        std::vector<std::tuple<Zero::Ref<Mesh>, ObjectConstant2D>> m_draw_2d_list;
+        std::vector<std::tuple<Ref<Mesh>, ObjectConstant2D>> m_draw_2d_list;
 
         // RenderPass
-        std::vector<Zero::Scope<RenderPass>> m_render_passes;
+        std::vector<Scope<RenderPass>> m_render_passes;
     };
 } // namespace Zero

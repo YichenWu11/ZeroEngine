@@ -129,7 +129,7 @@ namespace Zero {
     // *************************************************************************************************
     // *************************************************************************************************
 
-    Zero::Scope<IWindowSystem> IWindowSystem::create(const WindowCreateInfo& create_info) {
+    Scope<IWindowSystem> IWindowSystem::create(const WindowCreateInfo& create_info) {
         return Zero::CreateScope<WindowSystem>(create_info);
     }
 

@@ -31,12 +31,13 @@ namespace Zero {
         bool onWindowClose(WindowCloseEvent& e);
         bool onWindowResize(WindowResizeEvent& e);
 
-        Zero::Scope<IWindowSystem> m_window;
-        ImGuiLayer*                m_ImGuiLayer;
-        bool                       m_running   = true;
-        bool                       m_minimized = false;
-        LayerStack                 m_layerStack;
-        float                      m_lastframe_time = 0.0f;
+    private:
+        Scope<IWindowSystem> m_window;
+        ImGuiLayer*          m_ImGuiLayer;
+        bool                 m_running   = true;
+        bool                 m_minimized = false;
+        LayerStack           m_layerStack;
+        float                m_lastframe_time = 0.0f;
 
     private:
         static Application* s_instance;

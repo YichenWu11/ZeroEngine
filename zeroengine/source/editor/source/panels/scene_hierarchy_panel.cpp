@@ -198,6 +198,11 @@ namespace Zero {
                 ImGui::CloseCurrentPopup();
             }
 
+            if (ImGui::MenuItem("NativeScript")) {
+                m_selected_entity.addComponent<NativeScriptComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+
             ImGui::EndPopup();
         }
 
@@ -293,6 +298,8 @@ namespace Zero {
             ImGui::ColorEdit4("Modulate", reinterpret_cast<float*>(&component.color));
 
             ImGui::DragInt("TexID", reinterpret_cast<int*>(&component.tex_index), 1.0f, 0);
+            component.tex_index = std::max(0, (int)component.tex_index);
+
             {
                 ImGui::Image(
                     GET_TEXTURE_POOL().getImTextureID(component.tex_index),
@@ -311,6 +318,10 @@ namespace Zero {
             }
 
             ImGui::DragFloat("Tiling", reinterpret_cast<float*>(&component.tiling_factor), 0.1f, 0.1f);
+        });
+
+        // NativeScriptComponent
+        drawComponent<NativeScriptComponent>("NativeScript", entity, [](auto& component) {
         });
     }
 } // namespace Zero

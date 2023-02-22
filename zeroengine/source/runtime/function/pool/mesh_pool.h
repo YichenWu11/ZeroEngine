@@ -28,16 +28,16 @@ namespace Zero {
 
         void delayDisposeMesh(std::string_view mesh_name, Chen::CDX12::FrameResource* frameres);
 
-        Zero::Ref<Chen::CDX12::Mesh> getMesh(std::string_view mesh_name);
-        std::string                  getMeshName(const Zero::Ref<Chen::CDX12::Mesh>&);
+        Ref<Chen::CDX12::Mesh> getMesh(std::string_view mesh_name);
+        std::string            getMeshName(const Ref<Chen::CDX12::Mesh>&);
 
-        bool isMeshExist(std::string_view name) { return m_mesh_pool.contains(std::string(name)); }
+        bool isMeshExist(std::string_view name) const { return m_mesh_pool.contains(std::string(name)); }
 
     private:
         void buildBasicMesh();
 
     private:
-        std::map<std::string, Zero::Ref<Chen::CDX12::Mesh>> m_mesh_pool;
+        std::map<std::string, Ref<Chen::CDX12::Mesh>> m_mesh_pool;
 
         ComPtr<ID3D12CommandAllocator>    m_cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> m_commandList;

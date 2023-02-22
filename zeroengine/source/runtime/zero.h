@@ -27,5 +27,6 @@
 #include "runtime/function/scene/entity.h"
 #include "runtime/function/scene/scene.h"
 #include "runtime/function/scene/scriptable_entity.h"
+#include "runtime/function/scene/world.h"
 
 #include "runtime/resource/config_manager/config_manager.h"

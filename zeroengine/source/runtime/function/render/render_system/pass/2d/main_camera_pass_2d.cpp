@@ -121,7 +121,7 @@ namespace Zero {
 
         // NOTE: trick here, get the z-index from the _34 of the transform matrix
         std::sort(render_context.m_draw_2d_list.begin(), render_context.m_draw_2d_list.end(),
-                  [](std::tuple<Zero::Ref<Mesh>, ObjectConstant2D> a, std::tuple<Zero::Ref<Mesh>, ObjectConstant2D> b) {
+                  [](std::tuple<Ref<Mesh>, ObjectConstant2D> a, std::tuple<Ref<Mesh>, ObjectConstant2D> b) {
             return std::get<1>(a).transform._34 > std::get<1>(b).transform._34;
         });
     }

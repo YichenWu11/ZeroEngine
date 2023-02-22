@@ -111,7 +111,7 @@ namespace Zero {
         m_mesh_pool[std::string(mesh_name)]->DelayDispose(frameres);
     }
 
-    Zero::Ref<Mesh> MeshPool::getMesh(std::string_view mesh_name) {
+    Ref<Mesh> MeshPool::getMesh(std::string_view mesh_name) {
         if (m_mesh_pool.contains(std::string(mesh_name)))
             return m_mesh_pool[std::string(mesh_name)];
 
@@ -119,7 +119,7 @@ namespace Zero {
         return nullptr;
     }
 
-    std::string MeshPool::getMeshName(const Zero::Ref<Mesh>& target) {
+    std::string MeshPool::getMeshName(const Ref<Mesh>& target) {
         for (auto& [name, mesh] : m_mesh_pool) {
             if (target == mesh)
                 return name;
