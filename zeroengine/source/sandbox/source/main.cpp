@@ -1,7 +1,7 @@
 #include "sandbox/sandbox.h"
 
 int main(int /*argc*/, char** /*argv*/) {
-    auto sandbox_app = createApplication();
+    auto sandbox_app = createApp();
 
     sandbox_app->run();
 

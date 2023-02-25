@@ -24,3 +24,22 @@ public:
             transform.y -= speed * timestep;
     }
 };
+
+class TexMarchingScript : public Zero::ScriptableEntity {
+public:
+    void onCreate() override {
+    }
+
+    void onDestroy() override {
+    }
+
+    void onUpdate(Zero::TimeStep timestep) override {
+        static float elapsed_time = 0.0f;
+        elapsed_time += timestep;
+        if (elapsed_time >= 1.0f) {
+            auto& sprite     = getComponent<Zero::SpriteComponent>();
+            sprite.tex_index = (sprite.tex_index + 1) % GET_TEXTURE_POOL().getTextureNum();
+            elapsed_time -= 1.0f;
+        }
+    }
+};

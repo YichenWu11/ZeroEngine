@@ -14,6 +14,6 @@ public:
     }
 };
 
-Zero::Application* createApplication() {
+Zero::Application* createApp() {
     return new Sandbox();
 }

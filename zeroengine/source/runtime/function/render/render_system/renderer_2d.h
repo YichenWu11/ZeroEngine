@@ -15,6 +15,7 @@ namespace Zero {
         static void beginScene(const Camera& camera, const Matrix& cam_transform);
         static void beginScene(const EditorCamera& camera);
         static void beginScene(const OrthographicsCamera& camera);
+
         static void endScene();
 
         static void drawQuad(

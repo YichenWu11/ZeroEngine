@@ -56,20 +56,22 @@ namespace Zero {
     }
 
     void Application::run() {
-        while (m_running) {
-            float    time     = ImGui::GetTime();
-            TimeStep timestep = time - m_lastframe_time;
-            m_lastframe_time  = time;
+        m_timer.Reset();
 
-            static float elapse_time = 0.0f;
-            elapse_time += timestep;
+        while (m_running) {
+            m_timer.Tick();
+
+            TimeStep timestep = m_timer.DeltaTime();
+
+            static float elapsed_time = 0.0f;
+            elapsed_time += timestep;
 
             // frame_rate
-            if (elapse_time > 1.0f) {
+            if (elapsed_time > 1.0f) {
                 std::wstring window_text =
                     L"Zero Engine - " + std::to_wstring((int)ImGui::GetIO().Framerate) + L" fps";
                 SetWindowText(FindWindow(L"MainWnd", NULL), window_text.c_str());
-                elapse_time -= 1.0f;
+                elapsed_time -= 1.0f;
             }
 
             if (!m_minimized) {

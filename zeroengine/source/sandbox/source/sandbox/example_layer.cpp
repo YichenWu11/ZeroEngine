@@ -20,6 +20,7 @@ void ExampleLayer::onAttach() {
 
     auto&& square = m_world.getActiveScene()->createEntity("square");
     square.addComponent<Zero::SpriteComponent>();
+    square.addComponent<Zero::NativeScriptComponent>().bind<TexMarchingScript>();
 }
 
 void ExampleLayer::onDetach() {
@@ -30,8 +31,21 @@ void ExampleLayer::onUpdate(Zero::TimeStep timestep) {
 }
 
 void ExampleLayer::onImGuiRender() {
-    ImGuiWindowFlags window_flag =
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBackground;
+    Zero::Widgets::drawButton(
+        "Button",
+        Vector2{200.0f, 100.0f},
+        Color{0.5f, 0.5f, 0.5f, 0.8f},
+        Color{0.8f, 0.8f, 0.8f, 1.0f},
+        Color{0.4f, 0.4f, 0.4f, 1.0f},
+        []() {
+        LOG_INFO("Button Clicked");
+        });
+
+    Zero::Widgets::drawTextureButton("Buttonaaa", GET_TEXTURE_POOL().getImTextureID(1), Vector2{100.0f, 100.0f}, []() {
+        LOG_INFO("Button Clicked");
+    });
+
+    Zero::Widgets::drawText("Hello world");
 }
 
 void ExampleLayer::onEvent(Zero::Event& event) {

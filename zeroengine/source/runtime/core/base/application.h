@@ -33,16 +33,17 @@ namespace Zero {
 
     private:
         Scope<IWindowSystem> m_window;
-        ImGuiLayer*          m_ImGuiLayer;
-        bool                 m_running   = true;
-        bool                 m_minimized = false;
-        LayerStack           m_layerStack;
-        float                m_lastframe_time = 0.0f;
+
+        ImGuiLayer* m_ImGuiLayer;
+        LayerStack  m_layerStack;
+        Timer       m_timer;
+
+        bool m_running   = true;
+        bool m_minimized = false;
 
     private:
         static Application* s_instance;
     };
 
-    // TODO: to be defined in client
-    Application* createApplication();
+    Application* createApp();
 } // namespace Zero

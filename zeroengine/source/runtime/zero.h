@@ -15,6 +15,8 @@
 #include "runtime/function/pool/mesh_pool.h"
 #include "runtime/function/pool/texture_pool.h"
 
+#include "runtime/function/gui/widgets.h"
+
 #include "runtime/function/render/camera_system/editor_camera.h"
 #include "runtime/function/render/camera_system/orthographics_camera_controller.h"
 

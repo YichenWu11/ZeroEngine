@@ -13,7 +13,7 @@ namespace Zero {
         }
     };
 
-    Zero::Application* createApplication() {
+    Zero::Application* createApp() {
         Zero::RendererAPI::setEditorModeEnabled(true);
         return new Editor();
     }
