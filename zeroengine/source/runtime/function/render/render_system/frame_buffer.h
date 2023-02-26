@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CDX12/Material/Texture.h>
+#include <CDX12/Resource/Texture.h>
 
 namespace Zero {
     struct FrameBufferConfiguration {
@@ -25,7 +25,7 @@ namespace Zero {
         void onDestroy();
 
     private:
-        FrameBufferConfiguration          m_config;
-        Zero::Scope<Chen::CDX12::Texture> m_inner_texture;
+        FrameBufferConfiguration    m_config;
+        Scope<Chen::CDX12::Texture> m_inner_texture;
     };
 } // namespace Zero

@@ -5,8 +5,6 @@
 #include "panels/content_browser_panel.h"
 #include "panels/scene_hierarchy_panel.h"
 
-using namespace DirectX::SimpleMath;
-
 namespace Zero {
     class EditorLayer : public Layer {
     public:
@@ -25,6 +23,9 @@ namespace Zero {
         void newScene();
         void openScene();
         void saveSceneAs();
+
+        void onScenePlay();
+        void onSceneStop();
 
     private:
         Vector2 m_viewport_size;
@@ -47,5 +48,12 @@ namespace Zero {
         Entity m_hovered_entity;
 
         int m_GizmoType{7};
+
+        enum class SceneMode {
+            Editor = 0,
+            Game   = 1
+        };
+
+        SceneMode m_sceneMode = SceneMode::Editor;
     };
 } // namespace Zero

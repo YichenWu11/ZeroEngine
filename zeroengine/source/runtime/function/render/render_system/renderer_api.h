@@ -14,9 +14,6 @@ namespace Zero {
         };
 
     public:
-        void clear();
-        void setClearColor(const DirectX::SimpleMath::Vector4& color);
-
         static API       getAPI() { return s_api; }
         static Dimension getRenderDimension() { return s_dimension; }
 

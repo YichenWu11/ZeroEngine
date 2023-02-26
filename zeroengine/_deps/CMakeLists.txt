@@ -25,3 +25,7 @@ endif()
 if(NOT TARGET ImGuizmo)
     include(ImGuizmo.cmake)
 endif()
+
+if(NOT TARGET box2d)
+    add_subdirectory(box2d)
+endif()

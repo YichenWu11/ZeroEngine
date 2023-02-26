@@ -9,7 +9,7 @@ namespace Zero {
                                     Orthographic = 1 };
 
     public:
-        SceneCamera(const DirectX::SimpleMath::Matrix& _projection = DirectX::SimpleMath::Matrix::Identity);
+        SceneCamera(const Matrix& _projection = Matrix::Identity);
         ~SceneCamera() = default;
 
         void setOrthographic(float size, float near_clip, float far_clip);

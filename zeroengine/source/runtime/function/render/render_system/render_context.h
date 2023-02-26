@@ -1,19 +1,15 @@
 #pragma once
 
-#include <CDX12/CmdQueue.h>
-#include <CDX12/DescripitorHeap/DescriptorHeapAllocation.h>
-#include <CDX12/Device.h>
-#include <CDX12/FrameResourceMngr.h>
-#include <CDX12/Resource/ResourceStateTracker.h>
-#include <CDX12/Shader/PSOManager.h>
-#include <CDX12/Util/BindProperty.h>
+#include "runtime/function/render/render_system/dx.h"
 
 #include "runtime/core/util/singleton.h"
 #include "runtime/function/render/render_system/frame_buffer.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/pass/ui_pass.h"
 
-using Microsoft::WRL::ComPtr;
+using Chen::CDX12::DescriptorHeapAllocation;
+using Chen::CDX12::Mesh;
+using Chen::CDX12::Texture;
 
 #define GET_RENDER_CONTEXT() ::Zero::RenderContext::getInstance()
 
@@ -21,7 +17,7 @@ namespace Zero {
     struct ImGuiInitInfo {
         D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle;
         D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle;
-        ID3D12DescriptorHeap*       descriptor_heap;
+        DXRawDescHeapPtr            descriptor_heap;
     };
 
     class RenderContext : public Singleton<RenderContext> {
@@ -38,12 +34,12 @@ namespace Zero {
         void onRender();
 
         void submit(
-            const Zero::Ref<Chen::CDX12::Mesh>& mesh,
-            const DirectX::SimpleMath::Matrix&  trans,
-            const DirectX::SimpleMath::Color&   color,
-            uint32_t                            tex_index,
-            float                               tiling_factor,
-            int                                 entity_id) {
+            Mesh*         mesh,
+            const Matrix& trans,
+            const Color&  color,
+            uint32_t      tex_index,
+            float         tiling_factor,
+            int           entity_id) {
             ObjectConstant2D obj_constant;
             obj_constant.transform     = trans.Transpose();
             obj_constant.modulate      = color;
@@ -61,12 +57,13 @@ namespace Zero {
 
         Chen::CDX12::FrameResource& getCurrFrameResource() { return *m_frameResourceMngr->GetCurrentFrameResource(); }
         FrameBufferConfiguration    getFrameBufferConfig() { return m_frameBuffers[0]->getConfiguration(); }
-        ID3D12Device*               getGraphicsDevice() { return m_device.Get(); }
-        ID3D12CommandQueue*         getCommandQueue() { return m_commandQueue.Get(); }
+        DXRawDevicePtr              getGraphicsDevice() { return m_device.Get(); }
+        DXRawCmdQueuePtr            getCommandQueue() { return m_commandQueue.Get(); }
         ImGuiInitInfo               getImGuiInitInfo() {
                           return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
         }
-        ImTextureID getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
+        ImTextureID               getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
+        DescriptorHeapAllocation& getTexAlloc() { return m_tex_alloc; }
 
     private:
         void drawRenderPasses(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
@@ -81,36 +78,38 @@ namespace Zero {
         HWND m_window_handle;
         bool m_is_vsync_enable{false};
 
-        Chen::CDX12::Device                   m_device;
-        Microsoft::WRL::ComPtr<IDXGIFactory4> m_dxgiFactory;
+        DXDevice  m_device;
+        DXFactory m_dxgiFactory;
 
-        ComPtr<IDXGISwapChain3>        m_swapChain;
-        Chen::CDX12::CmdQueue          m_commandQueue;
-        ComPtr<ID3D12CommandSignature> m_command_signature;
-        Chen::CDX12::GCmdList          m_currframe_cmdlist;
+        DXSwapChain        m_swapChain;
+        DXCommandQueue     m_commandQueue;
+        DXCommandSignature m_command_signature;
+        DXCommandList      m_currframe_cmdlist;
 
-        CD3DX12_VIEWPORT m_viewport;
-        CD3DX12_RECT     m_scissorRect;
+        DXViewPort m_viewport;
+        DXRect     m_scissorRect;
 
         // render_target, depth_target, frame_buffer
-        Zero::Scope<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
-        Zero::Scope<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
-        Zero::Scope<FrameBuffer>          m_frameBuffers[s_frame_count];
+        Scope<Chen::CDX12::Texture> m_renderTargets[s_frame_count];
+        Scope<Chen::CDX12::Texture> m_depthTargets[s_frame_count];
+        Scope<FrameBuffer>          m_frameBuffers[s_frame_count];
 
-        Zero::Scope<Chen::CDX12::PSOManager>        m_psoManager;
-        Zero::Scope<Chen::CDX12::FrameResourceMngr> m_frameResourceMngr; // frameResourceMngr
-        std::vector<Chen::CDX12::BindProperty>      m_bindProperties;
-        Chen::CDX12::ResourceStateTracker           m_stateTracker; // stateTracker
+        Scope<DXPSOMngr>            m_psoManager;
+        Scope<DXFrameResMngr>       m_frameResourceMngr; // frameResourceMngr
+        std::vector<DXBindProperty> m_bindProperties;
+        DXResStateTracker           m_stateTracker; // stateTracker
 
         // DescriptorHeapAllocation
-        Chen::CDX12::DescriptorHeapAllocation m_rtvCpuDH;
-        Chen::CDX12::DescriptorHeapAllocation m_dsvCpuDH;
-        Chen::CDX12::DescriptorHeapAllocation m_csuGpuDH;
+        DescriptorHeapAllocation m_rtvCpuDH;
+        DescriptorHeapAllocation m_dsvCpuDH;
+        DescriptorHeapAllocation m_csuGpuDH;
+
+        DescriptorHeapAllocation m_tex_alloc;
 
         // Synchronization objects
-        uint32_t            m_backBufferIndex;
-        ComPtr<ID3D12Fence> m_fence;
-        uint64_t            m_fenceValue;
+        uint32_t m_backBufferIndex;
+        DXFence  m_fence;
+        uint64_t m_fenceValue;
 
         // Initial Total Descriptor_Num
         uint32_t numCpuRTV         = 168;
@@ -120,12 +119,12 @@ namespace Zero {
         uint32_t numGpuCSU_dynamic = 648;
 
         // debug
-        ComPtr<ID3D12DebugDevice> debug_device;
+        DXDebugDevice debug_device;
 
         // draw_list
-        std::vector<std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D>> m_draw_2d_list;
+        std::vector<std::tuple<Mesh*, ObjectConstant2D>> m_draw_2d_list;
 
         // RenderPass
-        std::vector<Zero::Scope<RenderPass>> m_render_passes;
+        std::vector<Scope<RenderPass>> m_render_passes;
     };
 } // namespace Zero

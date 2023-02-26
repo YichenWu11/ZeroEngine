@@ -3,6 +3,8 @@
 #include "runtime/function/render/render_system/pass/ui_pass.h"
 #include "runtime/function/render/render_system/render_context.h"
 
+using namespace Chen::CDX12;
+
 namespace Zero {
     UIPass::UIPass() {
         LOG_INFO("-- UIPass register success.");
@@ -14,10 +16,10 @@ namespace Zero {
     void UIPass::preLoadResource() {
     }
 
-    void UIPass::delayDisposeResource(Chen::CDX12::FrameResource&) {
+    void UIPass::delayDisposeResource(FrameResource&) {
     }
 
-    void UIPass::drawPass(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+    void UIPass::drawPass(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         RenderContext& render_context = GET_RENDER_CONTEXT();
 
         if (offscreen) {
@@ -57,7 +59,7 @@ namespace Zero {
         }
     }
 
-    void UIPass::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+    void UIPass::drawPassIndirect(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         drawPass(frameRes, frameIndex, offscreen);
     }
 } // namespace Zero

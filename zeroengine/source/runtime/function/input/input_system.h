@@ -5,9 +5,9 @@ namespace Zero {
     public:
         static bool isKeyPressed(int keycode);
 
-        static bool                         isMouseButtonPressed(int button);
-        static DirectX::SimpleMath::Vector2 getMousePosition();
-        static float                        getMouseX();
-        static float                        getMouseY();
+        static bool    isMouseButtonPressed(int button);
+        static Vector2 getMousePosition();
+        static float   getMouseX();
+        static float   getMouseY();
     };
 } // namespace Zero

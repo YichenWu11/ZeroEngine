@@ -2,6 +2,10 @@
 
 #include <memory>
 
+#include <CDX12/Common/Timer.h>
+
+#include "runtime/core/base/hash.h"
+
 #ifdef NDEBUG
 #define ZE_ASSERT(statement, msg)
 #else
@@ -39,4 +43,6 @@ namespace Zero {
     constexpr Ref<T> CreateRef(Args&&... args) {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
+
+    using Chen::CDX12::Timer;
 } // namespace Zero

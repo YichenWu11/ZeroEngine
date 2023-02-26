@@ -12,8 +12,7 @@
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/input/input_system.h"
 
-#include "runtime/function/pool/mesh_pool.h"
-#include "runtime/function/pool/texture_pool.h"
+#include "runtime/function/gui/widgets.h"
 
 #include "runtime/function/render/camera_system/editor_camera.h"
 #include "runtime/function/render/camera_system/orthographics_camera_controller.h"
@@ -27,5 +26,9 @@
 #include "runtime/function/scene/entity.h"
 #include "runtime/function/scene/scene.h"
 #include "runtime/function/scene/scriptable_entity.h"
+#include "runtime/function/scene/world.h"
 
 #include "runtime/resource/config_manager/config_manager.h"
+#include "runtime/resource/mesh.h"
+#include "runtime/resource/resource_manager.h"
+#include "runtime/resource/texture.h"

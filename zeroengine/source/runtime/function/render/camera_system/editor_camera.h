@@ -25,14 +25,14 @@ namespace Zero {
             m_viewDirty = true;
         }
 
-        DirectX::SimpleMath::Matrix getView() const { return m_view; }
-        DirectX::SimpleMath::Matrix getViewProjection() const { return m_view * m_projection; }
+        Matrix getView() const { return m_view; }
+        Matrix getViewProjection() const { return m_view * m_projection; }
 
-        DirectX::SimpleMath::Vector3 getPosition() const { return m_position; }
+        Vector3 getPosition() const { return m_position; }
 
-        DirectX::SimpleMath::Vector3 getRight() const { return m_right; }
-        DirectX::SimpleMath::Vector3 getUp() const { return m_up; }
-        DirectX::SimpleMath::Vector3 getLook() const { return m_look; }
+        Vector3 getRight() const { return m_right; }
+        Vector3 getUp() const { return m_up; }
+        Vector3 getLook() const { return m_look; }
 
         float getNearZ() const { return m_nearZ; }
         float getFarZ() const { return m_farZ; }
@@ -77,9 +77,9 @@ namespace Zero {
 
         bool m_viewDirty = true;
 
-        DirectX::XMFLOAT4X4 m_view{DirectX::SimpleMath::Matrix::Identity};
+        DirectX::XMFLOAT4X4 m_view{Matrix::Identity};
 
-        float                        m_viewportWidth = 1280, m_viewportHeight = 720;
-        DirectX::SimpleMath::Vector2 m_initialMousePosition = {0.0f, 0.0f};
+        float   m_viewportWidth = 1280, m_viewportHeight = 720;
+        Vector2 m_initialMousePosition = {0.0f, 0.0f};
     };
 } // namespace Zero

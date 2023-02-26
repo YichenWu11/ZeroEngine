@@ -8,7 +8,6 @@
 #include <Windows.h>
 #include <WindowsX.h>
 
-#include <CDX12/_deps/d3dx12.h>
 #include <D3Dcompiler.h>
 #include <DirectXCollision.h>
 #include <DirectXColors.h>
@@ -45,3 +44,5 @@
 #include "runtime/core/base/core.h"
 #include "runtime/core/log/log_system.h"
 #include "runtime/function/debug/profiler.h"
+
+using namespace DirectX::SimpleMath;

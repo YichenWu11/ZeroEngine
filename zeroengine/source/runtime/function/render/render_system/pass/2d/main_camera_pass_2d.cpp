@@ -6,8 +6,6 @@
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
-#include "runtime/function/pool/mesh_pool.h"
-#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
@@ -89,6 +87,7 @@ namespace Zero {
         }
         trans_shader->rasterizerState          = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
         trans_shader->rasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+        // trans_shader->rasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 
         trans_shader->blendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
         D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;
@@ -111,7 +110,7 @@ namespace Zero {
         trans_shader->depthStencilState.StencilEnable = true;
     }
 
-    void MainCameraPass2D::delayDisposeResource(Chen::CDX12::FrameResource&) {
+    void MainCameraPass2D::delayDisposeResource(FrameResource&) {
         // do nothing
     }
 
@@ -120,7 +119,7 @@ namespace Zero {
 
         // NOTE: trick here, get the z-index from the _34 of the transform matrix
         std::sort(render_context.m_draw_2d_list.begin(), render_context.m_draw_2d_list.end(),
-                  [](std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D> a, std::tuple<Zero::Ref<Chen::CDX12::Mesh>, ObjectConstant2D> b) {
+                  [](std::tuple<Mesh*, ObjectConstant2D> a, std::tuple<Mesh*, ObjectConstant2D> b) {
             return std::get<1>(a).transform._34 > std::get<1>(b).transform._34;
         });
     }
@@ -132,7 +131,7 @@ namespace Zero {
             - if `offscreen`, render to m_framebuffer; else render to m_renderTarget
             - and render imgui_data together
     */
-    void MainCameraPass2D::drawPass(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+    void MainCameraPass2D::drawPass(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         preZSortPass();
 
         RenderContext& render_context = GET_RENDER_CONTEXT();
@@ -188,7 +187,7 @@ namespace Zero {
 
             render_context.m_currframe_cmdlist->SetDescriptorHeaps(
                 1,
-                get_rvalue_ptr(GET_TEXTURE_POOL().getTexAllocation()->GetDescriptorHeap()));
+                get_rvalue_ptr(render_context.getTexAlloc().GetDescriptorHeap()));
 
             BasicShader* shader =
                 static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
@@ -225,7 +224,7 @@ namespace Zero {
                 frameRes.DrawMesh(
                     shader,
                     render_context.m_psoManager.get(),
-                    mesh.get(),
+                    mesh,
                     render_context.s_colorFormat,
                     render_context.s_depthFormat,
                     render_context.m_bindProperties);
@@ -234,7 +233,7 @@ namespace Zero {
             if (!offscreen) {
                 render_context.m_currframe_cmdlist->SetDescriptorHeaps(
                     1,
-                    get_rvalue_ptr(GET_TEXTURE_POOL().getTexAllocation()->GetDescriptorHeap()));
+                    get_rvalue_ptr(render_context.getTexAlloc().GetDescriptorHeap()));
 
                 ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), render_context.m_currframe_cmdlist.Get());
             }
@@ -248,7 +247,7 @@ namespace Zero {
             - if `offscreen`, render to m_framebuffer; else render to m_renderTarget
             - and render imgui_data together
     */
-    void MainCameraPass2D::drawPassIndirect(Chen::CDX12::FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
+    void MainCameraPass2D::drawPassIndirect(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         preZSortPass();
 
         RenderContext& render_context = GET_RENDER_CONTEXT();
@@ -303,7 +302,7 @@ namespace Zero {
 
         render_context.m_currframe_cmdlist->SetDescriptorHeaps(
             1,
-            get_rvalue_ptr(GET_TEXTURE_POOL().getTexAllocation()->GetDescriptorHeap()));
+            get_rvalue_ptr(render_context.getTexAlloc().GetDescriptorHeap()));
 
         BasicShader* shader =
             static_cast<BasicShader*>(GET_SHADER_BIND_TABLE().getShader("transparent"));
@@ -361,7 +360,7 @@ namespace Zero {
                         sizeof(obj_constant_array[cnt])});
 
                 // NOTE: cnt + 1
-                indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh.get(), obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
+                indirectDrawBufferData[cnt] = (frameRes.getIndirectArguments(mesh, obj_cbuffer.buffer->GetAddress(), cnt + 1, sizeof(ObjectConstant2D)));
 
                 m_indirectDrawBuffer[frameIndex]->CopyData(cnt * sizeof(IndirectDrawCommand),
                                                            {reinterpret_cast<vbyte const*>(&(indirectDrawBufferData[cnt])),
@@ -386,7 +385,7 @@ namespace Zero {
         if (!offscreen) {
             render_context.m_currframe_cmdlist->SetDescriptorHeaps(
                 1,
-                get_rvalue_ptr(GET_TEXTURE_POOL().getTexAllocation()->GetDescriptorHeap()));
+                get_rvalue_ptr(render_context.getTexAlloc().GetDescriptorHeap()));
 
             ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), render_context.m_currframe_cmdlist.Get());
         }

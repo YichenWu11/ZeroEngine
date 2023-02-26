@@ -4,7 +4,6 @@
 #include "runtime/function/render/camera_system/editor_camera.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 
-using namespace DirectX::SimpleMath;
 using namespace DirectX;
 using namespace Chen::CDX12;
 

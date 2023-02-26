@@ -15,8 +15,7 @@ static const float2 samplePoints[9] = {
     float2(edgeSize, -edgeSize),
 };
 
-float4 EdgeDetect(float2 uv, uint tex_index)
-{
+float4 EdgeDetect(float2 uv, uint tex_index) {
     //Sobel Kernels
     float xKernel[] = { -1, 0, 1,
         -2, 0, 2,
@@ -29,20 +28,17 @@ float4 EdgeDetect(float2 uv, uint tex_index)
     float x = 0;
     float y = 0;
 
-    for (int i = 0; i < 9; i++)
-    {
+    for (int i = 0; i < 9; i++) {
         float4 color = TextureMap[tex_index].Sample(u_samAnisotropicWrap, uv + samplePoints[i]);
         x += color.x * xKernel[i];
         y += color.x * yKernel[i];
     }
 
-    if ((x * x + y * y) < threshold)
-    {
+    if ((x * x + y * y) < threshold) {
         // If it's not an edge return original color.
         return TextureMap[tex_index].Sample(u_samAnisotropicWrap, uv + samplePoints[4]);
     }
-    else
-    {
+    else {
         // Make the edge white.
         return float4(1.0f, 1.0f, 1.0f, 1.0f);
     }

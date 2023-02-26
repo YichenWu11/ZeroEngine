@@ -2,13 +2,15 @@
 
 #include "runtime/core/base/application.h"
 #include "runtime/core/base/layer.h"
+#include "runtime/function/render/render_system/buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
+#include "runtime/resource/texture.h"
+
 using namespace Chen::CDX12;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     Application* Application::s_instance = nullptr;
@@ -22,18 +24,48 @@ namespace Zero {
 
         LOG_INFO("zeroengine start");
 
-        m_window = IWindowSystem::create();
+        m_window           = CreateScope<WindowSystem>(WindowCreateInfo{});
+        m_resource_manager = CreateScope<ResourceManager>();
+
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
 
-        Renderer::init();
-
-        m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
-        pushOverlay(m_ImGuiLayer);
+        preLoadResources();
     }
 
     Application::~Application() {
         Renderer::shutdown();
         LOG_INFO("zeroengine shutdown");
+    }
+
+    void Application::preLoadResources() {
+        m_resource_manager->add<ResourceType::Texture>(
+            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/bella.png");
+        m_resource_manager->add<ResourceType::Texture>(
+            GET_CONFIG_MNGR().getAssetFolder() / "icon/DirectoryIcon.png");
+        m_resource_manager->add<ResourceType::Texture>(
+            GET_CONFIG_MNGR().getAssetFolder() / "icon/FileIcon.png");
+
+        VertexData2D vertices_square[] = {
+            {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
+            {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}},
+        };
+        uint32_t indices_square[] = {0, 3, 1, 3, 2, 1};
+
+        static VertexBufferLayout               layout;
+        static std::vector<rtti::Struct const*> structs;
+        structs.emplace_back(&layout);
+
+        m_resource_manager->add<ResourceType::Mesh>(
+            "square",
+            vertices_square,
+            array_count(vertices_square) * sizeof(VertexData2D) / layout.structSize,
+            indices_square,
+            array_count(indices_square));
+
+        m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
+        pushOverlay(m_ImGuiLayer);
     }
 
     void Application::pushLayer(Layer* layer) {
@@ -57,20 +89,22 @@ namespace Zero {
     }
 
     void Application::run() {
-        while (m_running) {
-            float    time     = ImGui::GetTime();
-            TimeStep timestep = time - m_lastframe_time;
-            m_lastframe_time  = time;
+        m_timer.Reset();
 
-            static float elapse_time = 0.0f;
-            elapse_time += timestep;
+        while (m_running) {
+            m_timer.Tick();
+
+            TimeStep timestep = m_timer.DeltaTime();
+
+            static float elapsed_time = 0.0f;
+            elapsed_time += timestep;
 
             // frame_rate
-            if (elapse_time > 1.0f) {
+            if (elapsed_time > 1.0f) {
                 std::wstring window_text =
                     L"Zero Engine - " + std::to_wstring((int)ImGui::GetIO().Framerate) + L" fps";
                 SetWindowText(FindWindow(L"MainWnd", NULL), window_text.c_str());
-                elapse_time -= 1.0f;
+                elapsed_time -= 1.0f;
             }
 
             if (!m_minimized) {

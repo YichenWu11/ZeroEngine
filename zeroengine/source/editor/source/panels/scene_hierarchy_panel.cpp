@@ -1,7 +1,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "runtime/function/pool/texture_pool.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -76,10 +76,12 @@ namespace Zero {
             ImVec2 content_RegionAvailable = ImGui::GetContentRegionAvail();
 
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4{0.2f, 0.024f, 0.08f, 1.0f});
             float line_height = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
             ImGui::Separator();
             bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
             ImGui::PopStyleVar();
+            ImGui::PopStyleColor();
             ImGui::SameLine(content_RegionAvailable.x - line_height * 0.5f);
 
             if (ImGui::Button("+", ImVec2{line_height, line_height})) {
@@ -196,6 +198,11 @@ namespace Zero {
                 ImGui::CloseCurrentPopup();
             }
 
+            if (ImGui::MenuItem("NativeScript")) {
+                m_selected_entity.addComponent<NativeScriptComponent>();
+                ImGui::CloseCurrentPopup();
+            }
+
             ImGui::EndPopup();
         }
 
@@ -291,9 +298,11 @@ namespace Zero {
             ImGui::ColorEdit4("Modulate", reinterpret_cast<float*>(&component.color));
 
             ImGui::DragInt("TexID", reinterpret_cast<int*>(&component.tex_index), 1.0f, 0);
+            component.tex_index = std::max(0, (int)component.tex_index);
+
             {
                 ImGui::Image(
-                    GET_TEXTURE_POOL().getImTextureID(component.tex_index),
+                    ImTextureID(GET_RENDER_CONTEXT().getTexAlloc().GetGpuHandle(component.tex_index).ptr),
                     ImVec2(50, 50));
             }
 
@@ -309,6 +318,10 @@ namespace Zero {
             }
 
             ImGui::DragFloat("Tiling", reinterpret_cast<float*>(&component.tiling_factor), 0.1f, 0.1f);
+        });
+
+        // NativeScriptComponent
+        drawComponent<NativeScriptComponent>("NativeScript", entity, [](auto& component) {
         });
     }
 } // namespace Zero

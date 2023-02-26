@@ -40,7 +40,7 @@ namespace Zero {
 
         void delayDispose();
 
-        static Zero::Ref<VertexBuffer> create(float* vertices, uint32_t byte_size);
+        static Ref<VertexBuffer> create(float* vertices, uint32_t byte_size);
 
     private:
         Chen::CDX12::UploadBuffer* m_vertex_upload;
@@ -56,7 +56,7 @@ namespace Zero {
         void     unbind() const;
         uint32_t getCount() const { return m_index_count; }
 
-        static Zero::Ref<IndexBuffer> create(uint32_t* indices, uint32_t byte_size);
+        static Ref<IndexBuffer> create(uint32_t* indices, uint32_t byte_size);
 
     private:
         uint32_t                   m_index_count;

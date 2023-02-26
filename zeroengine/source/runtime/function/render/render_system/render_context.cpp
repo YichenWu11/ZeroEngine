@@ -4,14 +4,12 @@
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
-#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
 
 using namespace Chen::CDX12;
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
 
 namespace Zero {
     DXGI_FORMAT RenderContext::s_colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -21,8 +19,8 @@ namespace Zero {
         ZE_ASSERT(window_handle, "window handle passed to dx12_context is NULL!");
 
         m_window_handle = window_handle;
-        m_viewport      = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
-        m_scissorRect   = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
+        m_viewport      = DXViewPort(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+        m_scissorRect   = DXRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
 
 #if defined(DEBUG) || defined(_DEBUG)
         {
@@ -80,9 +78,10 @@ namespace Zero {
                 numGpuCSU_static,
                 numGpuCSU_dynamic);
 
-            m_rtvCpuDH = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(20);
-            m_dsvCpuDH = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(20);
-            m_csuGpuDH = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(20);
+            m_rtvCpuDH  = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(20);
+            m_dsvCpuDH  = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(20);
+            m_csuGpuDH  = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(20);
+            m_tex_alloc = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
         }
 
         // Create frame resources.
@@ -92,8 +91,8 @@ namespace Zero {
 
             // Create a RTV for each frame.
             for (uint32_t n = 0; n < s_frame_count; ++n) {
-                m_renderTargets[n] = Zero::Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
-                m_depthTargets[n]  = Zero::Scope<Texture>(
+                m_renderTargets[n] = Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+                m_depthTargets[n]  = Scope<Texture>(
                     new Texture(
                          m_device.Get(),
                          m_scissorRect.right,
@@ -119,11 +118,11 @@ namespace Zero {
                 dsvHandle.Offset(1, m_dsvCpuDH.GetDescriptorSize());
             }
 
-            m_frameResourceMngr = Zero::CreateScope<FrameResourceMngr>(s_frame_count, m_device.Get());
+            m_frameResourceMngr = Zero::CreateScope<DXFrameResMngr>(s_frame_count, m_device.Get());
         }
 
         {
-            m_psoManager = Zero::Scope<PSOManager>(new PSOManager(m_device.Get()));
+            m_psoManager = Scope<DXPSOMngr>(new DXPSOMngr(m_device.Get()));
         }
 
         {
@@ -191,6 +190,8 @@ namespace Zero {
             DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Free(std::move(m_dsvCpuDH));
         if (!m_csuGpuDH.IsNull())
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
+        if (!m_tex_alloc.IsNull())
+            DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_tex_alloc));
 
 #if defined(DEBUG) || defined(_DEBUG)
             // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
@@ -260,8 +261,8 @@ namespace Zero {
     void RenderContext::onResize(uint32_t width, uint32_t height) {
         flushCommandQueue();
 
-        m_viewport    = CD3DX12_VIEWPORT(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
-        m_scissorRect = CD3DX12_RECT(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
+        m_viewport    = DXViewPort(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
+        m_scissorRect = DXRect(0, 0, static_cast<LONG>(width), static_cast<LONG>(height));
 
         ComPtr<ID3D12CommandAllocator>    cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> commandList;
@@ -291,8 +292,8 @@ namespace Zero {
         CD3DX12_CPU_DESCRIPTOR_HANDLE dsvHandle(m_dsvCpuDH.GetCpuHandle());
 
         for (uint32_t n = 0; n < s_frame_count; ++n) {
-            m_renderTargets[n] = Zero::Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
-            m_depthTargets[n]  = Zero::Scope<Texture>(
+            m_renderTargets[n] = Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
+            m_depthTargets[n]  = Scope<Texture>(
                 new Texture(
                      m_device.Get(),
                      m_scissorRect.right,
