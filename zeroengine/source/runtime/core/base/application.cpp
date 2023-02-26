@@ -2,10 +2,13 @@
 
 #include "runtime/core/base/application.h"
 #include "runtime/core/base/layer.h"
+#include "runtime/function/render/render_system/buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
 #include "runtime/resource/config_manager/config_manager.h"
+
+#include "runtime/resource/texture.h"
 
 using namespace Chen::CDX12;
 
@@ -21,18 +24,48 @@ namespace Zero {
 
         LOG_INFO("zeroengine start");
 
-        m_window = IWindowSystem::create();
+        m_window           = CreateScope<WindowSystem>(WindowCreateInfo{});
+        m_resource_manager = CreateScope<ResourceManager>();
+
         m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
 
-        Renderer::init();
-
-        m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
-        pushOverlay(m_ImGuiLayer);
+        preLoadResources();
     }
 
     Application::~Application() {
         Renderer::shutdown();
         LOG_INFO("zeroengine shutdown");
+    }
+
+    void Application::preLoadResources() {
+        m_resource_manager->add<ResourceType::Texture>(
+            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/bella.png");
+        m_resource_manager->add<ResourceType::Texture>(
+            GET_CONFIG_MNGR().getAssetFolder() / "icon/DirectoryIcon.png");
+        m_resource_manager->add<ResourceType::Texture>(
+            GET_CONFIG_MNGR().getAssetFolder() / "icon/FileIcon.png");
+
+        VertexData2D vertices_square[] = {
+            {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
+            {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f}},
+            {{0.5f, 0.5f, 0.0f}, {1.0f, 0.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f}},
+        };
+        uint32_t indices_square[] = {0, 3, 1, 3, 2, 1};
+
+        static VertexBufferLayout               layout;
+        static std::vector<rtti::Struct const*> structs;
+        structs.emplace_back(&layout);
+
+        m_resource_manager->add<ResourceType::Mesh>(
+            "square",
+            vertices_square,
+            array_count(vertices_square) * sizeof(VertexData2D) / layout.structSize,
+            indices_square,
+            array_count(indices_square));
+
+        m_ImGuiLayer = new ImGuiLayer(m_window->getNativeWindowHandle());
+        pushOverlay(m_ImGuiLayer);
     }
 
     void Application::pushLayer(Layer* layer) {

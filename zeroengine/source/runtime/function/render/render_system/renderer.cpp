@@ -1,7 +1,5 @@
 #include <CDX12/Resource/Mesh.h>
 
-#include "runtime/function/pool/mesh_pool.h"
-#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
@@ -13,8 +11,6 @@ namespace Zero {
     Renderer::SceneData* Renderer::s_scene_data = new Renderer::SceneData();
 
     void Renderer::init() {
-        GET_MESH_POOL().init();
-        GET_TEXTURE_POOL().init();
         Renderer2D::init();
     }
 
@@ -48,7 +44,7 @@ namespace Zero {
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
-            std::make_pair(GET_TEXTURE_POOL().getTexAllocation(), 0));
+            std::make_pair(&GET_RENDER_CONTEXT().getTexAlloc(), 0));
     }
 
     void Renderer::endScene() {

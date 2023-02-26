@@ -34,12 +34,12 @@ namespace Zero {
         void onRender();
 
         void submit(
-            const Ref<Mesh>& mesh,
-            const Matrix&    trans,
-            const Color&     color,
-            uint32_t         tex_index,
-            float            tiling_factor,
-            int              entity_id) {
+            Mesh*         mesh,
+            const Matrix& trans,
+            const Color&  color,
+            uint32_t      tex_index,
+            float         tiling_factor,
+            int           entity_id) {
             ObjectConstant2D obj_constant;
             obj_constant.transform     = trans.Transpose();
             obj_constant.modulate      = color;
@@ -62,7 +62,8 @@ namespace Zero {
         ImGuiInitInfo               getImGuiInitInfo() {
                           return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
         }
-        ImTextureID getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
+        ImTextureID               getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
+        DescriptorHeapAllocation& getTexAlloc() { return m_tex_alloc; }
 
     private:
         void drawRenderPasses(Chen::CDX12::FrameResource& frameRes, uint frameIndex);
@@ -103,6 +104,8 @@ namespace Zero {
         DescriptorHeapAllocation m_dsvCpuDH;
         DescriptorHeapAllocation m_csuGpuDH;
 
+        DescriptorHeapAllocation m_tex_alloc;
+
         // Synchronization objects
         uint32_t m_backBufferIndex;
         DXFence  m_fence;
@@ -119,7 +122,7 @@ namespace Zero {
         DXDebugDevice debug_device;
 
         // draw_list
-        std::vector<std::tuple<Ref<Mesh>, ObjectConstant2D>> m_draw_2d_list;
+        std::vector<std::tuple<Mesh*, ObjectConstant2D>> m_draw_2d_list;
 
         // RenderPass
         std::vector<Scope<RenderPass>> m_render_passes;

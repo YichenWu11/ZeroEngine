@@ -9,7 +9,7 @@ namespace Zero {
         CHAR          szFile[260] = {0};
         ZeroMemory(&ofn, sizeof(OPENFILENAME));
         ofn.lStructSize  = sizeof(OPENFILENAME);
-        ofn.hwndOwner    = Application::get().getWindow().getNativeWindowHandle();
+        ofn.hwndOwner    = Application::get().getWindow()->getNativeWindowHandle();
         ofn.lpstrFile    = szFile;
         ofn.nMaxFile     = sizeof(szFile);
         ofn.lpstrFilter  = filter;
@@ -26,7 +26,7 @@ namespace Zero {
         CHAR          szFile[260] = {0};
         ZeroMemory(&ofn, sizeof(OPENFILENAME));
         ofn.lStructSize  = sizeof(OPENFILENAME);
-        ofn.hwndOwner    = Application::get().getWindow().getNativeWindowHandle();
+        ofn.hwndOwner    = Application::get().getWindow()->getNativeWindowHandle();
         ofn.lpstrFile    = szFile;
         ofn.nMaxFile     = sizeof(szFile);
         ofn.lpstrFilter  = filter;

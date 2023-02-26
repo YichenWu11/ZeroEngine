@@ -71,7 +71,7 @@ namespace Zero {
     void ImGuiLayer::end() {
         ImGuiIO&     io  = ImGui::GetIO();
         Application& app = Application::get();
-        io.DisplaySize   = ImVec2(app.getWindow().getWidth(), app.getWindow().getHeight());
+        io.DisplaySize   = ImVec2(app.getWindow()->getWidth(), app.getWindow()->getHeight());
 
         ImGui::Render();
     }

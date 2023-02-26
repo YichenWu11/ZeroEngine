@@ -24,5 +24,8 @@ namespace Zero {
         Ref<Chen::CDX12::Texture> m_texture;
         Vector2                   m_tex_coords[4];
         std::string               m_sub_name;
+
+    private:
+        static uint32_t s_count;
     };
 } // namespace Zero

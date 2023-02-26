@@ -13,26 +13,6 @@ namespace Zero {
     void EditorLayer::onAttach() {
         ZE_PROFILE_FUNCTION();
 
-        GET_TEXTURE_POOL().registerTex(
-            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/bella.png");
-        GET_TEXTURE_POOL().registerTex(
-            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/asoul.png");
-        GET_TEXTURE_POOL().registerTex(
-            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/asoul_moon.png");
-        GET_TEXTURE_POOL().registerTex(
-            "SpriteSheet",
-            GET_CONFIG_MNGR().getAssetFolder() / "game/texture/sprite_sheet.png");
-
-        m_texture_stair = SubTexture2D::createFromCoords(
-            GET_TEXTURE_POOL().getTextureFromName("SpriteSheet"),
-            {7, 6},
-            {128.0f, 128.0f});
-
-        m_texture_bush = SubTexture2D::createFromCoords(
-            GET_TEXTURE_POOL().getTextureFromName("SpriteSheet"),
-            {2, 3},
-            {256.0f, 128.0f});
-
         m_active_scene  = CreateRef<Scene>();
         m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 
@@ -244,7 +224,7 @@ namespace Zero {
 
                     ImGui::SameLine();
 
-                    float indent_scale = Application::get().getWindow().getWidth() / 1280.f;
+                    float indent_scale = Application::get().getWindow()->getWidth() / 1280.f;
 
                     {
                         ImGui::Indent(ImGui::GetWindowSize().x - 110.0f);

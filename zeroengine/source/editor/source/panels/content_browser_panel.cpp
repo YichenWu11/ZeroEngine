@@ -1,6 +1,7 @@
 #include <imgui.h>
 
-#include "runtime/function/pool/texture_pool.h"
+#include "runtime/core/base/application.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
 #include "panels/content_browser_panel.h"
@@ -42,7 +43,7 @@ namespace Zero {
             int icon = directoryEntry.is_directory() ? s_dir_icon : s_file_icon;
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             ImGui::ImageButton(
-                GET_TEXTURE_POOL().getImTextureID(icon),
+                ImTextureID(GET_RENDER_CONTEXT().getTexAlloc().GetGpuHandle(icon).ptr),
                 {thumbnailSize, thumbnailSize});
 
             if (ImGui::BeginDragDropSource()) {

@@ -4,6 +4,8 @@
 
 #include <CDX12/Common/Timer.h>
 
+#include "runtime/core/base/hash.h"
+
 #ifdef NDEBUG
 #define ZE_ASSERT(statement, msg)
 #else

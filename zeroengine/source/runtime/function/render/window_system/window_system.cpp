@@ -4,7 +4,6 @@
 #include "runtime/function/event/key_event.h"
 #include "runtime/function/event/mouse_event.h"
 #include "runtime/function/render/render_system/render_context.h"
-#include "runtime/function/render/window_system/i_window_system.h"
 #include "runtime/function/render/window_system/window_system.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -128,11 +127,6 @@ namespace Zero {
     // *************************************************************************************************
     // *************************************************************************************************
     // *************************************************************************************************
-
-    Scope<IWindowSystem> IWindowSystem::create(const WindowCreateInfo& create_info) {
-        return Zero::CreateScope<WindowSystem>(create_info);
-    }
-
     WindowSystem::WindowSystem(const WindowCreateInfo& create_info) {
         init(create_info);
     }

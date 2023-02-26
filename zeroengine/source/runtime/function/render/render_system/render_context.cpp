@@ -4,7 +4,6 @@
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
-#include "runtime/function/pool/texture_pool.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
@@ -79,9 +78,10 @@ namespace Zero {
                 numGpuCSU_static,
                 numGpuCSU_dynamic);
 
-            m_rtvCpuDH = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(20);
-            m_dsvCpuDH = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(20);
-            m_csuGpuDH = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(20);
+            m_rtvCpuDH  = DescriptorHeapMngr::GetInstance().GetRTVCpuDH()->Allocate(20);
+            m_dsvCpuDH  = DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Allocate(20);
+            m_csuGpuDH  = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(20);
+            m_tex_alloc = DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Allocate(168);
         }
 
         // Create frame resources.
@@ -190,6 +190,8 @@ namespace Zero {
             DescriptorHeapMngr::GetInstance().GetDSVCpuDH()->Free(std::move(m_dsvCpuDH));
         if (!m_csuGpuDH.IsNull())
             DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_csuGpuDH));
+        if (!m_tex_alloc.IsNull())
+            DescriptorHeapMngr::GetInstance().GetCSUGpuDH()->Free(std::move(m_tex_alloc));
 
 #if defined(DEBUG) || defined(_DEBUG)
             // debug_device->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);

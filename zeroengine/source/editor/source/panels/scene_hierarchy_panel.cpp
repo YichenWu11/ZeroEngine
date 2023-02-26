@@ -1,7 +1,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "runtime/function/pool/texture_pool.h"
+#include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/scene/components.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -302,7 +302,7 @@ namespace Zero {
 
             {
                 ImGui::Image(
-                    GET_TEXTURE_POOL().getImTextureID(component.tex_index),
+                    ImTextureID(GET_RENDER_CONTEXT().getTexAlloc().GetGpuHandle(component.tex_index).ptr),
                     ImVec2(50, 50));
             }
 

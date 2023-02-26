@@ -1,26 +1,35 @@
 #pragma once
 
-#include "runtime/function/render/window_system/i_window_system.h"
+#include "runtime/function/event/event.h"
 
 namespace Zero {
     class RenderContext;
 
-    class WindowSystem : public IWindowSystem {
+    struct WindowCreateInfo {
+        int         width{1280};
+        int         height{720};
+        std::string title{"ZeroEngine"};
+        bool        is_fullscreen{false};
+    };
+
+    class WindowSystem {
     public:
+        using EventCallbackFn = std::function<void(Event&)>;
+
         WindowSystem(const WindowCreateInfo& create_info);
         virtual ~WindowSystem();
 
-        void onUpdate() override;
+        void onUpdate();
 
-        int getWidth() const override { return m_data.width; }
-        int getHeight() const override { return m_data.height; }
+        int getWidth() const { return m_data.width; }
+        int getHeight() const { return m_data.height; }
 
-        HWND getNativeWindowHandle() override { return m_window; }
+        HWND getNativeWindowHandle() { return m_window; }
 
         // window attributes
-        void setEventCallback(const EventCallbackFn& callback) override { m_data.event_callback = callback; }
-        void setVSync(bool enabled) override;
-        bool isVSync() const override;
+        void setEventCallback(const EventCallbackFn& callback) { m_data.event_callback = callback; }
+        void setVSync(bool enabled);
+        bool isVSync() const;
 
     private:
         virtual void init(const WindowCreateInfo& create_info);
