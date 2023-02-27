@@ -32,7 +32,7 @@ namespace Zero {
         }
 
         m_vertex_upload = new UploadBuffer(
-            GET_RENDER_CONTEXT().getGraphicsDevice(),
+            RenderContext::getInstance().getGraphicsDevice(),
             vertex_data.size());
         m_vertex_upload->CopyData(0, vertex_data);
     }
@@ -72,7 +72,7 @@ namespace Zero {
     IndexBuffer::IndexBuffer(uint32_t* indices, uint32_t byte_size) :
         m_index_count(byte_size / 4) {
         m_index_upload = new UploadBuffer(
-            GET_RENDER_CONTEXT().getGraphicsDevice(),
+            RenderContext::getInstance().getGraphicsDevice(),
             byte_size);
         m_index_upload->CopyData(0, {reinterpret_cast<vbyte const*>(indices), byte_size});
     }

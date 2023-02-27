@@ -15,16 +15,16 @@ namespace Zero {
     }
 
     void Renderer::shutdown() {
-        GET_RENDER_CONTEXT().shutdown();
+        RenderContext::getInstance().shutdown();
         Renderer2D::shutdown();
     }
 
     void Renderer::onWindowResize(int width, int height) {
-        GET_RENDER_CONTEXT().onResize(width, height);
+        RenderContext::getInstance().onResize(width, height);
     }
 
     void Renderer::resizeFrameBuffer(int width, int height) {
-        GET_RENDER_CONTEXT().resizeFrameBuffer(width, height);
+        RenderContext::getInstance().resizeFrameBuffer(width, height);
     }
 
     void Renderer::beginScene(const OrthographicsCamera& camera) {
@@ -44,21 +44,21 @@ namespace Zero {
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
-            std::make_pair(&GET_RENDER_CONTEXT().getTexAlloc(), 0));
+            std::make_pair(&RenderContext::getInstance().getTexAlloc(), 0));
     }
 
     void Renderer::endScene() {
-        GET_RENDER_CONTEXT().onRender();
+        RenderContext::getInstance().onRender();
     }
 
     void Renderer::submit(Mesh* mesh, const Matrix& transfrom) {
     }
 
     ImTextureID Renderer::getOffScreenID() {
-        return GET_RENDER_CONTEXT().getOffScreenID();
+        return RenderContext::getInstance().getOffScreenID();
     }
 
     FrameBufferConfiguration Renderer::getFrameBufferConfig() {
-        return GET_RENDER_CONTEXT().getFrameBufferConfig();
+        return RenderContext::getInstance().getFrameBufferConfig();
     }
 } // namespace Zero

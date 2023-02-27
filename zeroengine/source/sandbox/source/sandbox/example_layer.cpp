@@ -2,26 +2,30 @@
 #include "sandbox/scripts.h"
 
 void ExampleLayer::onAttach() {
-    m_world.addScene("main").setActiveScene("main");
-    m_world.onResize(Zero::Application::get().getWindow()->getWidth(),
-                     Zero::Application::get().getWindow()->getHeight());
+    LOG_TRACE("attach");
+
+    Zero::Application::get().getResourceMngr()->add<Zero::ResourceType::Texture>(
+        Zero::ConfigManager::getInstance().getAssetFolder() / "texture/common/asoul_moon.png");
+    Zero::Application::get().getResourceMngr()->add<Zero::ResourceType::Texture>(
+        Zero::ConfigManager::getInstance().getAssetFolder() / "texture/common/bella.png");
+
+    m_world.addScene("main").setActiveScene("main").onResize(
+        Zero::Application::get().getWindow()->getWidth(),
+        Zero::Application::get().getWindow()->getHeight());
 
     auto&& player = m_world.getActiveScene()->createEntity("player");
     player.addComponent<Zero::CameraComponent>().camera.setOrthographicSize(5.0f);
+    player.addComponent<Zero::SpriteComponent>().tex_index =
+        Zero::Application::get().getResourceMngr()->index<Zero::ResourceType::Texture>("bella");
     player.addComponent<Zero::NativeScriptComponent>().bind<CameraController>();
 
-    auto& player_sprite = player.addComponent<Zero::SpriteComponent>();
-    player_sprite.tex_index =
-        Zero::Application::get().getResourceMngr()->index<Zero::ResourceType::Texture>("bella");
-
-    auto&& square        = m_world.getActiveScene()->createEntity("square");
-    auto&& square_sprite = square.addComponent<Zero::SpriteComponent>();
-    square_sprite.tex_index =
-        Zero::Application::get().getResourceMngr()->index<Zero::ResourceType::Texture>("bella");
-    // square.addComponent<Zero::NativeScriptComponent>().bind<TexMarchingScript>();
+    auto&& square = m_world.getActiveScene()->createEntity("square");
+    square.addComponent<Zero::SpriteComponent>();
+    square.addComponent<Zero::NativeScriptComponent>().bind<TexMarchingScript>();
 }
 
 void ExampleLayer::onDetach() {
+    LOG_TRACE("detach");
 }
 
 void ExampleLayer::onUpdate(Zero::TimeStep timestep) {

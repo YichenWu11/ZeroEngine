@@ -23,7 +23,7 @@ namespace Zero {
 
         ComPtr<ID3D12CommandAllocator>    m_cmdAllocator;
         ComPtr<ID3D12GraphicsCommandList> m_commandList;
-        DXRawDevicePtr                    device = GET_RENDER_CONTEXT().getGraphicsDevice();
+        DXRawDevicePtr                    device = RenderContext::getInstance().getGraphicsDevice();
 
         ThrowIfFailed(
             device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(m_cmdAllocator.GetAddressOf())));
@@ -52,8 +52,8 @@ namespace Zero {
         ThrowIfFailed(m_commandList->Close());
 
         ID3D12CommandList* ppM_commandLists[] = {m_commandList.Get()};
-        GET_RENDER_CONTEXT().getCommandQueue()->ExecuteCommandLists(array_count(ppM_commandLists), ppM_commandLists);
-        GET_RENDER_CONTEXT().flush();
+        RenderContext::getInstance().getCommandQueue()->ExecuteCommandLists(array_count(ppM_commandLists), ppM_commandLists);
+        RenderContext::getInstance().flush();
 
         LOG_INFO("register mesh named {0} success!", name);
     }

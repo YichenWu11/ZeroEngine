@@ -11,8 +11,6 @@ using Chen::CDX12::DescriptorHeapAllocation;
 using Chen::CDX12::Mesh;
 using Chen::CDX12::Texture;
 
-#define GET_RENDER_CONTEXT() ::Zero::RenderContext::getInstance()
-
 namespace Zero {
     struct ImGuiInitInfo {
         D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle;

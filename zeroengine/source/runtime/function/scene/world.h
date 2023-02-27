@@ -16,7 +16,7 @@ namespace Zero {
         void   removeScene(std::string_view scene_name);
 
         Ref<Scene> getScene(std::string_view scene_name);
-        void       setActiveScene(std::string_view scene_name);
+        World&     setActiveScene(std::string_view scene_name);
         Ref<Scene> getActiveScene();
 
         void onResize(uint32_t width, uint32_t height);

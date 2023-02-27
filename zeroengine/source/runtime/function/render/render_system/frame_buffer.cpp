@@ -19,7 +19,7 @@ namespace Zero {
     }
 
     void FrameBuffer::onResize(const FrameBufferConfiguration& config) {
-        DXRawDevicePtr device = GET_RENDER_CONTEXT().getGraphicsDevice();
+        DXRawDevicePtr device = RenderContext::getInstance().getGraphicsDevice();
 
         m_inner_texture.reset();
 

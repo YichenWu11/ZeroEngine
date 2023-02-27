@@ -19,7 +19,7 @@ namespace Zero {
         IResource(name) {
         m_is_valid = true;
 
-        DXRawDevicePtr device = GET_RENDER_CONTEXT().getGraphicsDevice();
+        DXRawDevicePtr device = RenderContext::getInstance().getGraphicsDevice();
         m_texture             = CreateScope<Texture>(
             device,
             tex_desc.width,
@@ -62,9 +62,9 @@ namespace Zero {
         device->CreateShaderResourceView(
             m_texture->GetResource(),
             &srv_desc,
-            GET_RENDER_CONTEXT().getTexAlloc().GetCpuHandle(s_tex_count));
+            RenderContext::getInstance().getTexAlloc().GetCpuHandle(s_tex_count));
 
-        auto uploadResourcesFinished = resourceUpload.End(GET_RENDER_CONTEXT().getCommandQueue());
+        auto uploadResourcesFinished = resourceUpload.End(RenderContext::getInstance().getCommandQueue());
         uploadResourcesFinished.wait();
 
         LOG_INFO("register texture named {0} success!", name);

@@ -17,7 +17,7 @@ namespace Zero {
         void add(Scope<IResource>&& resource, size_t uuid) override {
             if (!resource_lookup.contains(uuid)) {
                 resource_lookup.emplace(uuid, resources.size());
-                resources.emplace_back(std::unique_ptr<Resource<_Ty>>(dynamic_cast<Resource<_Ty>*>(resource.release())));
+                resources.emplace_back(Scope<Resource<_Ty>>(dynamic_cast<Resource<_Ty>*>(resource.release())));
             }
             else
                 LOG_WARN("try to add a resource whose uuid has been exsited!!!");

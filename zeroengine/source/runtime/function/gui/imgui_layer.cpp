@@ -32,14 +32,14 @@ namespace Zero {
 
         setZeroImGuiStyle();
 
-        auto font_path = GET_CONFIG_MNGR().getAssetFolder() / "font/JetBrainsMono-Light.ttf";
+        auto font_path = ConfigManager::getInstance().getAssetFolder() / "font/JetBrainsMono-Light.ttf";
         io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), 22.0f);
 
-        ImGuiInitInfo init_info = GET_RENDER_CONTEXT().getImGuiInitInfo();
+        ImGuiInitInfo init_info = RenderContext::getInstance().getImGuiInitInfo();
 
         ImGui_ImplWin32_Init(m_handle);
 
-        ImGui_ImplDX12_Init(GET_RENDER_CONTEXT().getGraphicsDevice(),
+        ImGui_ImplDX12_Init(RenderContext::getInstance().getGraphicsDevice(),
                             3,
                             DXGI_FORMAT_R8G8B8A8_UNORM,
                             init_info.descriptor_heap,

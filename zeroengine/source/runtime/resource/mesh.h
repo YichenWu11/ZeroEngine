@@ -41,8 +41,5 @@ namespace Zero {
     private:
         bool                     m_is_valid = false;
         Scope<Chen::CDX12::Mesh> m_mesh;
-
-    private:
-        static uint32_t s_tex_count;
     };
 } // namespace Zero

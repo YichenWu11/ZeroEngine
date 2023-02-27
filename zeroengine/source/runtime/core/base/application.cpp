@@ -8,8 +8,6 @@
 #include "runtime/function/render/window_system/window_system.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
-#include "runtime/resource/texture.h"
-
 using namespace Chen::CDX12;
 
 namespace Zero {
@@ -39,11 +37,7 @@ namespace Zero {
 
     void Application::preLoadResources() {
         m_resource_manager->add<ResourceType::Texture>(
-            GET_CONFIG_MNGR().getAssetFolder() / "texture/common/bella.png");
-        m_resource_manager->add<ResourceType::Texture>(
-            GET_CONFIG_MNGR().getAssetFolder() / "icon/DirectoryIcon.png");
-        m_resource_manager->add<ResourceType::Texture>(
-            GET_CONFIG_MNGR().getAssetFolder() / "icon/FileIcon.png");
+            ConfigManager::getInstance().getAssetFolder() / "texture/common/white.png");
 
         VertexData2D vertices_square[] = {
             {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
@@ -93,6 +87,7 @@ namespace Zero {
 
         while (m_running) {
             m_timer.Tick();
+            m_resource_manager->tick();
 
             TimeStep timestep = m_timer.DeltaTime();
 

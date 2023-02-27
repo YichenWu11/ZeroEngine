@@ -51,11 +51,11 @@ namespace Zero {
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
-            std::make_pair(&GET_RENDER_CONTEXT().getTexAlloc(), 0));
+            std::make_pair(&RenderContext::getInstance().getTexAlloc(), 0));
     }
 
     void Renderer2D::endScene() {
-        GET_RENDER_CONTEXT().onRender();
+        RenderContext::getInstance().onRender();
     }
 
     void Renderer2D::drawQuad(
@@ -93,7 +93,7 @@ namespace Zero {
 
         ZE_ASSERT(square_mesh, "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        GET_RENDER_CONTEXT().submit(square_mesh->getMesh(), transform, color, tex_index, tiling_factor, entity_id);
+        RenderContext::getInstance().submit(square_mesh->getMesh(), transform, color, tex_index, tiling_factor, entity_id);
     }
 
     void Renderer2D::drawCellQuad(
@@ -136,7 +136,7 @@ namespace Zero {
         //                    * Matrix::CreateScale(size.x, size.y, 1.0f)
         //                    * Matrix::CreateTranslation(position);
 
-        // GET_RENDER_CONTEXT().submit(
+        // RenderContext::getInstance().submit(
         //     GET_MESH_POOL().getMesh(sub_texture->constructSubTexName()),
         //     transform,
         //     color,

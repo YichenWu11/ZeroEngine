@@ -302,7 +302,7 @@ namespace Zero {
 
             {
                 ImGui::Image(
-                    ImTextureID(GET_RENDER_CONTEXT().getTexAlloc().GetGpuHandle(component.tex_index).ptr),
+                    ImTextureID(RenderContext::getInstance().getTexAlloc().GetGpuHandle(component.tex_index).ptr),
                     ImVec2(50, 50));
             }
 
@@ -310,7 +310,7 @@ namespace Zero {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     const wchar_t* path = (const wchar_t*)payload->Data;
                     auto           tex_path =
-                        GET_CONFIG_MNGR().getAssetFolder() / std::filesystem::path(path);
+                        ConfigManager::getInstance().getAssetFolder() / std::filesystem::path(path);
                     LOG_INFO("{0}", tex_path.string());
                     // TODO: Register Texture
                 }

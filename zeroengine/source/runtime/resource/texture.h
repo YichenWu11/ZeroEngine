@@ -45,6 +45,8 @@ namespace Zero {
 
         bool validate() const { return m_is_valid; }
 
+        uint32_t              getWidth() const { return m_texture->GetWidth(); }
+        uint32_t              getHeight() const { return m_texture->GetHeight(); }
         Chen::CDX12::Texture* getTexture() { return m_texture.get(); }
 
     private:

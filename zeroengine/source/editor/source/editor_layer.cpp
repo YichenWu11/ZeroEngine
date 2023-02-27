@@ -13,6 +13,11 @@ namespace Zero {
     void EditorLayer::onAttach() {
         ZE_PROFILE_FUNCTION();
 
+        Application::get().getResourceMngr()->add<ResourceType::Texture>(
+            ConfigManager::getInstance().getAssetFolder() / "icon/DirectoryIcon.png");
+        Application::get().getResourceMngr()->add<ResourceType::Texture>(
+            ConfigManager::getInstance().getAssetFolder() / "icon/FileIcon.png");
+
         m_active_scene  = CreateRef<Scene>();
         m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
 

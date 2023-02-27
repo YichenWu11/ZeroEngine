@@ -11,13 +11,13 @@ namespace Zero {
     static const int s_file_icon = 2;
 
     ContentBrowserPanel::ContentBrowserPanel() :
-        m_current_directory(GET_CONFIG_MNGR().getAssetFolder()) {
+        m_current_directory(ConfigManager::getInstance().getAssetFolder()) {
     }
 
     void ContentBrowserPanel::onImGuiRender() {
         ImGui::Begin("Browser");
 
-        if (m_current_directory != std::filesystem::path(GET_CONFIG_MNGR().getAssetFolder())) {
+        if (m_current_directory != std::filesystem::path(ConfigManager::getInstance().getAssetFolder())) {
             if (ImGui::Button("<-")) {
                 m_current_directory = m_current_directory.parent_path();
             }
@@ -36,14 +36,14 @@ namespace Zero {
 
         for (auto& directoryEntry : std::filesystem::directory_iterator(m_current_directory)) {
             const auto& path           = directoryEntry.path();
-            auto        relativePath   = std::filesystem::relative(path, GET_CONFIG_MNGR().getAssetFolder());
+            auto        relativePath   = std::filesystem::relative(path, ConfigManager::getInstance().getAssetFolder());
             std::string filenameString = relativePath.filename().string();
 
             ImGui::PushID(filenameString.c_str());
             int icon = directoryEntry.is_directory() ? s_dir_icon : s_file_icon;
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             ImGui::ImageButton(
-                ImTextureID(GET_RENDER_CONTEXT().getTexAlloc().GetGpuHandle(icon).ptr),
+                ImTextureID(RenderContext::getInstance().getTexAlloc().GetGpuHandle(icon).ptr),
                 {thumbnailSize, thumbnailSize});
 
             if (ImGui::BeginDragDropSource()) {
