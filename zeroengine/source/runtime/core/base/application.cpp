@@ -6,7 +6,6 @@
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/window_system/window_system.h"
-#include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
 
@@ -17,11 +16,10 @@ namespace Zero {
         ZE_ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
-        Zero::ConfigManager::getInstance().init();
         Zero::LogSystem::init();
-
         LOG_INFO("zeroengine start");
 
+        m_config_manager   = CreateScope<ConfigManager>();
         m_window           = CreateScope<WindowSystem>(WindowCreateInfo{});
         m_resource_manager = CreateScope<ResourceManager>();
 
@@ -37,7 +35,7 @@ namespace Zero {
 
     void Application::preLoadResources() {
         m_resource_manager->add<ResourceType::Texture>(
-            ConfigManager::getInstance().getAssetFolder() / "texture/common/white.png");
+            m_config_manager->getAssetFolder() / "texture/white.png");
 
         VertexData2D vertices_square[] = {
             {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},

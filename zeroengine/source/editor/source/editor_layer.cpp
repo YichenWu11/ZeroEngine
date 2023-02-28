@@ -2,7 +2,6 @@
 
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/scene/scene_serializer.h"
-#include "runtime/resource/config_manager/config_manager.h"
 
 #include "editor_layer.h"
 
@@ -14,9 +13,9 @@ namespace Zero {
         ZE_PROFILE_FUNCTION();
 
         Application::get().getResourceMngr()->add<ResourceType::Texture>(
-            ConfigManager::getInstance().getAssetFolder() / "icon/DirectoryIcon.png");
+            Application::get().getConfigMngr()->getAssetFolder() / "resource/icon/DirectoryIcon.png");
         Application::get().getResourceMngr()->add<ResourceType::Texture>(
-            ConfigManager::getInstance().getAssetFolder() / "icon/FileIcon.png");
+            Application::get().getConfigMngr()->getAssetFolder() / "resource/icon/FileIcon.png");
 
         m_active_scene  = CreateRef<Scene>();
         m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);

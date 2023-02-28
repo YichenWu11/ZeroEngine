@@ -1,7 +1,7 @@
 #include "runtime/resource/config_manager/config_manager.h"
 
 namespace Zero {
-    void ConfigManager::init() {
+    ConfigManager::ConfigManager() {
         m_root_folder   = std::filesystem::path(ZERO_XSTR(ZE_ROOT_DIR));
         m_asset_folder  = m_root_folder / "asset";
         m_script_folder = m_root_folder / "script";

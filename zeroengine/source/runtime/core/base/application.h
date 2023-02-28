@@ -9,6 +9,7 @@
 #include "runtime/function/gui/imgui_layer.h"
 #include "runtime/function/render/window_system/window_system.h"
 
+#include "runtime/resource/config_manager/config_manager.h"
 #include "runtime/resource/resource_manager.h"
 
 namespace Zero {
@@ -28,6 +29,7 @@ namespace Zero {
 
         WindowSystem*    getWindow() { return m_window.get(); }
         ResourceManager* getResourceMngr() { return m_resource_manager.get(); }
+        ConfigManager*   getConfigMngr() { return m_config_manager.get(); }
         ImGuiLayer*      getImGuiLayer() { return m_ImGuiLayer; }
 
         static Application& get() { return *s_instance; }
@@ -39,6 +41,7 @@ namespace Zero {
     private:
         Scope<WindowSystem>    m_window;
         Scope<ResourceManager> m_resource_manager;
+        Scope<ConfigManager>   m_config_manager;
         ImGuiLayer*            m_ImGuiLayer;
 
         LayerStack m_layerStack;

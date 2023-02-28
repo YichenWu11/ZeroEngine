@@ -25,10 +25,10 @@
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
 #include "runtime/function/scene/scene.h"
+#include "runtime/function/scene/scene_serializer.h"
 #include "runtime/function/scene/scriptable_entity.h"
 #include "runtime/function/scene/world.h"
 
-#include "runtime/resource/config_manager/config_manager.h"
-#include "runtime/resource/mesh.h"
+#include "runtime/resource/resource/mesh.h"
+#include "runtime/resource/resource/texture.h"
 #include "runtime/resource/resource_manager.h"
-#include "runtime/resource/texture.h"

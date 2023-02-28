@@ -4,7 +4,7 @@
 #include <WICTextureLoader.h>
 
 #include "runtime/function/render/render_system/render_context.h"
-#include "runtime/resource/texture.h"
+#include "runtime/resource/resource/texture.h"
 
 using namespace Chen::CDX12;
 

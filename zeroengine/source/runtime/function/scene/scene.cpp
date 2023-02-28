@@ -14,10 +14,15 @@ namespace Zero {
     }
 
     Entity Scene::createEntity(const std::string& name) {
+        static uint32_t create_entity_count = 0;
+
         Entity entity = {m_registry.create(), this};
         entity.addComponent<TransformComponent>();
         auto& name_component = entity.addComponent<NameComponent>();
-        name_component.name  = (name.empty()) ? "Entity" : name;
+        name_component.name  = (name.empty()) ? ("Entity" + std::to_string(create_entity_count)) :
+                                                name;
+
+        create_entity_count++;
 
         return entity;
     }

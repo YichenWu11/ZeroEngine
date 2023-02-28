@@ -1,11 +1,9 @@
 #pragma once
 
-#include "runtime/core/util/singleton.h"
-
 namespace Zero {
-    class ConfigManager : public Singleton<ConfigManager> {
+    class ConfigManager {
     public:
-        void init();
+        ConfigManager();
 
         const std::filesystem::path& getRootFolder() const;
         const std::filesystem::path& getAssetFolder() const;

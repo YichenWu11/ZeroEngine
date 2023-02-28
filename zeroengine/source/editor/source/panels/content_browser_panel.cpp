@@ -2,7 +2,6 @@
 
 #include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/render_context.h"
-#include "runtime/resource/config_manager/config_manager.h"
 
 #include "panels/content_browser_panel.h"
 
@@ -11,13 +10,13 @@ namespace Zero {
     static const int s_file_icon = 2;
 
     ContentBrowserPanel::ContentBrowserPanel() :
-        m_current_directory(ConfigManager::getInstance().getAssetFolder()) {
+        m_current_directory(Application::get().getConfigMngr()->getAssetFolder()) {
     }
 
     void ContentBrowserPanel::onImGuiRender() {
         ImGui::Begin("Browser");
 
-        if (m_current_directory != std::filesystem::path(ConfigManager::getInstance().getAssetFolder())) {
+        if (m_current_directory != std::filesystem::path(Application::get().getConfigMngr()->getAssetFolder())) {
             if (ImGui::Button("<-")) {
                 m_current_directory = m_current_directory.parent_path();
             }
@@ -36,7 +35,7 @@ namespace Zero {
 
         for (auto& directoryEntry : std::filesystem::directory_iterator(m_current_directory)) {
             const auto& path           = directoryEntry.path();
-            auto        relativePath   = std::filesystem::relative(path, ConfigManager::getInstance().getAssetFolder());
+            auto        relativePath   = std::filesystem::relative(path, Application::get().getConfigMngr()->getAssetFolder());
             std::string filenameString = relativePath.filename().string();
 
             ImGui::PushID(filenameString.c_str());

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "runtime/resource/mesh.h"
 #include "runtime/resource/resource.h"
-#include "runtime/resource/texture.h"
+#include "runtime/resource/resource/mesh.h"
+#include "runtime/resource/resource/texture.h"
 
 namespace Zero {
     struct IResourceManager {

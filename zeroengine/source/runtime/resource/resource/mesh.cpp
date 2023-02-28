@@ -1,4 +1,4 @@
-#include "runtime/resource/mesh.h"
+#include "runtime/resource/resource/mesh.h"
 #include "runtime/function/render/render_system/buffer.h"
 #include "runtime/function/render/render_system/render_context.h"
 

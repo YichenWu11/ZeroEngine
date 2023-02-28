@@ -22,6 +22,9 @@ void ExampleLayer::onAttach() {
     auto&& square = m_world.getActiveScene()->createEntity("square");
     square.addComponent<Zero::SpriteComponent>();
     square.addComponent<Zero::NativeScriptComponent>().bind<TexMarchingScript>();
+
+    // Zero::SceneSerializer serializer(m_world.getActiveScene());
+    // serializer.deserialize(Zero::Application::get().getConfigMngr()->getAssetFolder() / "scene/scene.json");
 }
 
 void ExampleLayer::onDetach() {

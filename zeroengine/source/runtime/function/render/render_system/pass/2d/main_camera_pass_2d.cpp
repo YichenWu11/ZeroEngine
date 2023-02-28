@@ -6,11 +6,11 @@
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
+#include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
-#include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
 
@@ -30,7 +30,7 @@ namespace Zero {
     }
 
     void MainCameraPass2D::preLoadResource() {
-        auto         shader_path = ConfigManager::getInstance().getRootFolder() / "zeroengine/shader/2d/shader.hlsl";
+        auto         shader_path = Application::get().getConfigMngr()->getRootFolder() / "zeroengine/shader/2d/shader.hlsl";
         std::wstring path        = AnsiToWString(shader_path.string());
 
         std::vector<std::pair<std::string, Shader::Property>> properties;
