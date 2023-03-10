@@ -23,6 +23,8 @@ namespace Zero {
         void onUpdateEditor(TimeStep timestep, EditorCamera& editor_camera);
         void onUpdateRuntime(TimeStep timestep);
 
+        void onRuntimeStart();
+
     private:
         std::optional<std::string>        m_active_scene_indictor{std::nullopt};
         std::map<std::string, Ref<Scene>> m_scenes;

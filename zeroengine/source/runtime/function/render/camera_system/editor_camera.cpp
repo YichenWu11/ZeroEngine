@@ -53,7 +53,7 @@ namespace Zero {
 
     void EditorCamera::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<MouseScrolledEvent>(ZE_BIND_EVENT_FN(EditorCamera::onMouseScroll));
+        dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(EditorCamera::onMouseScroll));
     }
 
     bool EditorCamera::onMouseScroll(MouseScrolledEvent& e) {

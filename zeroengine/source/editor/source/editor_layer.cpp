@@ -10,12 +10,12 @@ namespace Zero {
         Layer("EditorLayer") {}
 
     void EditorLayer::onAttach() {
-        ZE_PROFILE_FUNCTION();
+        PROFILE_FUNCTION();
 
         Application::get().getResourceMngr()->add<ResourceType::Texture>(
-            Application::get().getConfigMngr()->getAssetFolder() / "resource/icon/DirectoryIcon.png");
+            Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/diricon_desc.json");
         Application::get().getResourceMngr()->add<ResourceType::Texture>(
-            Application::get().getConfigMngr()->getAssetFolder() / "resource/icon/FileIcon.png");
+            Application::get().getConfigMngr()->getAssetFolder() / "desc/tex/fileicon_desc.json");
 
         m_active_scene  = CreateRef<Scene>();
         m_editor_camera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
@@ -24,11 +24,11 @@ namespace Zero {
     }
 
     void EditorLayer::onDetach() {
-        ZE_PROFILE_FUNCTION();
+        PROFILE_FUNCTION();
     }
 
     void EditorLayer::onUpdate(TimeStep timestep) {
-        ZE_PROFILE_FUNCTION();
+        PROFILE_FUNCTION();
 
         // resize
         {
@@ -50,7 +50,7 @@ namespace Zero {
         }
 
         {
-            ZE_PROFILE_SCOPE("Renderer2D::RenderScene");
+            PROFILE_SCOPE("Renderer2D::RenderScene");
 
             // update scene
 
@@ -84,7 +84,7 @@ namespace Zero {
     }
 
     void EditorLayer::onImGuiRender() {
-        ZE_PROFILE_FUNCTION();
+        PROFILE_FUNCTION();
 
         if (m_dockspace_enable) {
             static bool               dockspaceOpen             = true;
@@ -334,7 +334,7 @@ namespace Zero {
                 ImGui::PopStyleVar();
             }
 
-            ZE_PROFILE_RENDER();
+            PROFILE_RENDER();
 
             // ************************************************************************************************
 
@@ -348,7 +348,7 @@ namespace Zero {
         }
 
         EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<KeyPressedEvent>(ZE_BIND_EVENT_FN(EditorLayer::onKeyPressed));
+        dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::onKeyPressed));
     }
 
     bool EditorLayer::onKeyPressed(KeyPressedEvent& e) {

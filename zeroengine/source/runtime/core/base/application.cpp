@@ -12,30 +12,31 @@ using namespace Chen::CDX12;
 namespace Zero {
     Application* Application::s_instance = nullptr;
 
-    Application::Application() {
-        ZE_ASSERT(!s_instance, "Application already exists!");
+    Application::Application(const std::filesystem::path& game_root_path) {
+        ASSERT(!s_instance, "Application already exists!");
         s_instance = this;
 
         Zero::LogSystem::init();
-        LOG_INFO("zeroengine start");
+        LOG_INFO("zero start");
 
-        m_config_manager   = CreateScope<ConfigManager>();
+        m_config_manager   = CreateScope<ConfigManager>(game_root_path);
         m_window           = CreateScope<WindowSystem>(WindowCreateInfo{});
         m_resource_manager = CreateScope<ResourceManager>();
+        m_lua_interpreter  = CreateScope<LuaInterpreter>();
 
-        m_window->setEventCallback(ZE_BIND_EVENT_FN(Application::onEvent));
+        m_window->setEventCallback(BIND_EVENT_FN(Application::onEvent));
 
         preLoadResources();
     }
 
     Application::~Application() {
         Renderer::shutdown();
-        LOG_INFO("zeroengine shutdown");
+        LOG_INFO("zero shutdown");
     }
 
     void Application::preLoadResources() {
         m_resource_manager->add<ResourceType::Texture>(
-            m_config_manager->getAssetFolder() / "texture/white.png");
+            m_config_manager->getAssetFolder() / "desc/tex/white_desc.json");
 
         VertexData2D vertices_square[] = {
             {{-0.5f, -0.5f, 0.0f}, {0.0f, 1.0f}},
@@ -45,9 +46,7 @@ namespace Zero {
         };
         uint32_t indices_square[] = {0, 3, 1, 3, 2, 1};
 
-        static VertexBufferLayout               layout;
-        static std::vector<rtti::Struct const*> structs;
-        structs.emplace_back(&layout);
+        VertexBufferLayout layout;
 
         m_resource_manager->add<ResourceType::Mesh>(
             "square",
@@ -70,8 +69,8 @@ namespace Zero {
 
     void Application::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<WindowCloseEvent>(ZE_BIND_EVENT_FN(Application::onWindowClose));
-        dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(Application::onWindowResize));
+        dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::onWindowClose));
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::onWindowResize));
 
         for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
             if (e.m_handled)

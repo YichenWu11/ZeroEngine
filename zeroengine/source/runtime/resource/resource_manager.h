@@ -3,6 +3,7 @@
 #include "runtime/resource/resource.h"
 #include "runtime/resource/resource/mesh.h"
 #include "runtime/resource/resource/texture.h"
+#include "runtime/resource/resource/tile_sheet.h"
 
 namespace Zero {
     struct IResourceManager {

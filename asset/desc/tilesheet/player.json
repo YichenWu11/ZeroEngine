@@ -1,0 +1,7 @@
+{
+    "name": "player",
+    "tex_desc_path": "desc/tex/player_desc.json",
+    "row": 1,
+    "col": 60,
+    "is_engine_internel": true
+}

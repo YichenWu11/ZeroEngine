@@ -21,7 +21,7 @@ namespace Zero {
             return;
         }
 
-        ZE_ASSERT(RenderContext::getInstance().getGraphicsDevice(), "registerShader before creating device!");
+        ASSERT(RenderContext::getInstance().getGraphicsDevice(), "registerShader before creating device!");
 
         switch (usage) {
             case ShaderUsage::BASIC: {

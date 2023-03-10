@@ -5,6 +5,7 @@ namespace Zero {
         Unknown,
         Texture,
         Mesh,
+        TileSheet,
         Animation,
     };
 
@@ -16,10 +17,11 @@ namespace Zero {
         std::string_view getName() const;
         size_t           getUUID() const;
 
-        virtual bool validate() const { return true; }
+        virtual bool validate() const { return m_is_valid; }
 
     protected:
         std::string m_name;
+        bool        m_is_valid{false};
     };
 
     template <ResourceType Type>

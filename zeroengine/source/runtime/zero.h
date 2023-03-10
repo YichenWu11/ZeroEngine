@@ -20,7 +20,6 @@
 #include "runtime/function/render/render_system/render_command.h"
 #include "runtime/function/render/render_system/renderer.h"
 #include "runtime/function/render/render_system/renderer_2d.h"
-#include "runtime/function/render/render_system/subtexture_2d.h"
 
 #include "runtime/function/scene/components.h"
 #include "runtime/function/scene/entity.h"
@@ -31,4 +30,5 @@
 
 #include "runtime/resource/resource/mesh.h"
 #include "runtime/resource/resource/texture.h"
+#include "runtime/resource/resource/tile_sheet.h"
 #include "runtime/resource/resource_manager.h"

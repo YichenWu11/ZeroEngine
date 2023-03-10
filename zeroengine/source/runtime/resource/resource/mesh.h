@@ -39,7 +39,6 @@ namespace Zero {
         Chen::CDX12::Mesh* getMesh() { return m_mesh.get(); }
 
     private:
-        bool                     m_is_valid = false;
         Scope<Chen::CDX12::Mesh> m_mesh;
     };
 } // namespace Zero

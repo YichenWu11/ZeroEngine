@@ -24,7 +24,7 @@ namespace Zero {
         }
 
         IResource* get(size_t uuid) override {
-            ZE_ASSERT(resource_lookup.contains(uuid), "try to get a resource whose uuid does not exsit!!!");
+            ASSERT(resource_lookup.contains(uuid), "try to get a resource whose uuid does not exsit!!!");
             return resources[resource_lookup[uuid]].get();
         }
 
@@ -78,6 +78,7 @@ namespace Zero {
         m_managers.emplace(ResourceType::Texture, CreateScope<TResourceManager<ResourceType::Texture>>());
         m_managers.emplace(ResourceType::Mesh, CreateScope<TResourceManager<ResourceType::Mesh>>());
         m_managers.emplace(ResourceType::Animation, CreateScope<TResourceManager<ResourceType::Animation>>());
+        m_managers.emplace(ResourceType::TileSheet, CreateScope<TResourceManager<ResourceType::TileSheet>>());
     }
 
     void ResourceManager::tick() {

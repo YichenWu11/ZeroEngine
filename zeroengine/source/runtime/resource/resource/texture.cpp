@@ -3,6 +3,7 @@
 #include <ResourceUploadBatch.h>
 #include <WICTextureLoader.h>
 
+#include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/resource/resource/texture.h"
 
@@ -10,6 +11,32 @@ using namespace Chen::CDX12;
 
 namespace Zero {
     uint32_t Resource<ResourceType::Texture>::s_tex_count = 0;
+
+    Resource<ResourceType::Texture>::ResLoader::res_type Resource<ResourceType::Texture>::ResLoader::operator()(const std::filesystem::path& path) const {
+        rapidjson::Document doc;
+        JsonSerialzer::deserialze(doc, path);
+        auto        res_path = (doc.HasMember("is_engine_internel") && doc["is_engine_internel"].GetBool()) ?
+                                   Application::get().getConfigMngr()->getAssetFolder() / doc["path"].GetString() :
+                                   Application::get().getConfigMngr()->getGameAssetFolder() / doc["path"].GetString();
+        TextureDesc desc{
+            res_path.string(),
+            (doc["is_wip"].GetBool()) ? TexFileFormat::WIC : TexFileFormat::DDS};
+
+        return CreateScope<Resource<ResourceType::Texture>>(
+            (doc.HasMember("name")) ? doc["name"].GetString() : res_path.stem().string(),
+            desc);
+    }
+
+    Resource<ResourceType::Texture>::ResLoader::res_type Resource<ResourceType::Texture>::ResLoader::operator()(std::string_view name, const std::filesystem::path& path) const {
+        rapidjson::Document doc;
+        JsonSerialzer::deserialze(doc, path);
+        auto        res_path = (std::filesystem::path(ZE_XSTR(ROOT_DIR)) / "asset" / doc["path"].GetString());
+        TextureDesc desc{
+            res_path.string(),
+            (doc["is_wip"].GetBool()) ? TexFileFormat::WIC : TexFileFormat::DDS};
+
+        return CreateScope<Resource<ResourceType::Texture>>(name, desc);
+    }
 
     Resource<ResourceType::Texture>::Resource(std::string_view name) :
         IResource(name) {

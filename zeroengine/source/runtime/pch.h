@@ -31,6 +31,7 @@
 #include <fstream>
 #include <map>
 #include <optional>
+#include <queue>
 #include <set>
 #include <sstream>
 #include <string>
@@ -39,10 +40,18 @@
 #include <variant>
 #include <vector>
 
+
 #include <SimpleMath.h>
+
+#include <box2d/box2d.h>
+#include <entt/entt.hpp>
 
 #include "runtime/core/base/core.h"
 #include "runtime/core/log/log_system.h"
 #include "runtime/function/debug/profiler.h"
 
 using namespace DirectX::SimpleMath;
+
+namespace Zero {
+    using EntityIdType = ENTT_ID_TYPE;
+}
