@@ -22,12 +22,12 @@ namespace Zero {
     }
 
     Ref<Scene> World::getScene(std::string_view scene_name) {
-        ZE_ASSERT(m_scenes.contains(std::string(scene_name)),
-                  "The scene with this name does not exsit in the world!!!");
+        ASSERT(m_scenes.contains(std::string(scene_name)),
+               "The scene with this name does not exsit in the world!!!");
         return m_scenes[std::string(scene_name)];
     }
 
-    void World::setActiveScene(std::string_view scene_name) {
+    World& World::setActiveScene(std::string_view scene_name) {
         if (m_scenes.contains(std::string(scene_name))) {
             if (m_active_scene_indictor.has_value())
                 m_scenes[m_active_scene_indictor.value()]->onRuntimeStop();
@@ -37,11 +37,12 @@ namespace Zero {
         }
         else
             LOG_WARN("The scene with this name ({0}) does not exsit in the world!!!", scene_name);
+        return *this;
     }
 
     Ref<Scene> World::getActiveScene() {
-        ZE_ASSERT(m_active_scene_indictor.has_value(),
-                  "The world does not have a active scene!!!");
+        ASSERT(m_active_scene_indictor.has_value(),
+               "The world does not have a active scene!!!");
         return m_scenes[m_active_scene_indictor.value()];
     }
 
@@ -58,5 +59,10 @@ namespace Zero {
     void World::onUpdateRuntime(TimeStep timestep) {
         if (m_active_scene_indictor.has_value())
             m_scenes[m_active_scene_indictor.value()]->onUpdateRuntime(timestep);
+    }
+
+    void World::onRuntimeStart() {
+        if (m_active_scene_indictor.has_value())
+            m_scenes[m_active_scene_indictor.value()]->onRuntimeStart();
     }
 } // namespace Zero

@@ -1,0 +1,7 @@
+{
+    "name": "tilesheet",
+    "tex_desc_path": "desc/tex/tilesheet_tex_desc.json",
+    "row": 12,
+    "col": 12,
+    "is_engine_internel": true
+}

@@ -35,9 +35,6 @@ namespace Zero {
         bool m_viewport_hovered{false};
         bool m_dockspace_enable{true};
 
-        Ref<SubTexture2D> m_texture_stair;
-        Ref<SubTexture2D> m_texture_bush;
-
         Ref<Scene> m_active_scene;
 
         SceneHierarchyPanel m_scene_hierarchy_panel;

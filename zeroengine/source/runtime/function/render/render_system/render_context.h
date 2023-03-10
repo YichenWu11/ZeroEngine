@@ -11,8 +11,6 @@ using Chen::CDX12::DescriptorHeapAllocation;
 using Chen::CDX12::Mesh;
 using Chen::CDX12::Texture;
 
-#define GET_RENDER_CONTEXT() ::Zero::RenderContext::getInstance()
-
 namespace Zero {
     struct ImGuiInitInfo {
         D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle;
@@ -60,7 +58,7 @@ namespace Zero {
         DXRawDevicePtr              getGraphicsDevice() { return m_device.Get(); }
         DXRawCmdQueuePtr            getCommandQueue() { return m_commandQueue.Get(); }
         ImGuiInitInfo               getImGuiInitInfo() {
-                          return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
+            return {m_csuGpuDH.GetCpuHandle(), m_csuGpuDH.GetGpuHandle(), m_csuGpuDH.GetDescriptorHeap()};
         }
         ImTextureID               getOffScreenID() { return ImTextureID(m_csuGpuDH.GetGpuHandle(m_backBufferIndex + 1).ptr); }
         DescriptorHeapAllocation& getTexAlloc() { return m_tex_alloc; }

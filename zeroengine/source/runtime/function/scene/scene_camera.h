@@ -20,41 +20,41 @@ namespace Zero {
         // perspective
         float getPerspectiveVerticalFOV() const { return m_perspectiveFOV; }
         void  setPerspectiveVerticalFOV(float verticalFov) {
-             m_perspectiveFOV = verticalFov;
-             recalculateProjection();
+            m_perspectiveFOV = verticalFov;
+            recalculateProjection();
         }
         float getPerspectiveNearClip() const { return m_perspectiveNear; }
         void  setPerspectiveNearClip(float near_clip) {
-             m_perspectiveNear = near_clip;
-             recalculateProjection();
+            m_perspectiveNear = near_clip;
+            recalculateProjection();
         }
         float getPerspectiveFarClip() const { return m_perspectiveFar; }
         void  setPerspectiveFarClip(float far_clip) {
-             m_perspectiveFar = far_clip;
-             recalculateProjection();
+            m_perspectiveFar = far_clip;
+            recalculateProjection();
         }
 
         // orthographic
         float getOrthographicSize() const { return m_orthographicSize; }
         void  setOrthographicSize(float size) {
-             m_orthographicSize = size;
-             recalculateProjection();
+            m_orthographicSize = size;
+            recalculateProjection();
         }
         float getOrthographicNearClip() const { return m_orthographicNear; }
         void  setOrthographicNearClip(float near_clip) {
-             m_orthographicNear = near_clip;
-             recalculateProjection();
+            m_orthographicNear = near_clip;
+            recalculateProjection();
         }
         float getOrthographicFarClip() const { return m_orthographicFar; }
         void  setOrthographicFarClip(float far_clip) {
-             m_orthographicFar = far_clip;
-             recalculateProjection();
+            m_orthographicFar = far_clip;
+            recalculateProjection();
         }
 
         ProjectionType getProjectionType() const { return m_projectionType; }
         void           setProjectionType(ProjectionType type) {
-                      m_projectionType = type;
-                      recalculateProjection();
+            m_projectionType = type;
+            recalculateProjection();
         }
 
     private:

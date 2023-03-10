@@ -20,7 +20,7 @@ namespace Zero {
     }
 
     void UIPass::drawPass(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
-        RenderContext& render_context = GET_RENDER_CONTEXT();
+        RenderContext& render_context = RenderContext::getInstance();
 
         if (offscreen) {
             render_context.m_stateTracker.RecordState(

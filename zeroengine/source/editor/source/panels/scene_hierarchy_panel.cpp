@@ -1,9 +1,9 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/scene/components.h"
-#include "runtime/resource/config_manager/config_manager.h"
 
 #include "panels/scene_hierarchy_panel.h"
 
@@ -131,7 +131,7 @@ namespace Zero {
             // right-click on blank space
             if (ImGui::BeginPopupContextWindow(0, 1 | ImGuiPopupFlags_NoOpenOverItems)) {
                 if (ImGui::MenuItem("Create Empty Entity"))
-                    m_context->createEntity("New Entity");
+                    m_context->createEntity();
 
                 ImGui::EndPopup();
             }
@@ -302,7 +302,7 @@ namespace Zero {
 
             {
                 ImGui::Image(
-                    ImTextureID(GET_RENDER_CONTEXT().getTexAlloc().GetGpuHandle(component.tex_index).ptr),
+                    ImTextureID(RenderContext::getInstance().getTexAlloc().GetGpuHandle(component.tex_index).ptr),
                     ImVec2(50, 50));
             }
 
@@ -310,7 +310,7 @@ namespace Zero {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
                     const wchar_t* path = (const wchar_t*)payload->Data;
                     auto           tex_path =
-                        GET_CONFIG_MNGR().getAssetFolder() / std::filesystem::path(path);
+                        Application::get().getConfigMngr()->getAssetFolder() / std::filesystem::path(path);
                     LOG_INFO("{0}", tex_path.string());
                     // TODO: Register Texture
                 }

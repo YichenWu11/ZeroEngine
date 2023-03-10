@@ -13,4 +13,5 @@ namespace Zero {
     template class Resource<ResourceType::Mesh>;
     template class Resource<ResourceType::Texture>;
     template class Resource<ResourceType::Animation>;
+    template class Resource<ResourceType::TileSheet>;
 } // namespace Zero

@@ -62,13 +62,13 @@ namespace Zero {
     };
 } // namespace Zero
 
-#define ZE_PROFILE 0
-#if ZE_PROFILE
-#define ZE_PROFILE_SCOPE(name) ::Zero::StepTimer timer##__LINE__(name)
-#define ZE_PROFILE_FUNCTION() ZE_PROFILE_SCOPE(__FUNCSIG__)
-#define ZE_PROFILE_RENDER() ::Zero::Profiler::getInstance().render()
+#define PROFILE 0
+#if PROFILE
+#define PROFILE_SCOPE(name) ::Zero::StepTimer timer##__LINE__(name)
+#define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCSIG__)
+#define PROFILE_RENDER() ::Zero::Profiler::getInstance().render()
 #else
-#define ZE_PROFILE_SCOPE(name)
-#define ZE_PROFILE_FUNCTION()
-#define ZE_PROFILE_RENDER()
+#define PROFILE_SCOPE(name)
+#define PROFILE_FUNCTION()
+#define PROFILE_RENDER()
 #endif

@@ -6,11 +6,11 @@
 #include <backends/imgui_impl_win32.h>
 #include <imgui.h>
 
+#include "runtime/core/base/application.h"
 #include "runtime/function/render/render_system/pass/2d/main_camera_pass_2d.h"
 #include "runtime/function/render/render_system/render_context.h"
 #include "runtime/function/render/render_system/renderer_api.h"
 #include "runtime/function/render/render_system/shader_param_bind_table.h"
-#include "runtime/resource/config_manager/config_manager.h"
 
 using namespace Chen::CDX12;
 
@@ -20,7 +20,7 @@ namespace Zero {
     }
 
     MainCameraPass2D::~MainCameraPass2D() {
-        RenderContext& render_context = GET_RENDER_CONTEXT();
+        RenderContext& render_context = RenderContext::getInstance();
         for (int i = 0; i < render_context.s_frame_count; ++i) {
             if (m_indirectDrawBuffer[i] != nullptr) {
                 delete m_indirectDrawBuffer[i];
@@ -30,7 +30,7 @@ namespace Zero {
     }
 
     void MainCameraPass2D::preLoadResource() {
-        auto         shader_path = GET_CONFIG_MNGR().getRootFolder() / "zeroengine/shader/2d/shader.hlsl";
+        auto         shader_path = Application::get().getConfigMngr()->getRootFolder() / "zeroengine/shader/2d/shader.hlsl";
         std::wstring path        = AnsiToWString(shader_path.string());
 
         std::vector<std::pair<std::string, Shader::Property>> properties;
@@ -115,7 +115,7 @@ namespace Zero {
     }
 
     void MainCameraPass2D::preZSortPass() {
-        RenderContext& render_context = GET_RENDER_CONTEXT();
+        RenderContext& render_context = RenderContext::getInstance();
 
         // NOTE: trick here, get the z-index from the _34 of the transform matrix
         std::sort(render_context.m_draw_2d_list.begin(), render_context.m_draw_2d_list.end(),
@@ -134,7 +134,7 @@ namespace Zero {
     void MainCameraPass2D::drawPass(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         preZSortPass();
 
-        RenderContext& render_context = GET_RENDER_CONTEXT();
+        RenderContext& render_context = RenderContext::getInstance();
 
         if (offscreen) {
             if (offscreen) {
@@ -250,7 +250,7 @@ namespace Zero {
     void MainCameraPass2D::drawPassIndirect(FrameResource& frameRes, uint32_t frameIndex, bool offscreen) {
         preZSortPass();
 
-        RenderContext& render_context = GET_RENDER_CONTEXT();
+        RenderContext& render_context = RenderContext::getInstance();
 
         if (offscreen) {
             render_context.m_stateTracker.RecordState(

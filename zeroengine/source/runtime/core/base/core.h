@@ -7,10 +7,10 @@
 #include "runtime/core/base/hash.h"
 
 #ifdef NDEBUG
-#define ZE_ASSERT(statement, msg)
+#define ASSERT(statement, msg)
 #else
-#define ZE_ASSERT(statement, msg) \
-    if (!statement) { \
+#define ASSERT(statement, msg) \
+    if (!(statement)) { \
         LOG_ERROR("{0}", msg); \
         __debugbreak(); \
     }
@@ -18,14 +18,16 @@
 
 #define BIT(x) (1 << x)
 
-#define ZE_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+#define BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 // https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
-#define ZERO_XSTR(s) ZERO_STR(s)
-#define ZERO_STR(s) #s
+#define ZE_XSTR(s) ZE_STR(s)
+#define ZE_STR(s) #s
 
 template <class... Ts>
-struct overloaded : Ts... { using Ts::operator()...; };
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
 template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 

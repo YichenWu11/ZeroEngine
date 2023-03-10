@@ -12,7 +12,7 @@ namespace Zero {
     Vector2 InputSystem::getMousePosition() {
         POINT pos;
         bool  success = GetCursorPos(&pos);
-        ZE_ASSERT(success, "GetCursorPos failed!");
+        ASSERT(success, "GetCursorPos failed!");
         ScreenToClient(FindWindow(L"MainWnd", NULL), &pos);
         return {(float)pos.x, (float)pos.y};
     }

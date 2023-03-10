@@ -16,7 +16,7 @@ namespace Zero {
     DXGI_FORMAT RenderContext::s_depthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
     void RenderContext::init(HWND window_handle, int width, int height) {
-        ZE_ASSERT(window_handle, "window handle passed to dx12_context is NULL!");
+        ASSERT(window_handle, "window handle passed to dx12_context is NULL!");
 
         m_window_handle = window_handle;
         m_viewport      = DXViewPort(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height));
@@ -94,15 +94,15 @@ namespace Zero {
                 m_renderTargets[n] = Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
                 m_depthTargets[n]  = Scope<Texture>(
                     new Texture(
-                         m_device.Get(),
-                         m_scissorRect.right,
-                         m_scissorRect.bottom,
-                         DXGI_FORMAT_D24_UNORM_S8_UINT,
-                         TextureDimension::Tex2D,
-                         1,
-                         1,
-                         Texture::TextureUsage::DepthStencil,
-                         D3D12_RESOURCE_STATE_DEPTH_READ));
+                        m_device.Get(),
+                        m_scissorRect.right,
+                        m_scissorRect.bottom,
+                        DXGI_FORMAT_D24_UNORM_S8_UINT,
+                        TextureDimension::Tex2D,
+                        1,
+                        1,
+                        Texture::TextureUsage::DepthStencil,
+                        D3D12_RESOURCE_STATE_DEPTH_READ));
 
                 FrameBufferConfiguration fb_config{
                     static_cast<uint32_t>(width),
@@ -295,15 +295,15 @@ namespace Zero {
             m_renderTargets[n] = Scope<Texture>(new Texture(m_device.Get(), m_swapChain.Get(), n));
             m_depthTargets[n]  = Scope<Texture>(
                 new Texture(
-                     m_device.Get(),
-                     m_scissorRect.right,
-                     m_scissorRect.bottom,
-                     DXGI_FORMAT_D24_UNORM_S8_UINT,
-                     TextureDimension::Tex2D,
-                     1,
-                     1,
-                     Texture::TextureUsage::DepthStencil,
-                     D3D12_RESOURCE_STATE_DEPTH_READ));
+                    m_device.Get(),
+                    m_scissorRect.right,
+                    m_scissorRect.bottom,
+                    DXGI_FORMAT_D24_UNORM_S8_UINT,
+                    TextureDimension::Tex2D,
+                    1,
+                    1,
+                    Texture::TextureUsage::DepthStencil,
+                    D3D12_RESOURCE_STATE_DEPTH_READ));
 
             m_device->CreateRenderTargetView(m_renderTargets[n]->GetResource(), nullptr, rtvHandle);
             m_device->CreateDepthStencilView(m_depthTargets[n]->GetResource(), nullptr, dsvHandle);

@@ -17,14 +17,14 @@ namespace Zero {
         void add(Scope<IResource>&& resource, size_t uuid) override {
             if (!resource_lookup.contains(uuid)) {
                 resource_lookup.emplace(uuid, resources.size());
-                resources.emplace_back(std::unique_ptr<Resource<_Ty>>(dynamic_cast<Resource<_Ty>*>(resource.release())));
+                resources.emplace_back(Scope<Resource<_Ty>>(dynamic_cast<Resource<_Ty>*>(resource.release())));
             }
             else
                 LOG_WARN("try to add a resource whose uuid has been exsited!!!");
         }
 
         IResource* get(size_t uuid) override {
-            ZE_ASSERT(resource_lookup.contains(uuid), "try to get a resource whose uuid does not exsit!!!");
+            ASSERT(resource_lookup.contains(uuid), "try to get a resource whose uuid does not exsit!!!");
             return resources[resource_lookup[uuid]].get();
         }
 
@@ -78,6 +78,7 @@ namespace Zero {
         m_managers.emplace(ResourceType::Texture, CreateScope<TResourceManager<ResourceType::Texture>>());
         m_managers.emplace(ResourceType::Mesh, CreateScope<TResourceManager<ResourceType::Mesh>>());
         m_managers.emplace(ResourceType::Animation, CreateScope<TResourceManager<ResourceType::Animation>>());
+        m_managers.emplace(ResourceType::TileSheet, CreateScope<TResourceManager<ResourceType::TileSheet>>());
     }
 
     void ResourceManager::tick() {

@@ -33,8 +33,8 @@ namespace Zero {
 
     void OrthographicsCameraController::onEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<MouseScrolledEvent>(ZE_BIND_EVENT_FN(OrthographicsCameraController::onMouseScrolled));
-        dispatcher.Dispatch<WindowResizeEvent>(ZE_BIND_EVENT_FN(OrthographicsCameraController::onWindowResize));
+        dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(OrthographicsCameraController::onMouseScrolled));
+        dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OrthographicsCameraController::onWindowResize));
     }
 
     void OrthographicsCameraController::onResize(float width, float height) {

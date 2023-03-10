@@ -4,6 +4,8 @@ build-clion/
 bin/
 lib/
 log/
+.xmake/
+
 
 docs/zeroengine-design/.obsidian
 
@@ -11,6 +13,7 @@ zeroengine.log
 zero.log
 Zero.log
 imgui.ini
+docs/
 
 .vscode/
 .VSCodeCounter/

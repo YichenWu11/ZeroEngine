@@ -12,10 +12,8 @@ set_target_properties(${TARGET_NAME} PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-target_compile_definitions(${TARGET_NAME} PUBLIC ZE_ROOT_DIR=${CMAKE_SOURCE_DIR})
-
 target_include_directories(${TARGET_NAME}
-    PUBLIC ${ZE_ROOT_DIR}/zeroengine/source/sandbox/include
-    PUBLIC ${ZE_ROOT_DIR}/zeroengine/source)
+    PUBLIC ${ROOT_DIR}/zeroengine/source/sandbox/include
+    PUBLIC ${ROOT_DIR}/zeroengine/source)
 
 target_link_libraries(${TARGET_NAME} PUBLIC ZE::Runtime)

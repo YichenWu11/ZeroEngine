@@ -51,11 +51,11 @@ namespace Zero {
         GET_SHADER_BIND_TABLE().bindParam(
             shader,
             "TextureMap",
-            std::make_pair(&GET_RENDER_CONTEXT().getTexAlloc(), 0));
+            std::make_pair(&RenderContext::getInstance().getTexAlloc(), 0));
     }
 
     void Renderer2D::endScene() {
-        GET_RENDER_CONTEXT().onRender();
+        RenderContext::getInstance().onRender();
     }
 
     void Renderer2D::drawQuad(
@@ -91,57 +91,9 @@ namespace Zero {
         static auto square_mesh =
             Application::get().getResourceMngr()->get<ResourceType::Mesh>("square");
 
-        ZE_ASSERT(square_mesh, "the square mesh retrieve failure for unknown error(drawQuad)!");
+        ASSERT(square_mesh, "the square mesh retrieve failure for unknown error(drawQuad)!");
 
-        GET_RENDER_CONTEXT().submit(square_mesh->getMesh(), transform, color, tex_index, tiling_factor, entity_id);
-    }
-
-    void Renderer2D::drawCellQuad(
-        const Vector2&           position,
-        const Vector2&           size,
-        float                    rotation,
-        const Ref<SubTexture2D>& sub_texture,
-        const Color&             color) {
-        drawCellQuad({position.x, position.y, 0.0f}, size, rotation, sub_texture, color);
-    }
-
-    void Renderer2D::drawCellQuad(
-        const Vector3&           position,
-        const Vector2&           size,
-        float                    rotation,
-        const Ref<SubTexture2D>& sub_texture,
-        const Color&             color) {
-        // if (!GET_MESH_POOL().isMeshExist(sub_texture->constructSubTexName())) {
-        //     std::vector<VertexData2D> vertices;
-        //     uint32_t                  indices[]  = {0, 3, 1, 3, 2, 1};
-        //     auto                      tex_coords = sub_texture->getTexCoords();
-        //     vertices.push_back(
-        //         VertexData2D{{-0.5f, -0.5f, 0.0f}, {tex_coords[0].x, 1.0f - tex_coords[0].y}});
-        //     vertices.push_back(
-        //         VertexData2D{{0.5f, -0.5f, 0.0f}, {tex_coords[1].x, 1.0f - tex_coords[1].y}});
-        //     vertices.push_back(
-        //         VertexData2D{{0.5f, 0.5f, 0.0f}, {tex_coords[2].x, 1.0f - tex_coords[2].y}});
-        //     vertices.push_back(
-        //         VertexData2D{{-0.5f, 0.5f, 0.0f}, {tex_coords[3].x, 1.0f - tex_coords[3].y}});
-
-        //     GET_MESH_POOL().registerMesh(
-        //         sub_texture->constructSubTexName(),
-        //         vertices.data(),
-        //         vertices.size(),
-        //         indices,
-        //         6);
-        // }
-
-        // Matrix transform = Matrix::CreateRotationZ(XMConvertToRadians(-rotation))
-        //                    * Matrix::CreateScale(size.x, size.y, 1.0f)
-        //                    * Matrix::CreateTranslation(position);
-
-        // GET_RENDER_CONTEXT().submit(
-        //     GET_MESH_POOL().getMesh(sub_texture->constructSubTexName()),
-        //     transform,
-        //     color,
-        //     0, /* get the index of texture */
-        //     1.0f, -1);
+        RenderContext::getInstance().submit(square_mesh->getMesh(), transform, color, tex_index, tiling_factor, entity_id);
     }
 
     void Renderer2D::drawSprite(
@@ -149,5 +101,22 @@ namespace Zero {
         const SpriteComponent& src,
         int                    entity_id) {
         drawQuad(transform, src.color, src.tex_index, src.tiling_factor, entity_id);
+    }
+
+    void Renderer2D::drawTile(
+        const Matrix&        transform,
+        const TileComponent& tc,
+        int                  entity_id) {
+        Tile tile(tc.tile_sheet,
+                  Vector2{float(tc.coord_x), float(tc.coord_y)},
+                  Vector2{float(tc.size_x), float(tc.size_y)});
+
+        RenderContext::getInstance().submit(
+            Application::get().getResourceMngr()->get<ResourceType::Mesh>(tile.getTileName())->getMesh(),
+            transform,
+            tc.color,
+            Application::get().getResourceMngr()->index<ResourceType::Texture>(tile.getTileSheet()->getName()),
+            1.0f,
+            entity_id);
     }
 } // namespace Zero

@@ -19,6 +19,10 @@ namespace Zero {
         virtual void onDestroy() {}
         virtual void onUpdate(TimeStep ts) {}
 
+        // physics messages:
+        virtual void onCollisionEnter(Entity entity) {}
+        virtual void onCollisionExit(Entity entity) {}
+
     private:
         Entity m_entity;
     };

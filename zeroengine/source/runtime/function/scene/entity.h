@@ -30,13 +30,14 @@ namespace Zero {
 
         template <typename T>
         T& getComponent() {
-            ZE_ASSERT(hasComponent<T>(), "Entity dose not have this component!");
+            ASSERT(hasComponent<T>(), "Entity dose not have this component!");
             return m_parent_scene->m_registry.get<T>(m_entity_handle);
         }
 
         template <typename T>
         void removeComponent() {
-            ZE_ASSERT(hasComponent<T>(), "Entity does not have this component!");
+            ASSERT(hasComponent<T>(), "Entity does not have this component!");
+            m_parent_scene->onComponentErased(*this, getComponent<T>());
             m_parent_scene->m_registry.remove<T>(m_entity_handle);
         }
 
@@ -51,6 +52,11 @@ namespace Zero {
         bool operator!=(const Entity& other) const {
             return !(*this == other);
         }
+
+        std::string getName();
+        void        setName(std::string_view name);
+
+        Scene* getParentScene() { return m_parent_scene; }
 
     private:
         entt::entity m_entity_handle{entt::null};
