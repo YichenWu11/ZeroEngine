@@ -11,8 +11,6 @@
                    \/    \/                       \/      \//_____/           \/      \/
 ```
 
-![00](docs/images/00.png)
-
 ## Environment
 
 * Win32
