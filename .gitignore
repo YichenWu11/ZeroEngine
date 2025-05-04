@@ -20,6 +20,8 @@ docs/
 .cache/
 *.code-workspace
 
+vcpkg_installed
+
 # CLion
 .idea/
 compiledDependencies/

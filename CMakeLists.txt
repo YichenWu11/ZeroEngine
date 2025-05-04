@@ -7,7 +7,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
+# set(CMAKE_TOOLCHAIN_FILE $ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
+set(CMAKE_TOOLCHAIN_FILE E:/WorkSpace/Tool/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "")
 set(VCPKG_TARGET_TRIPLET x64-windows CACHE STRING "")
 
 set(CMAKE_CXX_STANDARD 20)

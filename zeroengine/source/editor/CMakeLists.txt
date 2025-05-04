@@ -16,4 +16,6 @@ target_include_directories(${TARGET_NAME}
     PUBLIC ${ROOT_DIR}/zeroengine/source/editor/include
     PUBLIC ${ROOT_DIR}/zeroengine/source)
 
+target_compile_options(${TARGET_NAME} PRIVATE /bigobj)
+
 target_link_libraries(${TARGET_NAME} PUBLIC ZE::Runtime)

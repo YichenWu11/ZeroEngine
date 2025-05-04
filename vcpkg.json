@@ -1,0 +1,32 @@
+{
+  "name": "klayycwu-cpp",
+  "version-semver": "0.0.0",
+  "dependencies": [
+    "box2d",
+    "entt",
+    "directxtk12",
+    "rapidjson",
+    "spdlog",
+    "lua",
+    "sol2"
+  ],
+  "overrides": [
+    {
+      "name": "box2d",
+      "version": "2.4.1#2"
+    },
+    {
+      "name": "entt",
+      "version": "3.10.1#1"
+    },
+    {
+      "name": "spdlog",
+      "version": "1.12.0#0"
+    },
+    {
+      "name": "sol2",
+      "version": "3.3.0"
+    }
+  ],
+  "builtin-baseline": "41c447cc210dc39aa85d4a5f58b4a1b9e573b3dc"
+}

@@ -1,0 +1,2 @@
+vcpkg install
+pause

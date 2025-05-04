@@ -31,7 +31,8 @@ namespace Zero {
         }
     };
 
-    Physics2DManager::Physics2DManager() {
+    Physics2DManager::Physics2DManager() :
+        m_world(CreateScope<b2World>(b2Vec2(m_gravity.x, m_gravity.y))) {
         resetWorld();
     }
 
@@ -84,7 +85,7 @@ namespace Zero {
         b2Body* body = m_world->CreateBody(&b2_bodydef);
         body->CreateFixture(&b2_fixturedef);
 
-        LOG_INFO("creating body for entity#{}, type={} at ({}, {}), rotation = {}", bodydef.entity_id, b2_bodydef.type, body->GetPosition().x, body->GetPosition().y, body->GetAngle());
+        //LOG_INFO("creating body for entity#{}, type={} at ({}, {}), rotation = {}", bodydef.entity_id, b2_bodydef.type, body->GetPosition().x, body->GetPosition().y, body->GetAngle());
 
         return body;
     }
